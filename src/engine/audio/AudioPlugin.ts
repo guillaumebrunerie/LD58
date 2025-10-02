@@ -1,4 +1,4 @@
-import { sound } from "@pixi/sound";
+import { PlayOptions, sound } from "@pixi/sound";
 import { ExtensionType } from "pixi.js";
 import type { Application, ExtensionMetadata } from "pixi.js";
 
@@ -24,9 +24,19 @@ export class CreationAudioPlugin {
 	public static init(): void {
 		const app = this as unknown as Application;
 
+		const bgm = new BGM();
+		const sfx = new SFX();
+
 		app.audio = {
-			bgm: new BGM(),
-			sfx: new SFX(),
+			bgm,
+			sfx,
+			playMusic: (alias: string, options?: PlayOptions) =>
+				bgm.play(`main/sounds/${alias}.mp3`, options),
+			stopMusic: () => bgm.stop(),
+			pauseMusic: () => bgm.pause(),
+			resumeMusic: () => bgm.resume(),
+			playSound: (alias: string, options?: PlayOptions) =>
+				sfx.play(`main/sounds/${alias}.mp3`, options),
 			getMasterVolume: () => sound.volumeAll,
 			setMasterVolume: (volume: number) => {
 				sound.volumeAll = volume;

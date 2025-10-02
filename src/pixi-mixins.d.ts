@@ -1,3 +1,4 @@
+import type { PlayOptions } from "@pixi/sound";
 import type { BGM, SFX } from "./engine/audio/audio";
 import type { Navigation } from "./engine/navigation/navigation";
 import type {
@@ -12,6 +13,11 @@ declare global {
 			audio: {
 				bgm: BGM;
 				sfx: SFX;
+				playMusic: (alias: string, options?: PlayOptions) => void;
+				stopMusic: () => void;
+				pauseMusic: () => void;
+				resumeMusic: () => void;
+				playSound: (alias: string, options?: PlayOptions) => void;
 				getMasterVolume: () => number;
 				setMasterVolume: (volume: number) => void;
 			};

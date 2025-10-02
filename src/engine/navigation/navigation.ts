@@ -6,13 +6,13 @@ import type { CreationEngine } from "../engine";
 /** Interface for app screens */
 interface AppScreen extends Container {
 	/** Show the screen */
-	show?(): Promise<void>;
+	show?(): Promise<void> | void;
 	/** Hide the screen */
-	hide?(): Promise<void>;
+	hide?(): Promise<void> | void;
 	/** Pause the screen */
-	pause?(): Promise<void>;
+	pause?(): Promise<void> | void;
 	/** Resume the screen */
-	resume?(): Promise<void>;
+	resume?(): Promise<void> | void;
 	/** Prepare screen, before showing */
 	prepare?(): void;
 	/** Reset screen, after hidden */
@@ -153,13 +153,16 @@ export class Navigation {
 		}
 
 		// If there is a screen already created, hide and destroy it
+		const promises: Promise<void>[] = [];
 		if (this.currentScreen) {
-			await this.hideAndRemoveScreen(this.currentScreen);
+			promises.push(this.hideAndRemoveScreen(this.currentScreen));
 		}
 
 		// Create the new screen and add that to the stage
 		this.currentScreen = BigPool.get(ctor);
-		await this.addAndShowScreen(this.currentScreen);
+		promises.push(this.addAndShowScreen(this.currentScreen));
+
+		await Promise.all(promises);
 	}
 
 	/**

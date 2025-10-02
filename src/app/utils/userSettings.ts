@@ -16,34 +16,28 @@ class UserSettings {
 		engine().audio.sfx.setVolume(this.getSfxVolume());
 	}
 
-	/** Get overall sound volume */
+	/** Overall sound volume */
 	public getMasterVolume() {
 		return storage.getNumber(KEY_VOLUME_MASTER) ?? 0.5;
 	}
-
-	/** Set overall sound volume */
 	public setMasterVolume(value: number) {
 		engine().audio.setMasterVolume(value);
 		storage.setNumber(KEY_VOLUME_MASTER, value);
 	}
 
-	/** Get background music volume */
+	/** Background music volume */
 	public getBgmVolume() {
 		return storage.getNumber(KEY_VOLUME_BGM) ?? 1;
 	}
-
-	/** Set background music volume */
 	public setBgmVolume(value: number) {
 		engine().audio.bgm.setVolume(value);
 		storage.setNumber(KEY_VOLUME_BGM, value);
 	}
 
-	/** Get sound effects volume */
+	/** Sound effects volume */
 	public getSfxVolume() {
 		return storage.getNumber(KEY_VOLUME_SFX) ?? 1;
 	}
-
-	/** Set sound effects volume */
 	public setSfxVolume(value: number) {
 		engine().audio.sfx.setVolume(value);
 		storage.setNumber(KEY_VOLUME_SFX, value);

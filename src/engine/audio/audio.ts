@@ -46,6 +46,29 @@ export class BGM {
 		);
 	}
 
+	public stop() {
+		if (this.current) {
+			const current = this.current;
+			this.current = undefined;
+			this.currentAlias = undefined;
+			animate(
+				current,
+				{ volume: 0 },
+				{ duration: 1, ease: "linear" },
+			).then(() => {
+				current.stop();
+			});
+		}
+	}
+
+	public pause() {
+		this.current?.pause();
+	}
+
+	public resume() {
+		this.current?.resume();
+	}
+
 	/** Get background music volume */
 	public getVolume() {
 		return this.volume;

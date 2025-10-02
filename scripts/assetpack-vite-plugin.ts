@@ -1,21 +1,12 @@
 // vite.config.mts
 import type { AssetPackConfig } from "@assetpack/core";
 import { AssetPack } from "@assetpack/core";
-import { pixiPipes } from "@assetpack/core/pixi";
 import type { Plugin, ResolvedConfig } from "vite";
+import assetPackConfig from "../assetpack.config.js";
 
 export function assetpackPlugin() {
-	const apConfig = {
-		entry: "./raw-assets",
-		pipes: [
-			...pixiPipes({
-				cacheBust: false,
-				manifest: {
-					output: "./src/manifest.json",
-				},
-			}),
-		],
-	} as AssetPackConfig;
+	const apConfig = assetPackConfig as AssetPackConfig;
+
 	let mode: ResolvedConfig["command"];
 	let ap: AssetPack | undefined;
 

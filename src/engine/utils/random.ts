@@ -74,14 +74,8 @@ export function randomRange(
  * @param arr - array to be selected
  * @param random - The random function to be used (defaults to Math.random)
  */
-export function randomItem<T>(obj: T, random = Math.random): T[keyof T] {
-	if (Array.isArray(obj)) {
-		return obj[Math.floor(random() * obj.length)];
-	}
-
-	const keys = Object.keys(obj as Record<string, unknown>);
-	const key = keys[Math.floor(random() * keys.length)];
-	return obj[key as keyof T];
+export function randomItem<T>(obj: T[], random = Math.random): T {
+	return obj[Math.floor(random() * obj.length)];
 }
 
 /**
