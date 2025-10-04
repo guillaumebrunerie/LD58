@@ -27,6 +27,7 @@ export class Background extends Container {
 
 export class Player extends Container {
 	game: Game;
+	currentWeb?: Web;
 	constructor(options: ViewContainerOptions & { game: Game }) {
 		super(options);
 		this.addChild(
@@ -56,6 +57,9 @@ export class Player extends Container {
 			this.position = this.position.add(delta);
 			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
 			this.game.useLife(ticker.deltaMS);
+		}
+		if (this.currentWeb) {
+			this.currentWeb.extendTo(this.position);
 		}
 	}
 }
@@ -157,16 +161,26 @@ export class Target extends Container {
 export class Web extends Container {
 	from: Point;
 	to: Point;
+	line: Graphics;
 	constructor(options: ViewContainerOptions & { from: Point; to: Point }) {
 		super(options);
 		this.from = options.from.clone();
 		this.to = options.to.clone();
-		this.addChild(
+		this.line = this.addChild(
 			new Graphics()
 				.moveTo(options.from.x, options.from.y)
 				.lineTo(options.to.x, options.to.y)
 				.stroke({ color: 0xffffff, width: 5 }),
 		);
+	}
+
+	extendTo(point: Point) {
+		this.to = point.clone();
+		this.line
+			.clear()
+			.moveTo(this.from.x, this.from.y)
+			.lineTo(this.to.x, this.to.y)
+			.stroke({ color: 0xffffff, width: 5 });
 	}
 }
 
@@ -224,10 +238,12 @@ export class Game extends Container {
 	}
 
 	click(position: Point) {
-		const oldPosition = this.target.position.clone();
+		const oldPosition = this.player.position.clone();
 		this.target.position = position;
 		this.target.visible = true;
-		this.webs.addChild(new Web({ from: oldPosition, to: position }));
+		this.player.currentWeb = this.webs.addChild(
+			new Web({ from: oldPosition, to: oldPosition.clone() }),
+		);
 	}
 
 	useLife(amount: number) {
