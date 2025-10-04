@@ -68,7 +68,7 @@ export class GameScreen extends Container {
 	pointerUp(event: FederatedPointerEvent) {
 		const pointerData = this.pointers[event.pointerId];
 
-		const tapDelay = 250;
+		const tapDelay = 300;
 		const posThreshold = 10;
 		const deltaT = Date.now() - pointerData.downTime;
 		const deltaPos = pointerData

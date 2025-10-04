@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Graphics, ViewContainerOptions } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 
@@ -34,18 +34,50 @@ export class Lifebar extends Container {
 	}
 }
 
+type InventoryItemType = "empty" | "battery";
+
+export class InventoryItem extends Container {
+	constructor(options?: ViewContainerOptions & { type: InventoryItemType }) {
+		super(options);
+		if (options?.type === "battery") {
+			this.addChild(new Graphics().rect(-20, -20, 40, 40).fill("white"));
+		}
+	}
+}
+
+export class Inventory extends Container {
+	items: InventoryItem[];
+	constructor(options?: ViewContainerOptions) {
+		super(options);
+
+		const background = this.addChild(
+			new Graphics().rect(0, 0, 600, 200).fill("blue"),
+		);
+		background.position.set(-300, -100);
+
+		this.items = [
+			this.addChild(new InventoryItem({ x: -250, type: "battery" })),
+			this.addChild(new InventoryItem({ x: 0, type: "battery" })),
+			this.addChild(new InventoryItem({ x: 250, type: "battery" })),
+		];
+	}
+}
+
 export class HUD extends Container {
 	game: Game;
 	lifebar: Lifebar;
+	inventory: Inventory;
 
 	constructor(options: { game: Game }) {
 		super();
 		this.game = options.game;
 		this.lifebar = this.addChild(new Lifebar());
+		this.inventory = this.addChild(new Inventory());
 	}
 
 	resize(width: number, height: number) {
 		this.lifebar.position.set(width / 2, 30);
+		this.inventory.position.set(width / 2, height - 150);
 	}
 
 	updateLife(amount: number) {
