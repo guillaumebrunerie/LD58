@@ -87,15 +87,15 @@ export class Inventory extends Container {
 	constructor(options?: ViewContainerOptions) {
 		super(options);
 
-		const background = this.addChild(
-			new Graphics().rect(0, 0, 600, 200).fill("blue"),
+		this.addChild(
+			new Sprite({ texture: Assets.get("Inventory.png"), anchor: 0.5 }),
 		);
-		background.position.set(-300, -100);
 
+		const gap = 215;
 		this.items = [
-			this.addChild(new InventoryItem({ x: -250, type: "battery" })),
+			this.addChild(new InventoryItem({ x: -gap, type: "battery" })),
 			this.addChild(new InventoryItem({ x: 0, type: "battery" })),
-			this.addChild(new InventoryItem({ x: 250, type: "battery" })),
+			this.addChild(new InventoryItem({ x: gap, type: "battery" })),
 		];
 	}
 }
