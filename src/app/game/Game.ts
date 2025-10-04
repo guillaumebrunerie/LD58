@@ -98,17 +98,30 @@ export class Item extends Container {
 		this.addChild(
 			new Sprite({ texture: Assets.get(options.item), anchor: 0.5 }),
 		);
-		this.direction = Math.random() * Math.PI * 2;
+		this.rotation = Math.random() * Math.PI * 2;
 		this.game = options.game;
 		this.game.addToTicker(this);
-		this.rotation = this.direction + Math.PI / 2;
 	}
 
 	update(ticker: Ticker) {
+		const bounds = 3000;
+		if (this.x > bounds && Math.sin(this.rotation) > 0) {
+			this.rotation = -this.rotation;
+		}
+		if (this.x < -bounds && Math.sin(this.rotation) < 0) {
+			this.rotation = -this.rotation;
+		}
+		if (this.y > bounds && -Math.cos(this.rotation) > 0) {
+			this.rotation = Math.PI - this.rotation;
+		}
+		if (this.y < -bounds && -Math.cos(this.rotation) < 0) {
+			this.rotation = Math.PI - this.rotation;
+		}
+
 		const previousPosition = this.position.clone();
 		const delta = {
-			x: Math.cos(this.direction) * this.speed * ticker.deltaMS,
-			y: Math.sin(this.direction) * this.speed * ticker.deltaMS,
+			x: Math.sin(this.rotation) * this.speed * ticker.deltaMS,
+			y: -Math.cos(this.rotation) * this.speed * ticker.deltaMS,
 		};
 		this.position = this.position.add(delta);
 
