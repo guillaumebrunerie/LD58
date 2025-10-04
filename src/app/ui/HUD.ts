@@ -88,7 +88,7 @@ export class Inventory extends Container {
 	constructor(options?: ViewContainerOptions) {
 		super(options);
 
-		const gap = 212 / 2;
+		const gap = 115;
 		this.items = [
 			this.addChild(new InventoryItem({ x: -gap, type: "Fly_05.png" })),
 			this.addChild(

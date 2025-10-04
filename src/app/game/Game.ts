@@ -134,8 +134,7 @@ export class Item extends Container {
 		};
 		this.position = this.position.add(delta);
 
-		let index = -1;
-		this.game.webs.children.forEach((web, i) => {
+		for (const web of this.game.webs.children) {
 			const { from, to } = web;
 			const intersection = segmentIntersection(
 				from,
@@ -144,12 +143,7 @@ export class Item extends Container {
 				this.position.clone(),
 			);
 			if (intersection) {
-				index = i;
-			}
-		});
-		if (index >= 0) {
-			for (const web of this.game.webs.children.slice(0, index + 1)) {
-				web.destroy();
+				web.destroyAt(intersection);
 			}
 		}
 	}
@@ -167,16 +161,19 @@ export class Web extends Container {
 	from: Point;
 	to: Point;
 	line: Graphics;
-	constructor(options: ViewContainerOptions & { from: Point; to: Point }) {
+	previousWeb?: Web;
+	constructor(
+		options: ViewContainerOptions & {
+			from: Point;
+			to: Point;
+			previousWeb?: Web;
+		},
+	) {
 		super(options);
 		this.from = options.from.clone();
 		this.to = options.to.clone();
-		this.line = this.addChild(
-			new Graphics()
-				.moveTo(options.from.x, options.from.y)
-				.lineTo(options.to.x, options.to.y)
-				.stroke({ color: 0xffffff, width: 5 }),
-		);
+		this.line = this.addChild(new Graphics());
+		this.previousWeb = options.previousWeb;
 	}
 
 	extendTo(point: Point) {
@@ -185,8 +182,13 @@ export class Web extends Container {
 			.clear()
 			.moveTo(this.from.x, this.from.y)
 			.lineTo(this.to.x, this.to.y)
-			.stroke({ color: 0xffffff, width: 5 });
+			.stroke({ color: 0xffffff, width: 5 })
+			.circle(this.from.x, this.from.y, 2.5)
+			.fill({ color: 0xffffff })
+			.circle(this.to.x, this.to.y, 2.5)
+			.fill({ color: 0xffffff });
 	}
+	destroyAt(point: Point) {}
 }
 
 export class Game extends Container {
@@ -246,9 +248,12 @@ export class Game extends Container {
 		const oldPosition = this.player.position.clone();
 		this.target.position = position;
 		this.target.visible = true;
-		this.player.currentWeb = this.webs.addChild(
-			new Web({ from: oldPosition, to: oldPosition.clone() }),
-		);
+		const web = new Web({
+			from: oldPosition,
+			to: oldPosition.clone(),
+			previousWeb: this.player.currentWeb,
+		});
+		this.player.currentWeb = this.webs.addChild(web);
 	}
 
 	useLife(amount: number) {
