@@ -78,8 +78,8 @@ const segmentIntersection = (
 		return null;
 	}
 
-	const s = ((a1.x - b1.x) * dby - (a1.y - b1.y) * dbx) / denom;
-	const t = ((a1.x - b1.x) * day - (a1.y - b1.y) * dax) / denom;
+	const s = ((b1.x - a1.x) * dby - (b1.y - a1.y) * dbx) / denom;
+	const t = ((b1.x - a1.x) * day - (b1.y - a1.y) * dax) / denom;
 
 	if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
 		// Segments intersect
@@ -95,10 +95,13 @@ export class Item extends Container {
 	game: Game;
 	constructor(options: ViewContainerOptions & { game: Game; item: string }) {
 		super(options);
-		this.addChild(new Graphics().circle(0, 0, 20).fill(options.item));
+		this.addChild(
+			new Sprite({ texture: Assets.get(options.item), anchor: 0.5 }),
+		);
 		this.direction = Math.random() * Math.PI * 2;
 		this.game = options.game;
 		this.game.addToTicker(this);
+		this.rotation = this.direction + Math.PI / 2;
 	}
 
 	update(ticker: Ticker) {
@@ -109,7 +112,8 @@ export class Item extends Container {
 		};
 		this.position = this.position.add(delta);
 
-		for (const web of this.game.webs.children) {
+		let index = -1;
+		this.game.webs.children.forEach((web, i) => {
 			const { from, to } = web;
 			const intersection = segmentIntersection(
 				from,
@@ -118,6 +122,11 @@ export class Item extends Container {
 				this.position.clone(),
 			);
 			if (intersection) {
+				index = i;
+			}
+		});
+		if (index >= 0) {
+			for (const web of this.game.webs.children.slice(0, index + 1)) {
 				web.destroy();
 			}
 		}
@@ -127,8 +136,8 @@ export class Item extends Container {
 export class Target extends Container {
 	constructor(options: ViewContainerOptions & { game: Game }) {
 		super(options);
-		this.addChild(new Graphics().rect(-50, -5, 100, 10).fill("#00FF00"));
-		this.addChild(new Graphics().rect(-5, -50, 10, 100).fill("#00FF00"));
+		// this.addChild(new Graphics().rect(-50, -5, 100, 10).fill("#00FF00"));
+		// this.addChild(new Graphics().rect(-5, -50, 10, 100).fill("#00FF00"));
 	}
 }
 
@@ -179,12 +188,12 @@ export class Game extends Container {
 				new Item({
 					game: this,
 					item: randomItem([
-						"red",
-						"green",
-						"yellow",
-						"blue",
-						"magenta",
-						"cyan",
+						"Fly_01.png",
+						"Fly_02.png",
+						"Fly_03.png",
+						"Fly_04.png",
+						"Fly_05.png",
+						"Fly_06.png",
 					]),
 					position: new Point(
 						Math.random() * 4000 - 2000,
