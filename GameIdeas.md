@@ -1,3 +1,29 @@
+== Collector ==
+
+Rover in a desert, need to choose wisely which parts to get. For instance
+battery, plugs, accumulators, better wheels, metal detector, shovel, better vision.
+
+In a city, you are a cop, collect wanted suspects. You are in a car (or on
+foot), there are many people around, you need to go next to them to find the
+suspect. You can collect spare parts to upgrade your car.
+
+
+You control a dog, you need to collect sheep. The sheep are dumb, they just
+basically follow you, so if you need to go get a sheep that escaped you need to
+move your dog there but then all other sheep will follow you.
+
+Tax collector, you need to go from house to house to collect taxes. The more
+taxes, the more collectors you can hire. Or maybe some people don’t want to pay
+taxes and they attack you, so you need to hire body guards first.
+
+You need to collect various mechanical spare parts that can be combined to give
+you various objects. You have only a limited inventory, so you need to choose
+wisely which parts you collect so that you can open doors/kill enemies/etc in
+order to get more parts, so that in the end you collected everything.
+
+
+== Old ideas ==
+
 * Keep it together
 
 Herd of sheep that try to escape, build a fence around it to keep them from

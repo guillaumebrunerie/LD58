@@ -1,7 +1,7 @@
 import { sound } from "@pixi/sound";
 import { setEngine } from "./app/getEngine";
 import { LoadScreen } from "./app/screens/LoadScreen";
-import { MainScreen } from "./app/screens/main/MainScreen";
+import { GameScreen } from "./app/screens/GameScreen";
 import { userSettings } from "./app/utils/userSettings";
 import { CreationEngine } from "./engine/engine";
 
@@ -9,6 +9,7 @@ import { CreationEngine } from "./engine/engine";
  * Importing these modules will automatically register their plugins with the engine.
  */
 import "@pixi/sound";
+import "pixi.js/math-extras";
 // import "pixi.js/advanced-blend-modes";
 // import "@esotericsoftware/spine-pixi-v8";
 sound.disableAutoPause = true;
@@ -31,5 +32,5 @@ setEngine(engine);
 	// Show the load screen
 	await engine.navigation.showScreen(LoadScreen);
 	// Show the main screen once the load screen is dismissed
-	await engine.navigation.showScreen(MainScreen);
+	await engine.navigation.showScreen(GameScreen);
 })();
