@@ -1,36 +1,68 @@
-import { Graphics, ViewContainerOptions } from "pixi.js";
+import { Assets, Graphics, Sprite, ViewContainerOptions } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 
 export class Lifebar extends Container {
-	background: Graphics;
-	life: Graphics;
+	background: Sprite;
+	life: Sprite;
+	barMask: Graphics;
 
 	fullWidth = 500;
 	fullHeight = 20;
 
 	constructor() {
 		super();
+
 		this.background = this.addChild(
-			new Graphics()
-				.rect(0, 0, this.fullWidth, this.fullHeight)
-				.fill("red"),
+			new Sprite({
+				texture: Assets.get("EnergyBarBack.png"),
+				anchor: 0.5,
+			}),
 		);
-		this.background.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
 
 		this.life = this.addChild(
-			new Graphics()
-				.rect(0, 0, this.fullWidth, this.fullHeight)
-				.fill("green"),
+			new Sprite({
+				texture: Assets.get("EnergyBar.png"),
+				anchor: 0.5,
+			}),
 		);
-		this.life.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
+		this.barMask = this.addChild(
+			new Graphics()
+				.rect(
+					-this.life.width / 2,
+					-this.life.height / 2,
+					this.life.width,
+					this.life.height,
+				)
+				.fill("white"),
+		);
+		this.life.mask = this.barMask;
+
+		// this.background = this.addChild(
+		// 	new Graphics()
+		// 		.rect(0, 0, this.fullWidth, this.fullHeight)
+		// 		.fill("red"),
+		// );
+		// this.background.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
+
+		// this.life = this.addChild(
+		// 	new Graphics()
+		// 		.rect(0, 0, this.fullWidth, this.fullHeight)
+		// 		.fill("green"),
+		// );
+		// this.life.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
 	}
 
 	updateLife(amount: number) {
-		this.life
+		this.barMask
 			.clear()
-			.rect(0, 0, amount * this.fullWidth, this.fullHeight)
-			.fill("green");
+			.rect(
+				-this.life.width / 2,
+				-this.life.height / 2,
+				this.life.width * amount,
+				this.life.height,
+			)
+			.fill("white");
 	}
 }
 
@@ -40,7 +72,12 @@ export class InventoryItem extends Container {
 	constructor(options?: ViewContainerOptions & { type: InventoryItemType }) {
 		super(options);
 		if (options?.type === "battery") {
-			this.addChild(new Graphics().rect(-20, -20, 40, 40).fill("white"));
+			this.addChild(
+				new Sprite({
+					texture: Assets.get("Accumulator.png"),
+					anchor: 0.5,
+				}),
+			);
 		}
 	}
 }
@@ -76,7 +113,7 @@ export class HUD extends Container {
 	}
 
 	resize(width: number, height: number) {
-		this.lifebar.position.set(width / 2, 30);
+		this.lifebar.position.set(width / 2, 80);
 		this.inventory.position.set(width / 2, height - 150);
 	}
 
