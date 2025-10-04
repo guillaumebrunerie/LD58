@@ -66,19 +66,20 @@ export class Lifebar extends Container {
 	}
 }
 
-type InventoryItemType = "empty" | "battery";
+type InventoryItemType = string;
 
 export class InventoryItem extends Container {
-	constructor(options?: ViewContainerOptions & { type: InventoryItemType }) {
+	constructor(options: ViewContainerOptions & { type: InventoryItemType }) {
 		super(options);
-		if (options?.type === "battery") {
-			this.addChild(
-				new Sprite({
-					texture: Assets.get("Accumulator.png"),
-					anchor: 0.5,
-				}),
-			);
-		}
+		this.addChild(
+			new Sprite({ texture: Assets.get("Inventory.png"), anchor: 0.5 }),
+		);
+		this.addChild(
+			new Sprite({
+				texture: Assets.get(options.type),
+				anchor: 0.5,
+			}),
+		);
 	}
 }
 
@@ -87,15 +88,17 @@ export class Inventory extends Container {
 	constructor(options?: ViewContainerOptions) {
 		super(options);
 
-		this.addChild(
-			new Sprite({ texture: Assets.get("Inventory.png"), anchor: 0.5 }),
-		);
-
-		const gap = 212;
+		const gap = 212 / 2;
 		this.items = [
-			this.addChild(new InventoryItem({ x: -gap, type: "battery" })),
-			this.addChild(new InventoryItem({ x: 0, type: "battery" })),
-			this.addChild(new InventoryItem({ x: gap, type: "battery" })),
+			this.addChild(new InventoryItem({ x: -gap, type: "Fly_05.png" })),
+			this.addChild(
+				new InventoryItem({
+					x: 0,
+					y: -(gap * Math.sqrt(3)),
+					type: "Fly_02.png",
+				}),
+			),
+			this.addChild(new InventoryItem({ x: gap, type: "Fly_04.png" })),
 		];
 	}
 }
@@ -109,12 +112,12 @@ export class HUD extends Container {
 		super();
 		this.game = options.game;
 		this.lifebar = this.addChild(new Lifebar());
-		this.inventory = this.addChild(new Inventory());
+		this.inventory = this.addChild(new Inventory({ scale: 0.75 }));
 	}
 
 	resize(width: number, height: number) {
 		this.lifebar.position.set(width / 2, 80);
-		this.inventory.position.set(width / 2, height - 150);
+		this.inventory.position.set(width / 2, height - 100);
 	}
 
 	updateLife(amount: number) {
