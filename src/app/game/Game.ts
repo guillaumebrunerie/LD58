@@ -1,8 +1,11 @@
 import {
+	Assets,
 	Graphics,
 	Point,
 	RenderLayer,
+	Sprite,
 	Ticker,
+	TilingSprite,
 	ViewContainerOptions,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
@@ -11,20 +14,28 @@ import { HUD } from "../ui/HUD";
 export class Background extends Container {
 	constructor() {
 		super();
-		const count = 50;
-		for (let i = 0; i < count; i++) {
-			const star = this.addChild(
-				new Graphics()
-					.circle(0, 0, Math.random() * 10 + 10)
-					.fill({ h: Math.random() * 360, s: 30, l: 50 }),
-			);
-			const width = 2000;
-			const height = 2000;
-			star.position.set(
-				Math.random() * width - width / 2,
-				Math.random() * height - height / 2,
-			);
-		}
+		this.addChild(
+			new TilingSprite({
+				texture: Assets.get("Bg.jpg"),
+				anchor: 0.5,
+				width: 10000,
+				height: 10000,
+			}),
+		);
+		// const count = 50;
+		// for (let i = 0; i < count; i++) {
+		// 	const star = this.addChild(
+		// 		new Graphics()
+		// 			.circle(0, 0, Math.random() * 10 + 10)
+		// 			.fill({ h: Math.random() * 360, s: 30, l: 50 }),
+		// 	);
+		// 	const width = 2000;
+		// 	const height = 2000;
+		// 	star.position.set(
+		// 		Math.random() * width - width / 2,
+		// 		Math.random() * height - height / 2,
+		// 	);
+		// }
 	}
 }
 
@@ -32,9 +43,12 @@ export class Player extends Container {
 	game: Game;
 	constructor(options: ViewContainerOptions & { game: Game }) {
 		super(options);
-		this.addChild(new Graphics().circle(0, 0, 70).fill("white"));
-		this.addChild(new Graphics().circle(0, 0, 60).fill("red"));
-		this.addChild(new Graphics().rect(-5, -90, 10, 30).fill("white"));
+		this.addChild(
+			new Sprite({
+				texture: Assets.get("Hero.png"),
+				anchor: 0.5,
+			}),
+		);
 		this.game = options.game;
 		this.game.addToTicker(this);
 	}
