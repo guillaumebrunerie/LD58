@@ -9,19 +9,24 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
-import { randomItem } from "../../engine/utils/random";
+import { randomInt, randomItem } from "../../engine/utils/random";
 
 export class Background extends Container {
 	constructor() {
 		super();
-		this.addChild(
-			new TilingSprite({
-				texture: Assets.get("Bg.jpg"),
-				anchor: 0.5,
-				width: 10000,
-				height: 10000,
-			}),
-		);
+		const width = 799;
+		for (let i = -10; i <= 10; i++) {
+			for (let j = -10; j <= 10; j++) {
+				this.addChild(
+					new Sprite({
+						texture: Assets.get(`BgTile${randomInt(1, 4)}.jpg`),
+						anchor: 0.5,
+						x: i * width,
+						y: j * width,
+					}),
+				);
+			}
+		}
 	}
 }
 
