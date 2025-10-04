@@ -3,15 +3,34 @@ import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 
 export class Lifebar extends Container {
+	background: Graphics;
+	life: Graphics;
+
+	fullWidth = 500;
+	fullHeight = 20;
+
 	constructor() {
 		super();
-		// Create lifebar graphics here
-		const width = 500;
-		const height = 20;
-		const bar = this.addChild(
-			new Graphics().rect(0, 0, width, height).fill("green"),
+		this.background = this.addChild(
+			new Graphics()
+				.rect(0, 0, this.fullWidth, this.fullHeight)
+				.fill("red"),
 		);
-		bar.position.set(-width / 2, -height / 2);
+		this.background.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
+
+		this.life = this.addChild(
+			new Graphics()
+				.rect(0, 0, this.fullWidth, this.fullHeight)
+				.fill("green"),
+		);
+		this.life.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
+	}
+
+	updateLife(amount: number) {
+		this.life
+			.clear()
+			.rect(0, 0, amount * this.fullWidth, this.fullHeight)
+			.fill("green");
 	}
 }
 
@@ -26,7 +45,10 @@ export class HUD extends Container {
 	}
 
 	resize(width: number, height: number) {
-		// Resize HUD elements here if needed
 		this.lifebar.position.set(width / 2, 30);
+	}
+
+	updateLife(amount: number) {
+		this.lifebar.updateLife(amount);
 	}
 }

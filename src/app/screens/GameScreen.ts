@@ -1,4 +1,4 @@
-import { Graphics, Point } from "pixi.js";
+import { FederatedPointerEvent, Graphics, Point } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 import { HUD } from "../ui/HUD";
@@ -21,15 +21,12 @@ export class GameScreen extends Container {
 			new Graphics().rect(0, 0, 100, 100).fill("#00000001"),
 		);
 		this.touchArea.interactive = true;
-		this.touchArea.on("pointerdown", (e) =>
-			this.pointerDown(e.getLocalPosition(this.touchArea)),
-		);
-		this.touchArea.on("pointermove", (e) => {
-			this.pointerMove(e.getLocalPosition(this.touchArea));
-		});
-		this.touchArea.on("pointerup", () => this.pointerUp());
+		this.touchArea.on("pointerdown", (e) => this.pointerDown(e));
+		this.touchArea.on("pointermove", (e) => this.pointerMove(e));
+		this.touchArea.on("pointerup", (e) => this.pointerUp(e));
 
 		this.hud = this.addChild(new HUD({ game: this.game }));
+		this.game.hud = this.hud;
 	}
 
 	resize(width: number, height: number) {
@@ -38,30 +35,58 @@ export class GameScreen extends Container {
 		this.hud.resize(width, height);
 	}
 
-	pointerPosition?: Point;
-	downTime = 0;
-	pointerDown(position: Point) {
-		this.pointerPosition = position;
-		this.downTime = Date.now();
+	pointers: {
+		[id: number]: {
+			position: Point;
+			initialPosition: Point;
+			downTime: number;
+		};
+	} = {};
+
+	pointerDown(event: FederatedPointerEvent) {
+		const position = event.getLocalPosition(this.touchArea);
+		this.pointers[event.pointerId] = {
+			position,
+			initialPosition: position,
+			downTime: Date.now(),
+		};
 	}
-	pointerMove(newPosition: Point) {
-		if (this.pointerPosition) {
+
+	pointerMove(event: FederatedPointerEvent) {
+		// if (Object.keys(this.pointers).length == 2) {
+
+		const pointerData = this.pointers[event.pointerId];
+		if (pointerData) {
+			const newPosition = event.getLocalPosition(this.touchArea);
 			this.game.position = this.game.position.add(
-				newPosition.subtract(this.pointerPosition),
+				newPosition.subtract(pointerData.position),
 			);
-			this.pointerPosition = newPosition;
+			pointerData.position = newPosition;
 		}
 	}
-	pointerUp() {
-		const tapDelay = 200;
-		if (this.pointerPosition && Date.now() - this.downTime < tapDelay) {
+
+	pointerUp(event: FederatedPointerEvent) {
+		const pointerData = this.pointers[event.pointerId];
+
+		const tapDelay = 250;
+		const posThreshold = 10;
+		const deltaT = Date.now() - pointerData.downTime;
+		const deltaPos = pointerData
+			.position!.subtract(pointerData.initialPosition!)
+			.magnitude();
+		if (
+			Object.keys(this.pointers).length === 1 &&
+			pointerData.position &&
+			deltaT < tapDelay &&
+			deltaPos < posThreshold
+		) {
 			this.game.click(
-				this.pointerPosition
+				pointerData.position
 					?.subtract(this.gameContainer.position)
 					.subtract(this.game.position),
 			);
 		}
-		this.pointerPosition = undefined;
-		this.downTime = 0;
+
+		delete this.pointers[event.pointerId];
 	}
 }

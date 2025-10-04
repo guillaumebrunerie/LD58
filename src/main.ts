@@ -22,7 +22,7 @@ setEngine(engine);
 	// Initialize the creation engine instance
 	await engine.init({
 		background: "#1E1E1E",
-		resizeOptions: { minWidth: 1280, minHeight: 720, letterbox: false },
+		resizeOptions: { minWidth: 1500, minHeight: 1500, letterbox: false },
 		// useBackBuffer: true,
 	});
 

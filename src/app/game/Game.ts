@@ -1,5 +1,12 @@
-import { Graphics, Point, Ticker, ViewContainerOptions } from "pixi.js";
+import {
+	Graphics,
+	Point,
+	RenderLayer,
+	Ticker,
+	ViewContainerOptions,
+} from "pixi.js";
 import { Container } from "../../PausableContainer";
+import { HUD } from "../ui/HUD";
 
 export class Background extends Container {
 	constructor() {
@@ -27,15 +34,19 @@ export class Player extends Container {
 		super(options);
 		this.addChild(new Graphics().circle(0, 0, 70).fill("white"));
 		this.addChild(new Graphics().circle(0, 0, 60).fill("red"));
+		this.addChild(new Graphics().rect(-5, -90, 10, 30).fill("white"));
 		this.game = options.game;
 		this.game.addToTicker(this);
 	}
+	speed = 1.5;
 	update(ticker: Ticker) {
+		if (this.game.lifeCurrent <= 0) {
+			return;
+		}
 		if (this.game.target.visible) {
-			const speed = 1.5;
 			const vector = this.game.target.position.subtract(this.position);
 			const magnitude = Math.min(
-				speed * ticker.deltaMS,
+				this.speed * ticker.deltaMS,
 				vector.magnitude(),
 			);
 			if (magnitude == 0) {
@@ -43,6 +54,8 @@ export class Player extends Container {
 			}
 			const delta = vector.normalize().multiplyScalar(magnitude);
 			this.position = this.position.add(delta);
+			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
+			this.game.useLife(ticker.deltaMS);
 		}
 	}
 }
@@ -50,8 +63,17 @@ export class Player extends Container {
 export class Target extends Container {
 	constructor(options?: ViewContainerOptions) {
 		super(options);
-		this.addChild(new Graphics().rect(-50, -5, 100, 10).fill("green"));
-		this.addChild(new Graphics().rect(-5, -50, 10, 100).fill("green"));
+		this.addChild(new Graphics().rect(-50, -5, 100, 10).fill("#00FF00"));
+		this.addChild(new Graphics().rect(-5, -50, 10, 100).fill("#00FF00"));
+	}
+}
+
+export class Range extends Container {
+	constructor(options?: ViewContainerOptions) {
+		super(options);
+		this.addChild(
+			new Graphics().circle(0, 0, 100).fill("#00FF0011").stroke("black"),
+		);
 	}
 }
 
@@ -59,7 +81,11 @@ export class Game extends Container {
 	ticker: Ticker;
 
 	player: Player;
+	range: Range;
 	target: Target;
+	hud!: HUD;
+	lifeMax = 1000;
+	lifeCurrent = 1000;
 
 	constructor() {
 		super();
@@ -71,7 +97,12 @@ export class Game extends Container {
 				visible: false,
 			}),
 		);
+		const rangeLayer = this.addChild(new RenderLayer());
 		this.player = this.addChild(new Player({ game: this }));
+		this.range = this.player.addChild(
+			new Range({ scale: (this.lifeCurrent * this.player.speed) / 100 }),
+		);
+		rangeLayer.attach(this.range);
 	}
 
 	addToTicker(container: Container & { update(ticker: Ticker): void }) {
@@ -83,5 +114,11 @@ export class Game extends Container {
 	click(position: Point) {
 		this.target.position = position;
 		this.target.visible = true;
+	}
+
+	useLife(amount: number) {
+		this.lifeCurrent -= amount;
+		this.hud.updateLife(this.lifeCurrent / this.lifeMax);
+		this.range.scale.set((this.lifeCurrent * this.player.speed) / 100);
 	}
 }
