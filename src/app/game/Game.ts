@@ -2,7 +2,6 @@ import {
 	Assets,
 	Graphics,
 	Point,
-	RenderLayer,
 	Sprite,
 	Ticker,
 	TilingSprite,
@@ -10,6 +9,7 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
+import { randomItem } from "../../engine/utils/random";
 
 export class Background extends Container {
 	constructor() {
@@ -22,20 +22,6 @@ export class Background extends Container {
 				height: 10000,
 			}),
 		);
-		// const count = 50;
-		// for (let i = 0; i < count; i++) {
-		// 	const star = this.addChild(
-		// 		new Graphics()
-		// 			.circle(0, 0, Math.random() * 10 + 10)
-		// 			.fill({ h: Math.random() * 360, s: 30, l: 50 }),
-		// 	);
-		// 	const width = 2000;
-		// 	const height = 2000;
-		// 	star.position.set(
-		// 		Math.random() * width - width / 2,
-		// 		Math.random() * height - height / 2,
-		// 	);
-		// }
 	}
 }
 
@@ -74,19 +60,90 @@ export class Player extends Container {
 	}
 }
 
+// Returns the intersection point of two line segments AB and CD, or null if none.
+const segmentIntersection = (
+	a1: Point,
+	a2: Point,
+	b1: Point,
+	b2: Point,
+): Point | null => {
+	const dax = a2.x - a1.x;
+	const day = a2.y - a1.y;
+	const dbx = b2.x - b1.x;
+	const dby = b2.y - b1.y;
+
+	const denom = dax * dby - day * dbx;
+	if (denom === 0) {
+		// Parallel (or collinear)
+		return null;
+	}
+
+	const s = ((a1.x - b1.x) * dby - (a1.y - b1.y) * dbx) / denom;
+	const t = ((a1.x - b1.x) * day - (a1.y - b1.y) * dax) / denom;
+
+	if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+		// Segments intersect
+		return new Point(a1.x + s * dax, a1.y + s * day);
+	}
+
+	return null; // no intersection within segment bounds
+};
+
+export class Item extends Container {
+	direction = 0;
+	speed = 0.1;
+	game: Game;
+	constructor(options: ViewContainerOptions & { game: Game; item: string }) {
+		super(options);
+		this.addChild(new Graphics().circle(0, 0, 20).fill(options.item));
+		this.direction = Math.random() * Math.PI * 2;
+		this.game = options.game;
+		this.game.addToTicker(this);
+	}
+
+	update(ticker: Ticker) {
+		const previousPosition = this.position.clone();
+		const delta = {
+			x: Math.cos(this.direction) * this.speed * ticker.deltaMS,
+			y: Math.sin(this.direction) * this.speed * ticker.deltaMS,
+		};
+		this.position = this.position.add(delta);
+
+		for (const web of this.game.webs.children) {
+			const { from, to } = web;
+			const intersection = segmentIntersection(
+				from,
+				to,
+				previousPosition,
+				this.position.clone(),
+			);
+			if (intersection) {
+				web.destroy();
+			}
+		}
+	}
+}
+
 export class Target extends Container {
-	constructor(options?: ViewContainerOptions) {
+	constructor(options: ViewContainerOptions & { game: Game }) {
 		super(options);
 		this.addChild(new Graphics().rect(-50, -5, 100, 10).fill("#00FF00"));
 		this.addChild(new Graphics().rect(-5, -50, 10, 100).fill("#00FF00"));
 	}
 }
 
-export class Range extends Container {
-	constructor(options?: ViewContainerOptions) {
+export class Web extends Container {
+	from: Point;
+	to: Point;
+	constructor(options: ViewContainerOptions & { from: Point; to: Point }) {
 		super(options);
+		this.from = options.from.clone();
+		this.to = options.to.clone();
 		this.addChild(
-			new Graphics().circle(0, 0, 100).fill("#00FF0011").stroke("black"),
+			new Graphics()
+				.moveTo(options.from.x, options.from.y)
+				.lineTo(options.to.x, options.to.y)
+				.stroke({ color: 0xffffff, width: 5 }),
 		);
 	}
 }
@@ -95,11 +152,12 @@ export class Game extends Container {
 	ticker: Ticker;
 
 	player: Player;
-	range: Range;
+	webs: Container<Web>;
+	items: Container<Item>;
 	target: Target;
 	hud!: HUD;
-	lifeMax = 1000;
-	lifeCurrent = 1000;
+	lifeMax = 100000;
+	lifeCurrent = 100000;
 
 	constructor() {
 		super();
@@ -108,15 +166,33 @@ export class Game extends Container {
 		this.addChild(new Background());
 		this.target = this.addChild(
 			new Target({
+				game: this,
 				visible: false,
 			}),
 		);
-		const rangeLayer = this.addChild(new RenderLayer());
+		this.webs = this.addChild(new Container<Web>());
 		this.player = this.addChild(new Player({ game: this }));
-		this.range = this.player.addChild(
-			new Range({ scale: (this.lifeCurrent * this.player.speed) / 100 }),
-		);
-		rangeLayer.attach(this.range);
+
+		this.items = this.addChild(new Container<Item>());
+		for (let i = 0; i < 20; i++) {
+			this.items.addChild(
+				new Item({
+					game: this,
+					item: randomItem([
+						"red",
+						"green",
+						"yellow",
+						"blue",
+						"magenta",
+						"cyan",
+					]),
+					position: new Point(
+						Math.random() * 4000 - 2000,
+						Math.random() * 4000 - 2000,
+					),
+				}),
+			);
+		}
 	}
 
 	addToTicker(container: Container & { update(ticker: Ticker): void }) {
@@ -126,13 +202,14 @@ export class Game extends Container {
 	}
 
 	click(position: Point) {
+		const oldPosition = this.target.position.clone();
 		this.target.position = position;
 		this.target.visible = true;
+		this.webs.addChild(new Web({ from: oldPosition, to: position }));
 	}
 
 	useLife(amount: number) {
 		this.lifeCurrent -= amount;
 		this.hud.updateLife(this.lifeCurrent / this.lifeMax);
-		this.range.scale.set((this.lifeCurrent * this.player.speed) / 100);
 	}
 }

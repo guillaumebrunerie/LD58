@@ -68,26 +68,33 @@ export class GameScreen extends Container {
 			);
 			const otherPointerData = this.pointers[otherPointerId!];
 			const otherPosition = otherPointerData.position;
-			const previousDistance = otherPosition
-				.subtract(oldPosition)
-				.magnitude();
-			const newDistance = otherPosition.subtract(newPosition).magnitude();
+			const previousVector = otherPosition.subtract(oldPosition);
+			const previousDistance = previousVector.magnitude();
+			const previousAngle = Math.atan2(
+				previousVector.y,
+				previousVector.x,
+			);
+			const newVector = otherPosition.subtract(newPosition);
+			const newDistance = newVector.magnitude();
+			const newAngle = Math.atan2(newVector.y, newVector.x);
 			const scale = newDistance / previousDistance;
 			const otherPositionL = this.game.toLocal(
 				otherPosition,
 				this.touchArea,
 			);
 			this.game.scale.set(this.game.scale.x * scale);
+			this.game.rotation =
+				this.game.rotation + (newAngle - previousAngle);
 			const otherPositionL2 = this.game.toLocal(
 				otherPosition,
 				this.touchArea,
 			);
-			this.game.position = this.game.position.subtract(
-				otherPositionL.multiplyScalar(this.game.scale.x),
-			);
-			this.game.position = this.game.position.add(
-				otherPositionL2.multiplyScalar(this.game.scale.x),
-			);
+			const delta2 = this.gameContainer
+				.toLocal(otherPositionL2, this.game)
+				.subtract(
+					this.gameContainer.toLocal(otherPositionL, this.game),
+				);
+			this.game.position = this.game.position.add(delta2);
 		} else {
 			this.game.position = this.game.position.add(
 				newPosition.subtract(oldPosition),

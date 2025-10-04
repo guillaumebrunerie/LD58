@@ -1,7 +1,8 @@
 == Collector ==
 
 Rover in a desert, need to choose wisely which parts to get. For instance
-battery, plugs, accumulators, better wheels, metal detector, shovel, better vision.
+battery, plugs, accumulators, better wheels, metal detector, shovel, better
+vision.
 
 In a city, you are a cop, collect wanted suspects. You are in a car (or on
 foot), there are many people around, you need to go next to them to find the

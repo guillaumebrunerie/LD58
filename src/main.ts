@@ -1,3 +1,4 @@
+import "pixi.js/math-extras";
 import { sound } from "@pixi/sound";
 import { setEngine } from "./app/getEngine";
 import { LoadScreen } from "./app/screens/LoadScreen";
@@ -9,7 +10,6 @@ import { CreationEngine } from "./engine/engine";
  * Importing these modules will automatically register their plugins with the engine.
  */
 import "@pixi/sound";
-import "pixi.js/math-extras";
 // import "pixi.js/advanced-blend-modes";
 // import "@esotericsoftware/spine-pixi-v8";
 sound.disableAutoPause = true;
