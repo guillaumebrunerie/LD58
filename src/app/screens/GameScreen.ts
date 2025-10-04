@@ -36,7 +36,7 @@ export class GameScreen extends Container {
 	}
 
 	pointers: {
-		[id: number]: {
+		[id: string]: {
 			position: Point;
 			initialPosition: Point;
 			downTime: number;
@@ -53,15 +53,45 @@ export class GameScreen extends Container {
 	}
 
 	pointerMove(event: FederatedPointerEvent) {
-		// if (Object.keys(this.pointers).length == 2) {
-
 		const pointerData = this.pointers[event.pointerId];
-		if (pointerData) {
-			const newPosition = event.getLocalPosition(this.touchArea);
-			this.game.position = this.game.position.add(
-				newPosition.subtract(pointerData.position),
+		if (!pointerData) {
+			return;
+		}
+
+		const oldPosition = pointerData.position;
+		const newPosition = event.getLocalPosition(this.touchArea);
+		pointerData.position = newPosition;
+		const pointerIds = Object.keys(this.pointers);
+		if (pointerIds.length == 2) {
+			const otherPointerId = pointerIds.find(
+				(id) => id != `${event.pointerId}`,
 			);
-			pointerData.position = newPosition;
+			const otherPointerData = this.pointers[otherPointerId!];
+			const otherPosition = otherPointerData.position;
+			const previousDistance = otherPosition
+				.subtract(oldPosition)
+				.magnitude();
+			const newDistance = otherPosition.subtract(newPosition).magnitude();
+			const scale = newDistance / previousDistance;
+			const otherPositionL = this.game.toLocal(
+				otherPosition,
+				this.touchArea,
+			);
+			this.game.scale.set(this.game.scale.x * scale);
+			const otherPositionL2 = this.game.toLocal(
+				otherPosition,
+				this.touchArea,
+			);
+			this.game.position = this.game.position.subtract(
+				otherPositionL.multiplyScalar(this.game.scale.x),
+			);
+			this.game.position = this.game.position.add(
+				otherPositionL2.multiplyScalar(this.game.scale.x),
+			);
+		} else {
+			this.game.position = this.game.position.add(
+				newPosition.subtract(oldPosition),
+			);
 		}
 	}
 
@@ -80,11 +110,7 @@ export class GameScreen extends Container {
 			deltaT < tapDelay &&
 			deltaPos < posThreshold
 		) {
-			this.game.click(
-				pointerData.position
-					?.subtract(this.gameContainer.position)
-					.subtract(this.game.position),
-			);
+			this.game.click(event.getLocalPosition(this.game));
 		}
 
 		delete this.pointers[event.pointerId];

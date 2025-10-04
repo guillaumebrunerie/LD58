@@ -91,7 +91,7 @@ export class Inventory extends Container {
 			new Sprite({ texture: Assets.get("Inventory.png"), anchor: 0.5 }),
 		);
 
-		const gap = 215;
+		const gap = 212;
 		this.items = [
 			this.addChild(new InventoryItem({ x: -gap, type: "battery" })),
 			this.addChild(new InventoryItem({ x: 0, type: "battery" })),
