@@ -24,6 +24,7 @@ export class GameScreen extends Container {
 		this.touchArea.on("pointerdown", (e) => this.pointerDown(e));
 		this.touchArea.on("pointermove", (e) => this.pointerMove(e));
 		this.touchArea.on("pointerup", (e) => this.pointerUp(e));
+		this.touchArea.on("wheel", (e) => this.wheel(e));
 
 		this.hud = this.addChild(new HUD({ game: this.game }));
 		this.game.hud = this.hud;
@@ -121,5 +122,16 @@ export class GameScreen extends Container {
 		}
 
 		delete this.pointers[event.pointerId];
+	}
+
+	wheel(event: FederatedPointerEvent) {
+		const position = event.getLocalPosition(this.touchArea);
+		const otherPositionL = this.game.toLocal(position, this.touchArea);
+		this.game.scale.set(this.game.scale.x * (1 - event.deltaY * 0.001));
+		const otherPositionL2 = this.game.toLocal(position, this.touchArea);
+		const delta2 = this.gameContainer
+			.toLocal(otherPositionL2, this.game)
+			.subtract(this.gameContainer.toLocal(otherPositionL, this.game));
+		this.game.position = this.game.position.add(delta2);
 	}
 }
