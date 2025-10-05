@@ -1,0 +1,114 @@
+import {
+	Sprite,
+	ViewContainerOptions,
+	Graphics,
+	Assets,
+	Ticker,
+} from "pixi.js";
+import { randomFloat } from "../../engine/utils/random";
+import { Container } from "../../PausableContainer";
+import { Game, InsectType, gameWidth, segmentIntersectsDisk } from "./Game";
+
+export class Insect extends Container {
+	speed = randomFloat(0.01, 0.05);
+	radius = 50;
+	game: Game;
+	sprite: Sprite;
+	shadow: Sprite;
+	rotationalSpeed = 0;
+	type: InsectType;
+
+	constructor(options: ViewContainerOptions & { game: Game; type: string }) {
+		super(options);
+
+		this.type = options.type;
+		this.game = options.game;
+		this.game.addToTicker(this);
+
+		this.addChild(
+			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF00"),
+		);
+		this.sprite = this.addChild(
+			new Sprite({ texture: Assets.get(options.type), anchor: 0.5 }),
+		);
+		this.shadow = this.addChild(
+			new Sprite({
+				texture: Assets.get(options.type),
+				anchor: 0.5,
+				x: 40,
+				y: 20,
+				tint: 0,
+				alpha: 0.5,
+			}),
+		);
+		this.game.shadows.attach(this.shadow);
+
+		this.setRotation(Math.random() * Math.PI * 2);
+	}
+
+	getRotation() {
+		return this.sprite.rotation;
+	}
+	setRotation(rotation: number) {
+		this.sprite.rotation = rotation;
+		this.shadow.rotation = rotation;
+	}
+
+	rotationTimeout = 0;
+	update(ticker: Ticker) {
+		const bounds = gameWidth / 2 - 15;
+		const dt = ticker.deltaMS;
+
+		this.rotationTimeout -= dt;
+		if (this.rotationTimeout <= 0) {
+			this.rotationTimeout += randomFloat(1000, 3000);
+			this.rotationalSpeed = randomFloat(-1, 1);
+		}
+		this.setRotation(
+			(dt * this.rotationalSpeed) / 1000 + this.getRotation(),
+		);
+
+		const r = this.getRotation();
+		if (this.x > bounds && Math.sin(r) > 0) {
+			this.setRotation(-r);
+		}
+		if (this.x < -bounds && Math.sin(r) < 0) {
+			this.setRotation(-r);
+		}
+		if (this.y > bounds && -Math.cos(r) > 0) {
+			this.setRotation(Math.PI - r);
+		}
+		if (this.y < -bounds && -Math.cos(r) < 0) {
+			this.setRotation(Math.PI - r);
+		}
+
+		const delta = {
+			x: Math.sin(r) * this.speed * ticker.deltaMS,
+			y: -Math.cos(r) * this.speed * ticker.deltaMS,
+		};
+		this.position = this.position.add(delta);
+
+		for (const thread of this.game.threads.children) {
+			if (thread.isDestroyed || thread.isFrozen) {
+				continue;
+			}
+			const { from, to } = thread;
+			const intersection = segmentIntersectsDisk(
+				from,
+				to,
+				this.position,
+				this.radius * this.scale.x,
+			);
+			if (intersection) {
+				thread.destroyAt(intersection, this.game);
+			}
+		}
+	}
+
+	collect() {
+		this.speed = 0;
+		this.animate<Insect>(this, { alpha: 0 }, { duration: 1 }).then(() =>
+			this.destroy(),
+		);
+	}
+}
