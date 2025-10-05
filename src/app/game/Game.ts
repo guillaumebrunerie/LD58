@@ -13,6 +13,10 @@ import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
 import { randomItem } from "../../engine/utils/random";
 
+const mod = (a: number, b: number) => {
+	return ((a % b) + b) % b;
+};
+
 export class Background extends Container {
 	constructor() {
 		super();
@@ -25,6 +29,10 @@ export class Background extends Container {
 						anchor: 0.5,
 						x: i * width,
 						y: j * width,
+						scale: {
+							x: mod(i, 2) == 1 ? -1 : 1,
+							y: mod(j, 2) == 1 ? -1 : 1,
+						},
 					}),
 				);
 			}
