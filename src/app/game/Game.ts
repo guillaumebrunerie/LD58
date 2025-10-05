@@ -444,7 +444,7 @@ export class Web extends Container {
 
 	findWebIntersection() {
 		for (const web of this.game.webs.children) {
-			if (web == this || web.isDestroyed) {
+			if (web == this || web.isDestroyed || web.isFrozen) {
 				continue;
 			}
 			const point = segmentIntersection(
