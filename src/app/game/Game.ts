@@ -1,6 +1,5 @@
 import {
 	Assets,
-	Circle,
 	Graphics,
 	Point,
 	Polygon,
@@ -71,9 +70,9 @@ export class Player extends Container {
 			this.position = this.position.add(delta);
 			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
 			this.game.useLife(ticker.deltaMS);
-		}
-		if (this.currentWeb) {
-			this.currentWeb.extendTo(this.position);
+			if (this.currentWeb) {
+				this.currentWeb.extendTo(this.position);
+			}
 		}
 	}
 }
@@ -108,12 +107,52 @@ const segmentIntersection = (
 	return null; // no intersection within segment bounds
 };
 
+const segmentIntersectsDisk = (
+	from: Point,
+	to: Point,
+	center: Point,
+	radius: number,
+): Point | undefined => {
+	const segment = to.subtract(from);
+	const segLenSq = segment.magnitudeSquared();
+
+	if (segLenSq == 0) {
+		if (to.subtract(center).magnitudeSquared() <= radius * radius) {
+			return to;
+		} else {
+			return;
+		}
+	}
+
+	const vector = center.subtract(from);
+	const t = vector.dot(segment) / segLenSq;
+	const projection = from.add(segment.multiplyScalar(t));
+
+	if (
+		projection.subtract(center).magnitudeSquared() <= radius * radius &&
+		t > 0.001 &&
+		t < 0.999
+	) {
+		return projection;
+	} else if (from.subtract(center).magnitudeSquared() <= radius * radius) {
+		return from;
+	} else if (to.subtract(center).magnitudeSquared() <= radius * radius) {
+		return to;
+	} else {
+		return;
+	}
+};
+
 export class Item extends Container {
 	direction = 0;
 	speed = 0.1;
+	radius = 50;
 	game: Game;
 	constructor(options: ViewContainerOptions & { game: Game; item: string }) {
 		super(options);
+		this.addChild(
+			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF44"),
+		);
 		this.addChild(
 			new Sprite({ texture: Assets.get(options.item), anchor: 0.5 }),
 		);
@@ -137,7 +176,6 @@ export class Item extends Container {
 			this.rotation = Math.PI - this.rotation;
 		}
 
-		const previousPosition = this.position.clone();
 		const delta = {
 			x: Math.sin(this.rotation) * this.speed * ticker.deltaMS,
 			y: -Math.cos(this.rotation) * this.speed * ticker.deltaMS,
@@ -149,11 +187,11 @@ export class Item extends Container {
 				continue;
 			}
 			const { from, to } = web;
-			const intersection = segmentIntersection(
+			const intersection = segmentIntersectsDisk(
 				from,
 				to,
-				previousPosition,
-				this.position.clone(),
+				this.position,
+				this.radius,
 			);
 			if (intersection) {
 				web.destroyAt(intersection);

@@ -1,4 +1,9 @@
-import { FederatedPointerEvent, Graphics, Point } from "pixi.js";
+import {
+	FederatedPointerEvent,
+	FederatedWheelEvent,
+	Graphics,
+	Point,
+} from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 import { HUD } from "../ui/HUD";
@@ -105,6 +110,9 @@ export class GameScreen extends Container {
 
 	pointerUp(event: FederatedPointerEvent) {
 		const pointerData = this.pointers[event.pointerId];
+		if (!pointerData) {
+			return;
+		}
 
 		const tapDelay = 300;
 		const posThreshold = 10;
@@ -124,7 +132,7 @@ export class GameScreen extends Container {
 		delete this.pointers[event.pointerId];
 	}
 
-	wheel(event: FederatedPointerEvent) {
+	wheel(event: FederatedWheelEvent) {
 		const position = event.getLocalPosition(this.touchArea);
 		const otherPositionL = this.game.toLocal(position, this.touchArea);
 		this.game.scale.set(this.game.scale.x * (1 - event.deltaY * 0.001));
