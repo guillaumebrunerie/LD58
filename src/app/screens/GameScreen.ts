@@ -7,6 +7,7 @@ import {
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 import { HUD } from "../ui/HUD";
+import { clamp } from "../../engine/utils/maths";
 
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
@@ -83,12 +84,12 @@ export class GameScreen extends Container {
 			const newVector = otherPosition.subtract(newPosition);
 			const newDistance = newVector.magnitude();
 			const newAngle = Math.atan2(newVector.y, newVector.x);
-			const scale = newDistance / previousDistance;
+			const scaleFactor = newDistance / previousDistance;
 			const otherPositionL = this.game.toLocal(
 				otherPosition,
 				this.touchArea,
 			);
-			this.game.scale.set(this.game.scale.x * scale);
+			this.multiplyScale(scaleFactor);
 			this.game.rotation =
 				this.game.rotation + (newAngle - previousAngle);
 			const otherPositionL2 = this.game.toLocal(
@@ -106,6 +107,11 @@ export class GameScreen extends Container {
 				newPosition.subtract(oldPosition),
 			);
 		}
+	}
+
+	multiplyScale(factor: number) {
+		const newScale = clamp(this.game.scale.x * factor, 0.3, 1);
+		this.game.scale.set(newScale);
 	}
 
 	pointerUp(event: FederatedPointerEvent) {
@@ -135,7 +141,7 @@ export class GameScreen extends Container {
 	wheel(event: FederatedWheelEvent) {
 		const position = event.getLocalPosition(this.touchArea);
 		const otherPositionL = this.game.toLocal(position, this.touchArea);
-		this.game.scale.set(this.game.scale.x * (1 - event.deltaY * 0.001));
+		this.multiplyScale(1 - event.deltaY * 0.001);
 		const otherPositionL2 = this.game.toLocal(position, this.touchArea);
 		const delta2 = this.gameContainer
 			.toLocal(otherPositionL2, this.game)
