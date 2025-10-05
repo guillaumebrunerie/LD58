@@ -110,7 +110,7 @@ export class GameScreen extends Container {
 	}
 
 	multiplyScale(factor: number) {
-		const newScale = clamp(this.game.scale.x * factor, 0.3, 1);
+		const newScale = clamp(this.game.scale.x * factor, 1, 3);
 		this.game.scale.set(newScale);
 	}
 
