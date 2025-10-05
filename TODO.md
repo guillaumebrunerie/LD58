@@ -4,7 +4,6 @@
 - Pause and various menus
 
 == Game design
-- Winning
 - Level design
 - Rethink the controls
 
@@ -12,6 +11,5 @@
 - When creating a web, delete threads inside
 - Rotating shadows
 - Add insect corpses and dying animation?
-- Idle animations for insects
 - Better looking inventory
 - Better segment intersecting disk

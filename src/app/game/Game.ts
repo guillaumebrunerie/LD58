@@ -105,14 +105,7 @@ export class Target extends Container {
 export type InsectType = string;
 
 const pickInsectType = (): InsectType =>
-	randomItem([
-		"Fly_01.png",
-		"Fly_02.png",
-		"Fly_03.png",
-		"Fly_04.png",
-		"Fly_05.png",
-		"Fly_06.png",
-	]);
+	randomItem(["Fly_01", "Fly_02", "Fly_03", "Fly_04", "Fly_05", "Fly_06"]);
 
 export type ConfigurationType = "a" | "aa" | "ab" | "aaa" | "aab" | "abc";
 
@@ -190,6 +183,9 @@ export class Game extends Container {
 
 	start() {
 		this.ticker.start();
+		for (const insect of this.insects.children) {
+			insect.start();
+		}
 	}
 
 	spawnInsect(type = pickInsectType()) {

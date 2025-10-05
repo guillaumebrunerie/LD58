@@ -89,7 +89,7 @@ export class BlueprintItem extends Container {
 		);
 		this.icon = this.addChild(
 			new Sprite({
-				texture: Assets.get(options.type),
+				texture: Assets.get(`${options.type}.png`),
 				anchor: 0.5,
 			}),
 		);

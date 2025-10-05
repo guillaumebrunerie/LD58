@@ -5,10 +5,12 @@ import {
 	Assets,
 	Ticker,
 	Point,
+	AnimatedSprite,
 } from "pixi.js";
 import { randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
 import { Game, InsectType, segmentIntersectsDisk } from "./Game";
+import { getIdleAnimation } from "../utils/animation";
 
 export const insectBounds = 400;
 
@@ -16,7 +18,7 @@ export class Insect extends Container {
 	speed = randomFloat(0.01, 0.05);
 	radius = 50;
 	game: Game;
-	sprite: Sprite;
+	sprite: AnimatedSprite;
 	shadow: Sprite;
 	rotationalSpeed = 0;
 	type: InsectType;
@@ -33,7 +35,11 @@ export class Insect extends Container {
 			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF00"),
 		);
 		this.sprite = this.addChild(
-			new Sprite({ texture: Assets.get(options.type), anchor: 0.5 }),
+			new AnimatedSprite({
+				textures: getIdleAnimation(`${options.type}_Idle`),
+				anchor: 0.5,
+				animationSpeed: 0.3,
+			}),
 		);
 		this.shadow = this.addChild(
 			new Sprite({
@@ -149,5 +155,9 @@ export class Insect extends Container {
 		this.speed = 1;
 		this.rotationTimeout /= 10;
 		this.isEscaping = true;
+	}
+
+	start() {
+		this.sprite.play();
 	}
 }
