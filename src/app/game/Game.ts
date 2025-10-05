@@ -27,6 +27,9 @@ const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
 };
 
+const gameWidth = 1500;
+const gameHeight = 1500;
+
 export class Background extends Container {
 	game: Game;
 	tiles: Sprite[][];
@@ -39,7 +42,7 @@ export class Background extends Container {
 		const width = 798;
 		const bg = this.addChild(new RenderLayer());
 		this.tiles = timesOfDay[0].tints.map(() => []);
-		const size = 10;
+		const size = 1;
 		for (let i = -size; i <= size; i++) {
 			for (let j = -size; j <= size; j++) {
 				const tile = this.addChild(
@@ -65,20 +68,22 @@ export class Background extends Container {
 				new Sprite({
 					texture: Assets.get(`Bg_0${item}.png`),
 					anchor: 0.5,
-					x: randomInt(-2000, 2000),
-					y: randomInt(-2000, 2000),
+					x: randomInt(-gameWidth / 2, gameWidth / 2),
+					y: randomInt(-gameHeight / 2, gameHeight / 2),
 					scale: {
-						x: randomFloat(4, 6),
-						y: randomFloat(4, 6),
+						x: randomFloat(2, 3),
+						y: randomFloat(2, 3),
 					},
 					rotation: randomFloat(0, Math.PI * 2),
 				}),
 			);
 			this.tiles[item].push(element);
-			// this.addChild(
-			// 	new Graphics().rect(-400, -400, 800, 800).fill("green"),
-			// );
 		}
+		this.addChild(
+			new Graphics()
+				.rect(-gameWidth / 2, -gameHeight / 2, gameWidth, gameHeight)
+				.stroke("blue"),
+		);
 	}
 
 	season = 0;
@@ -269,7 +274,7 @@ export class Item extends Container {
 	}
 
 	update(ticker: Ticker) {
-		const bounds = 3000;
+		const bounds = gameWidth / 2;
 		const r = this.getRotation();
 		if (this.x > bounds && Math.sin(r) > 0) {
 			this.setRotation(-r);
@@ -299,7 +304,7 @@ export class Item extends Container {
 				from,
 				to,
 				this.position,
-				this.radius,
+				this.radius * this.scale.x,
 			);
 			if (intersection) {
 				web.destroyAt(intersection);
@@ -532,7 +537,7 @@ export class Game extends Container {
 		this.webs = this.addChild(new Container<Web>());
 		this.itemShadows = this.addChild(new RenderLayer());
 		this.polygons = this.addChild(new Container<PolygonHighlight>());
-		this.player = this.addChild(new Player({ game: this }));
+		this.player = this.addChild(new Player({ game: this, scale: 0.2 }));
 
 		this.items = this.addChild(new Container<Item>());
 		for (let i = 0; i < 20; i++) {
@@ -548,9 +553,10 @@ export class Game extends Container {
 						"Fly_06.png",
 					]),
 					position: new Point(
-						Math.random() * 4000 - 2000,
-						Math.random() * 4000 - 2000,
+						Math.random() * gameWidth - gameWidth / 2,
+						Math.random() * gameHeight - gameHeight / 2,
 					),
+					scale: 0.2,
 				}),
 			);
 		}
