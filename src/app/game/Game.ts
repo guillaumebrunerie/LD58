@@ -1,4 +1,5 @@
 import {
+	AnimatedSprite,
 	Assets,
 	Graphics,
 	IRenderLayer,
@@ -283,7 +284,8 @@ export class Web extends Container {
 	game: Game;
 	from: Point;
 	to: Point;
-	line: Graphics;
+	// line: Graphics;
+	line: AnimatedSprite;
 	previousWeb?: Web;
 	isDestroyed = false;
 	constructor(
@@ -298,22 +300,43 @@ export class Web extends Container {
 		this.game = options.game;
 		this.from = options.from.clone();
 		this.to = options.to.clone();
-		this.line = this.addChild(new Graphics());
+		this.line = this.addChild(
+			new AnimatedSprite({
+				textures: Object.values(Assets.get("WebLong").textures),
+				anchor: { x: 0, y: 0.5 },
+				autoPlay: true,
+				animationSpeed: 15 / 60,
+			}),
+		);
 		this.previousWeb = options.previousWeb;
 		this.extendTo(this.to);
 		this.game.addToTicker(this);
 	}
 
 	redraw() {
-		this.line
-			.clear()
-			.moveTo(this.from.x, this.from.y)
-			.lineTo(this.to.x, this.to.y)
-			.stroke({ color: 0xffffff, width: 5 })
-			.circle(this.from.x, this.from.y, 2.5)
-			.fill({ color: 0xffffff })
-			.circle(this.to.x, this.to.y, 2.5)
-			.fill({ color: 0xffffff });
+		const vector = this.to.subtract(this.from);
+		const length = vector.magnitude();
+		let web = "WebLong";
+		if (length < 400) {
+			web = "WebMedium";
+		} else if (length < 200) {
+			web = "WebShort";
+		}
+		this.line.textures = Object.values(Assets.get(web).textures);
+		this.line.position = this.from;
+		this.line.scale.set(length / Assets.get(`${web}_000.png`).width, 1);
+		this.line.rotation = Math.atan2(vector.y, vector.x);
+		this.line.play();
+
+		// this.line
+		// 	.clear()
+		// 	.moveTo(this.from.x, this.from.y)
+		// 	.lineTo(this.to.x, this.to.y)
+		// 	.stroke({ color: 0xffffff, width: 5 })
+		// 	.circle(this.from.x, this.from.y, 2.5)
+		// 	.fill({ color: 0xffffff })
+		// 	.circle(this.to.x, this.to.y, 2.5)
+		// 	.fill({ color: 0xffffff });
 	}
 
 	extendTo(point: Point) {
