@@ -112,13 +112,13 @@ export class Inventory extends Container {
 
 export class HUD extends Container {
 	game: Game;
-	lifebar: Lifebar;
+	// lifebar: Lifebar;
 	inventories: Container<Inventory>;
 
 	constructor(options: { game: Game }) {
 		super();
 		this.game = options.game;
-		this.lifebar = this.addChild(new Lifebar());
+		// this.lifebar = this.addChild(new Lifebar());
 
 		this.inventories = this.addChild(new Container<Inventory>());
 		this.game.wantedConfigurations.forEach((itemTypes) =>
@@ -132,7 +132,7 @@ export class HUD extends Container {
 	}
 
 	resize(width: number, height: number) {
-		this.lifebar.position.set(width / 2, 80);
+		// this.lifebar.position.set(width / 2, 80);
 		this.inventories.position.set(0, height - 100);
 
 		const gap = width / (this.inventories.children.length + 1);
@@ -141,7 +141,7 @@ export class HUD extends Container {
 		});
 	}
 
-	updateLife(amount: number) {
-		this.lifebar.updateLife(amount);
-	}
+	// updateLife(amount: number) {
+	// 	this.lifebar.updateLife(amount);
+	// }
 }

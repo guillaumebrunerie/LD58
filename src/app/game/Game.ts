@@ -165,7 +165,7 @@ export class Player extends Container {
 			const delta = vector.normalize().multiplyScalar(magnitude);
 			this.position = this.position.add(delta);
 			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
-			this.game.useLife(ticker.deltaMS);
+			// this.game.useLife(ticker.deltaMS);
 			if (this.currentWeb) {
 				this.currentWeb.extendTo(this.position);
 			}
@@ -240,12 +240,12 @@ const segmentIntersectsDisk = (
 };
 
 export class Item extends Container {
-	direction = 0;
-	speed = 0.1;
+	speed = randomFloat(0.01, 0.05);
 	radius = 50;
 	game: Game;
 	sprite: Sprite;
 	shadow: Sprite;
+	rotationalSpeed = 0;
 
 	constructor(options: ViewContainerOptions & { game: Game; item: string }) {
 		super(options);
@@ -282,8 +282,20 @@ export class Item extends Container {
 		this.shadow.rotation = rotation;
 	}
 
+	rotationTimeout = 0;
 	update(ticker: Ticker) {
 		const bounds = gameWidth / 2;
+		const dt = ticker.deltaMS;
+
+		this.rotationTimeout -= dt;
+		if (this.rotationTimeout <= 0) {
+			this.rotationTimeout += randomFloat(1000, 3000);
+			this.rotationalSpeed = randomFloat(-1, 1);
+		}
+		this.setRotation(
+			(dt * this.rotationalSpeed) / 1000 + this.getRotation(),
+		);
+
 		const r = this.getRotation();
 		if (this.x > bounds && Math.sin(r) > 0) {
 			this.setRotation(-r);
@@ -558,7 +570,10 @@ export class PolygonHighlight extends Container {
 					y: centerY,
 				},
 				rotation: randomFloat(0, Math.PI * 2),
-				scale: size * 0.002,
+				scale: {
+					x: size * 0.002 * randomFloat(0.8, 1.2),
+					y: size * 0.002 * randomFloat(0.8, 1.2),
+				},
 			}),
 		);
 
@@ -666,10 +681,10 @@ export class Game extends Container {
 		this.player.currentWeb = this.webs.addChild(web);
 	}
 
-	useLife(amount: number) {
-		this.lifeCurrent -= amount;
-		this.hud.updateLife(this.lifeCurrent / this.lifeMax);
-	}
+	// useLife(amount: number) {
+	// 	this.lifeCurrent -= amount;
+	// 	this.hud.updateLife(this.lifeCurrent / this.lifeMax);
+	// }
 
 	polygonCollect(polygon: Polygon) {
 		this.polygons.addChild(new PolygonHighlight({ game: this, polygon }));
