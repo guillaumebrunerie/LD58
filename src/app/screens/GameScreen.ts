@@ -19,7 +19,7 @@ export class GameScreen extends Container {
 	game: Game;
 	hud: HUD;
 	touchArea: Graphics;
-	level: number = levels.length - 1;
+	level: number = 0;
 
 	constructor() {
 		super();

@@ -243,5 +243,25 @@ export class Game extends Container {
 			const blueprint = this.hud.blueprints.children[matchingIndex];
 			blueprint.complete();
 		}
+		if (this.hud.blueprints.children.every((b) => b.isComplete)) {
+			this.win();
+		}
+	}
+
+	win() {
+		this.ticker.stop();
+		this.addChild(
+			new Text({
+				text: `CONGRATULATIONS`,
+				x: 0,
+				y: 0,
+				anchor: 0.5,
+				style: {
+					fontFamily: "Amatic SC",
+					fill: "white",
+					fontSize: 200,
+				},
+			}),
+		);
 	}
 }
