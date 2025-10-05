@@ -7,6 +7,7 @@ import {
 	Polygon,
 	RenderLayer,
 	Sprite,
+	Texture,
 	Ticker,
 	ViewContainerOptions,
 } from "pixi.js";
@@ -100,7 +101,7 @@ export class Player extends Container {
 				this.speed * ticker.deltaMS,
 				vector.magnitude(),
 			);
-			if (magnitude == 0) {
+			if (vector.magnitude() == 0) {
 				this.speed = -1;
 				this.game.target.visible = false;
 				return;
@@ -302,7 +303,9 @@ export class Web extends Container {
 		this.to = options.to.clone();
 		this.line = this.addChild(
 			new AnimatedSprite({
-				textures: Object.values(Assets.get("WebLong").textures),
+				textures: Object.values(
+					Assets.get("WebLong").textures,
+				) as Texture[],
 				anchor: { x: 0, y: 0.5 },
 				autoPlay: true,
 				animationSpeed: 15 / 60,
@@ -322,7 +325,9 @@ export class Web extends Container {
 		} else if (length < 200) {
 			web = "WebShort";
 		}
-		this.line.textures = Object.values(Assets.get(web).textures);
+		this.line.textures = Object.values(
+			Assets.get(web).textures,
+		) as Texture[];
 		this.line.position = this.from;
 		this.line.scale.set(length / Assets.get(`${web}_000.png`).width, 1);
 		this.line.rotation = Math.atan2(vector.y, vector.x);
