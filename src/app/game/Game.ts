@@ -1,6 +1,7 @@
 import {
 	AnimatedSprite,
 	Assets,
+	Color,
 	Graphics,
 	IRenderLayer,
 	Point,
@@ -19,19 +20,28 @@ import {
 	randomInt,
 	randomItem,
 } from "../../engine/utils/random";
-import { tints } from "./configuration";
+import { timesOfDay } from "./configuration";
+import { lerp } from "../../engine/utils/maths";
 
 const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
 };
 
 export class Background extends Container {
-	constructor() {
-		super();
+	game: Game;
+	tiles: Sprite[][];
+	lt = 0;
+
+	constructor(options: ViewContainerOptions & { game: Game }) {
+		super(options);
+		this.game = options.game;
+		this.game.addToTicker(this);
 		const width = 798;
 		const bg = this.addChild(new RenderLayer());
-		for (let i = -10; i <= 10; i++) {
-			for (let j = -10; j <= 10; j++) {
+		this.tiles = timesOfDay[0].tints.map(() => []);
+		const size = 10;
+		for (let i = -size; i <= size; i++) {
+			for (let j = -size; j <= size; j++) {
 				const tile = this.addChild(
 					// new Graphics().rect(-400, -400, 800, 800).fill("green"),
 					new Sprite({
@@ -43,30 +53,60 @@ export class Background extends Container {
 							x: mod(i, 2) == 1 ? -1 : 1,
 							y: mod(j, 2) == 1 ? -1 : 1,
 						},
-						tint: tints[0],
 					}),
 				);
 				bg.attach(tile);
+				this.tiles[0].push(tile);
 				const item = randomInt(1, 5);
-				this.addChild(
+				const element = this.addChild(
 					new Sprite({
 						texture: Assets.get(`Bg_0${item}.png`),
 						anchor: 0.5,
 						x: i * width + randomInt(-200, 200),
 						y: j * width + randomInt(-200, 200),
 						scale: {
-							x: randomFloat(4, 6),
-							y: randomFloat(4, 6),
+							x: randomFloat(4, 6) / 10,
+							y: randomFloat(4, 6) / 10,
 						},
 						rotation: randomFloat(0, Math.PI * 2),
-						tint: tints[item],
 					}),
 				);
+				this.tiles[item].push(element);
 				// this.addChild(
 				// 	new Graphics().rect(-400, -400, 800, 800).fill("green"),
 				// );
 			}
 		}
+	}
+
+	season = 0;
+	update(ticker: Ticker) {
+		this.lt += ticker.deltaMS / 1000;
+		const duration = timesOfDay[this.season].duration;
+		if (this.lt > duration) {
+			this.season = (this.season + 1) % timesOfDay.length;
+			this.lt -= duration;
+		}
+		const nt = this.lt / timesOfDay[this.season].duration;
+		const getTint = (colorFrom: string, colorTo: string) => {
+			const rgbFrom = new Color(colorFrom).toRgb();
+			const rgbTo = new Color(colorTo).toRgb();
+			return new Color({
+				r: lerp(rgbFrom.r, rgbTo.r, nt) * 255,
+				g: lerp(rgbFrom.g, rgbTo.g, nt) * 255,
+				b: lerp(rgbFrom.b, rgbTo.b, nt) * 255,
+			});
+		};
+
+		this.tiles.forEach((tiles, index) => {
+			const tint = getTint(
+				timesOfDay[this.season].tints[index],
+				timesOfDay[(this.season + 1) % timesOfDay.length].tints[index],
+			);
+			for (const tile of tiles) {
+				tile.tint = tint;
+			}
+		});
 	}
 }
 
@@ -480,7 +520,7 @@ export class Game extends Container {
 		super();
 		this.ticker = new Ticker();
 		this.ticker.start();
-		this.addChild(new Background());
+		this.addChild(new Background({ game: this }));
 		this.target = this.addChild(
 			new Target({
 				game: this,
