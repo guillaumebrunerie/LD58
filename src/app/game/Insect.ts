@@ -158,11 +158,9 @@ export class Insect extends Container {
 		this.speed = 0;
 		this.sprite.visible = false;
 		this.body.visible = true;
-		this.animate<Insect>(
-			this,
-			{ alpha: 0 },
-			{ delay: 1, duration: 3 },
-		).then(() => this.destroy());
+		this.animate<Insect>(this, { alpha: 0 }, { duration: 3 }).then(() =>
+			this.destroy(),
+		);
 	}
 
 	escape(from: Point) {
