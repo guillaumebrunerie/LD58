@@ -319,11 +319,14 @@ export class Web extends Container {
 	redraw() {
 		const vector = this.to.subtract(this.from);
 		const length = vector.magnitude();
+		// 200, 600, 1200, 1800
 		let web = "WebLong";
-		if (length < 400) {
-			web = "WebMedium";
-		} else if (length < 200) {
+		if (length < 350) {
+			web = "WebSuperShort";
+		} else if (length < 8500) {
 			web = "WebShort";
+		} else if (length < 1500) {
+			web = "WebMedium";
 		}
 		this.line.textures = Object.values(
 			Assets.get(web).textures,
@@ -482,8 +485,8 @@ export class Game extends Container {
 		);
 		this.webs = this.addChild(new Container<Web>());
 		this.itemShadows = this.addChild(new RenderLayer());
-		this.player = this.addChild(new Player({ game: this }));
 		this.polygons = this.addChild(new Container<PolygonHighlight>());
+		this.player = this.addChild(new Player({ game: this }));
 
 		this.items = this.addChild(new Container<Item>());
 		for (let i = 0; i < 20; i++) {
