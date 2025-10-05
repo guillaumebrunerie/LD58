@@ -1,187 +1,26 @@
 import {
-	Assets,
-	Color,
-	Graphics,
 	IRenderLayer,
 	Point,
 	Polygon,
 	RenderLayer,
-	Sprite,
 	Ticker,
 	ViewContainerOptions,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
-import {
-	randomBool,
-	randomFloat,
-	randomInt,
-	randomItem,
-} from "../../engine/utils/random";
-import { timesOfDay } from "./configuration";
-import { lerp } from "../../engine/utils/maths";
+import { randomBool, randomItem } from "../../engine/utils/random";
 import { Thread } from "./Thread";
 import { Web } from "./Web";
+import { Player } from "./Player";
+import { Insect } from "./Insect";
+import { Background } from "./Background";
 
-const mod = (a: number, b: number) => {
+export const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
 };
 
-const gameWidth = 1000;
-const gameHeight = 1000;
-
-export class Background extends Container {
-	game: Game;
-	tiles: Sprite[][];
-	lt = 0;
-
-	constructor(options: ViewContainerOptions & { game: Game }) {
-		super(options);
-		this.game = options.game;
-		this.game.addToTicker(this);
-		const width = 798;
-		const bg = this.addChild(new RenderLayer());
-		this.tiles = timesOfDay[0].tints.map(() => []);
-		const size = 1;
-		for (let i = -size; i <= size; i++) {
-			for (let j = -size; j <= size; j++) {
-				const tile = this.addChild(
-					// new Graphics().rect(-400, -400, 800, 800).fill("green"),
-					new Sprite({
-						texture: Assets.get(`BgTile.jpg`),
-						anchor: 0.5,
-						x: i * width,
-						y: j * width,
-						scale: {
-							x: mod(i, 2) == 1 ? -1 : 1,
-							y: mod(j, 2) == 1 ? -1 : 1,
-						},
-					}),
-				);
-				bg.attach(tile);
-				this.tiles[0].push(tile);
-			}
-		}
-		const putBgElement = (item: number, cx: number, cy: number) => {
-			const x =
-				randomInt(-gameWidth / 4, gameWidth / 4) + (cx * gameWidth) / 4;
-			const y =
-				randomInt(-gameHeight / 4, gameHeight / 4) +
-				(cy * gameHeight) / 4;
-			const element = this.addChild(
-				new Sprite({
-					texture: Assets.get(`Bg_0${item}.png`),
-					anchor: 0.5,
-					x,
-					y,
-					scale: {
-						x: randomFloat(2, 3),
-						y: randomFloat(2, 3),
-					},
-					rotation: randomFloat(0, Math.PI * 2),
-				}),
-			);
-			this.tiles[item].push(element);
-		};
-		putBgElement(1, 0, 0);
-		putBgElement(2, 1, 1);
-		putBgElement(3, 1, -1);
-		putBgElement(4, -1, 1);
-		putBgElement(5, -1, -1);
-		// this.addChild(
-		// 	new Graphics()
-		// 		.rect(-gameWidth / 2, -gameHeight / 2, gameWidth, gameHeight)
-		// 		.stroke("blue"),
-		// );
-	}
-
-	season = 0;
-	update(ticker: Ticker) {
-		this.lt += ticker.deltaMS / 1000;
-		const duration = timesOfDay[this.season].duration;
-		if (this.lt > duration) {
-			this.season = (this.season + 1) % timesOfDay.length;
-			this.lt -= duration;
-		}
-		const nt = this.lt / timesOfDay[this.season].duration;
-		const getTint = (colorFrom: string, colorTo: string) => {
-			const rgbFrom = new Color(colorFrom).toRgb();
-			const rgbTo = new Color(colorTo).toRgb();
-			return new Color({
-				r: lerp(rgbFrom.r, rgbTo.r, nt) * 255,
-				g: lerp(rgbFrom.g, rgbTo.g, nt) * 255,
-				b: lerp(rgbFrom.b, rgbTo.b, nt) * 255,
-			});
-		};
-
-		this.tiles.forEach((tiles, index) => {
-			const tint = getTint(
-				timesOfDay[this.season].tints[index],
-				timesOfDay[(this.season + 1) % timesOfDay.length].tints[index],
-			);
-			for (const tile of tiles) {
-				tile.tint = tint;
-			}
-		});
-	}
-}
-
-export class Player extends Container {
-	game: Game;
-	currentThread?: Thread;
-	constructor(options: ViewContainerOptions & { game: Game }) {
-		super(options);
-		this.addChild(
-			new Sprite({
-				texture: Assets.get("Hero.png"),
-				anchor: 0.5,
-			}),
-		);
-		this.game = options.game;
-		this.game.addToTicker(this);
-	}
-	maxSpeed = 3;
-	acceleration = 0.01;
-	speed = 0;
-	update(ticker: Ticker) {
-		if (this.game.lifeCurrent <= 0) {
-			return;
-		}
-		if (this.game.target.visible) {
-			this.speed = Math.min(
-				this.speed + this.acceleration * ticker.deltaMS,
-				this.maxSpeed,
-			);
-			const vector = this.game.target.position.subtract(this.position);
-			const magnitude = Math.min(
-				this.speed * ticker.deltaMS,
-				vector.magnitude(),
-			);
-			if (vector.magnitude() == 0) {
-				this.speed = 0;
-				this.game.target.visible = false;
-				return;
-			}
-			const delta = vector.normalize().multiplyScalar(magnitude);
-			const newPosition = this.position.add(delta);
-			if (
-				newPosition.x < -gameWidth / 2 ||
-				newPosition.x > gameWidth / 2 ||
-				newPosition.y < -gameHeight / 2 ||
-				newPosition.y > gameHeight / 2
-			) {
-				this.speed = 0;
-				this.game.target.visible = false;
-				return;
-			}
-			this.position = newPosition;
-			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
-			if (this.currentThread) {
-				this.currentThread.extendTo(this.position, this.game);
-			}
-		}
-	}
-}
+export const gameWidth = 1000;
+export const gameHeight = 1000;
 
 // Returns the intersection point of two line segments AB and CD, or null if none.
 export const segmentIntersection = (
@@ -213,7 +52,7 @@ export const segmentIntersection = (
 	return null; // no intersection within segment bounds
 };
 
-const segmentIntersectsDisk = (
+export const segmentIntersectsDisk = (
 	from: Point,
 	to: Point,
 	center: Point,
@@ -248,110 +87,6 @@ const segmentIntersectsDisk = (
 		return;
 	}
 };
-
-export class Insect extends Container {
-	speed = randomFloat(0.01, 0.05);
-	radius = 50;
-	game: Game;
-	sprite: Sprite;
-	shadow: Sprite;
-	rotationalSpeed = 0;
-	type: InsectType;
-
-	constructor(options: ViewContainerOptions & { game: Game; type: string }) {
-		super(options);
-
-		this.type = options.type;
-		this.game = options.game;
-		this.game.addToTicker(this);
-
-		this.addChild(
-			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF00"),
-		);
-		this.sprite = this.addChild(
-			new Sprite({ texture: Assets.get(options.type), anchor: 0.5 }),
-		);
-		this.shadow = this.addChild(
-			new Sprite({
-				texture: Assets.get(options.type),
-				anchor: 0.5,
-				x: 40,
-				y: 20,
-				tint: 0,
-				alpha: 0.5,
-			}),
-		);
-		this.game.shadows.attach(this.shadow);
-
-		this.setRotation(Math.random() * Math.PI * 2);
-	}
-
-	getRotation() {
-		return this.sprite.rotation;
-	}
-	setRotation(rotation: number) {
-		this.sprite.rotation = rotation;
-		this.shadow.rotation = rotation;
-	}
-
-	rotationTimeout = 0;
-	update(ticker: Ticker) {
-		const bounds = gameWidth / 2 - 15;
-		const dt = ticker.deltaMS;
-
-		this.rotationTimeout -= dt;
-		if (this.rotationTimeout <= 0) {
-			this.rotationTimeout += randomFloat(1000, 3000);
-			this.rotationalSpeed = randomFloat(-1, 1);
-		}
-		this.setRotation(
-			(dt * this.rotationalSpeed) / 1000 + this.getRotation(),
-		);
-
-		const r = this.getRotation();
-		if (this.x > bounds && Math.sin(r) > 0) {
-			this.setRotation(-r);
-		}
-		if (this.x < -bounds && Math.sin(r) < 0) {
-			this.setRotation(-r);
-		}
-		if (this.y > bounds && -Math.cos(r) > 0) {
-			this.setRotation(Math.PI - r);
-		}
-		if (this.y < -bounds && -Math.cos(r) < 0) {
-			this.setRotation(Math.PI - r);
-		}
-
-		const delta = {
-			x: Math.sin(r) * this.speed * ticker.deltaMS,
-			y: -Math.cos(r) * this.speed * ticker.deltaMS,
-		};
-		this.position = this.position.add(delta);
-
-		for (const thread of this.game.threads.children) {
-			if (thread.isDestroyed || thread.isFrozen) {
-				continue;
-			}
-			const { from, to } = thread;
-			const intersection = segmentIntersectsDisk(
-				from,
-				to,
-				this.position,
-				this.radius * this.scale.x,
-			);
-			if (intersection) {
-				thread.destroyAt(intersection, this.game);
-			}
-		}
-	}
-
-	collect() {
-		this.speed = 0;
-		this.animate<Insect>(this, { alpha: 0 }, { duration: 1 }).then(() =>
-			this.destroy(),
-		);
-	}
-}
 
 export class Target extends Container {
 	constructor(options: ViewContainerOptions & { game: Game }) {
@@ -413,7 +148,7 @@ export class Game extends Container {
 		this.threads = this.addChild(new Container<Thread>());
 		this.shadows = this.addChild(new RenderLayer());
 		this.webs = this.addChild(new Container<Web>());
-		this.player = this.addChild(new Player({ game: this, scale: 0.2 }));
+		this.player = this.addChild(new Player({ game: this, scale: 0.4 }));
 
 		this.wantedConfigurations = [
 			pickConfiguration(),
@@ -443,7 +178,7 @@ export class Game extends Container {
 					Math.random() * gameWidth - gameWidth / 2,
 					Math.random() * gameHeight - gameHeight / 2,
 				),
-				scale: 0.2,
+				scale: 0.3,
 			}),
 		);
 	}
@@ -470,13 +205,8 @@ export class Game extends Container {
 		this.player.speed = 0;
 	}
 
-	// useLife(amount: number) {
-	// 	this.lifeCurrent -= amount;
-	// 	this.hud.updateLife(this.lifeCurrent / this.lifeMax);
-	// }
-
 	webCollect(polygon: Polygon) {
-		this.webs.addChild(new Web({ game: this, polygon }));
+		this.webs.addChild(new Web({ polygon }));
 		const collectedInsects = [];
 		for (const insect of this.insects.children) {
 			if (polygon.contains(insect.x, insect.y)) {

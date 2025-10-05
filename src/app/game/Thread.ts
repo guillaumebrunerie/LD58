@@ -23,6 +23,7 @@ export class Thread extends Container {
 		options: ViewContainerOptions & {
 			from: Point;
 			to: Point;
+			scaleY?: number;
 			previousThread?: Thread;
 		},
 	) {
@@ -34,6 +35,7 @@ export class Thread extends Container {
 				textures: Object.values(
 					Assets.get("WebLong").textures,
 				) as Texture[],
+				scale: { x: 1, y: options.scaleY ?? 1 },
 				anchor: { x: 0, y: 0.5 },
 				autoPlay: true,
 				animationSpeed: 15 / 60,
@@ -70,7 +72,7 @@ export class Thread extends Container {
 			Assets.get(web).textures,
 		) as Texture[];
 		this.line.position = this.from;
-		this.line.scale.set(length / Assets.get(`${web}_000.png`).width, 1);
+		this.line.scale.x = length / Assets.get(`${web}_000.png`).width;
 		this.line.rotation = Math.atan2(vector.y, vector.x);
 		this.line.play();
 
@@ -84,8 +86,6 @@ export class Thread extends Container {
 		const result = this.findThreadIntersection(game.threads.children);
 		if (result) {
 			const { thread, point } = result;
-			const previousTo = thread.to.clone();
-			const previousFrom = this.from.clone();
 			thread.extendTo(point.clone(), game);
 			const points = [point.clone(), this.from.clone()];
 			this.from = point.clone();
@@ -93,26 +93,8 @@ export class Thread extends Container {
 				const previousThread = this.previousThread;
 				this.previousThread = previousThread?.previousThread;
 				points.push(previousThread.from.clone());
-				previousThread.freeze();
+				previousThread.destroy();
 			}
-
-			const newThread1 = new Thread({
-				from: previousFrom,
-				to: point.clone(),
-			});
-			this.parent!.addChild(newThread1);
-			newThread1.isDestroyed = true;
-			newThread1.freeze();
-			game.addToTicker(newThread1);
-
-			const newThread2 = new Thread({
-				from: point.clone(),
-				to: previousTo.clone(),
-			});
-			this.parent!.addChild(newThread2);
-			newThread1.isDestroyed = true;
-			newThread2.freeze();
-			game.addToTicker(newThread2);
 
 			game.webCollect(new Polygon(points));
 		}
