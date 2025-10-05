@@ -287,6 +287,7 @@ export class Web extends Container {
 	to: Point;
 	// line: Graphics;
 	line: AnimatedSprite;
+	dot: AnimatedSprite;
 	previousWeb?: Web;
 	isDestroyed = false;
 	constructor(
@@ -307,6 +308,16 @@ export class Web extends Container {
 					Assets.get("WebLong").textures,
 				) as Texture[],
 				anchor: { x: 0, y: 0.5 },
+				autoPlay: true,
+				animationSpeed: 15 / 60,
+			}),
+		);
+		this.dot = this.addChild(
+			new AnimatedSprite({
+				textures: Object.values(
+					Assets.get("WebDot").textures,
+				) as Texture[],
+				anchor: 0.5,
 				autoPlay: true,
 				animationSpeed: 15 / 60,
 			}),
@@ -336,15 +347,8 @@ export class Web extends Container {
 		this.line.rotation = Math.atan2(vector.y, vector.x);
 		this.line.play();
 
-		// this.line
-		// 	.clear()
-		// 	.moveTo(this.from.x, this.from.y)
-		// 	.lineTo(this.to.x, this.to.y)
-		// 	.stroke({ color: 0xffffff, width: 5 })
-		// 	.circle(this.from.x, this.from.y, 2.5)
-		// 	.fill({ color: 0xffffff })
-		// 	.circle(this.to.x, this.to.y, 2.5)
-		// 	.fill({ color: 0xffffff });
+		this.dot.position.set(this.from.x, this.from.y);
+		this.dot.play();
 	}
 
 	extendTo(point: Point) {
