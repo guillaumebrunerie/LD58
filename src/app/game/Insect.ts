@@ -15,7 +15,7 @@ import { getIdleAnimation } from "../utils/animation";
 export const insectBounds = 400;
 
 export class Insect extends Container {
-	speed = randomFloat(0.01, 0.05);
+	speed = randomFloat(0.02, 0.05);
 	radius = 50;
 	game: Game;
 	sprite: AnimatedSprite;
