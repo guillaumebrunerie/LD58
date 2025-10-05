@@ -7,11 +7,60 @@
 		<link rel="stylesheet" href="/style.css" />
 		<title>PixiJS - Template</title>
 	</head>
-
+	<style type="text/css">
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			-webkit-touch-callout: none; /* Safari */
+			user-select: none;
+		}
+		body {
+			display: flex;
+			display: -webkit-flex;
+			-webkit-justify-content: center;
+			justify-content: center;
+			-webkit-align-items: center;
+			align-items: center;
+			/* transition: background-color 0.1s; */
+			background-color: rgb(49 49 49);
+		}
+		body.levelSelect {
+			background-color: rgb(1 2 20);
+		}
+		#pixi-container {
+			display: contents;
+		}
+		canvas {
+			display: block;
+			outline: none;
+			height: 100%;
+			max-height: 177.77vw;
+			width: 100%;
+			max-width: 56.25vh;
+		}
+		#pixi-container img {
+			position: absolute;
+			width: 100%;
+			max-height: 177.77vw;
+			height: 100%;
+			max-width: 56.25vh;
+		}
+		@media (orientation: landscape) {
+			canvas,
+			#pixi-container img {
+				max-height: 56.25vw;
+				max-width: 177.77vh;
+			}
+		}
+	</style>
 	<body>
-		<div id="app">
-			<div id="pixi-container"></div>
+		<div id="pixi-container">
+			<!-- <img src="gfx/Loading.jpg" /> -->
 		</div>
+		<!-- <div id="app"> -->
+		<!-- 	<div id="pixi-container"></div> -->
+		<!-- </div> -->
 		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>

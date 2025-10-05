@@ -60,6 +60,7 @@ export class GameScreen extends Container {
 	}
 
 	pointerMove(event: FederatedPointerEvent) {
+		return;
 		const pointerData = this.pointers[event.pointerId];
 		if (!pointerData) {
 			return;
@@ -139,13 +140,13 @@ export class GameScreen extends Container {
 	}
 
 	wheel(event: FederatedWheelEvent) {
-		const position = event.getLocalPosition(this.touchArea);
-		const otherPositionL = this.game.toLocal(position, this.touchArea);
-		this.multiplyScale(1 - event.deltaY * 0.001);
-		const otherPositionL2 = this.game.toLocal(position, this.touchArea);
-		const delta2 = this.gameContainer
-			.toLocal(otherPositionL2, this.game)
-			.subtract(this.gameContainer.toLocal(otherPositionL, this.game));
-		this.game.position = this.game.position.add(delta2);
+		// const position = event.getLocalPosition(this.touchArea);
+		// const otherPositionL = this.game.toLocal(position, this.touchArea);
+		// this.multiplyScale(1 - event.deltaY * 0.001);
+		// const otherPositionL2 = this.game.toLocal(position, this.touchArea);
+		// const delta2 = this.gameContainer
+		// 	.toLocal(otherPositionL2, this.game)
+		// 	.subtract(this.gameContainer.toLocal(otherPositionL, this.game));
+		// this.game.position = this.game.position.add(delta2);
 	}
 }

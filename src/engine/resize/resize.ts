@@ -5,6 +5,11 @@ export function resize(
 	minHeight: number,
 	letterbox: boolean,
 ) {
+	if (w < h) {
+		return { width: minWidth, height: minHeight };
+	} else {
+		return { width: minHeight, height: minWidth };
+	}
 	const aspectRatio = minWidth / minHeight;
 	let canvasWidth = w;
 	let canvasHeight = h;

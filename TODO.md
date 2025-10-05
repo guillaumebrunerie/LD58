@@ -1,15 +1,20 @@
-UI:
-- battery/life
-- inventory
-- hamburger menu
+== Framework
+- Decide all the sizes (of the canvas, of the view, etc.)
+- Start screen
+- Sounds/music/sound on/off button
+- Pause and various menus
 
-Game:
-- robot
-- background
-- items
+== Game design
+- Dying
+- Level design
+- Winning
+- Rethink the controls
+- 3 lives
 
-Game UI:
-- range
-
-Gameplay:
-- click to move somewhere
+== Cosmetics
+- When creating a web, delete threads inside
+- Sides of the web inside the web class, and with the same scale
+- Rotating shadows
+- Add insect corpses and dying animation?
+- Idle animations for insects
+- Better looking inventory

@@ -21,14 +21,14 @@ import {
 	randomItem,
 } from "../../engine/utils/random";
 import { timesOfDay } from "./configuration";
-import { lerp } from "../../engine/utils/maths";
+import { clamp, lerp } from "../../engine/utils/maths";
 
 const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
 };
 
-const gameWidth = 1500;
-const gameHeight = 1500;
+const gameWidth = 1000;
+const gameHeight = 1000;
 
 export class Background extends Container {
 	game: Game;
@@ -142,7 +142,7 @@ export class Player extends Container {
 	}
 	maxSpeed = 3;
 	acceleration = 0.01;
-	speed = -1;
+	speed = 0;
 	update(ticker: Ticker) {
 		if (this.game.lifeCurrent <= 0) {
 			return;
@@ -158,14 +158,24 @@ export class Player extends Container {
 				vector.magnitude(),
 			);
 			if (vector.magnitude() == 0) {
-				this.speed = -1;
+				this.speed = 0;
 				this.game.target.visible = false;
 				return;
 			}
 			const delta = vector.normalize().multiplyScalar(magnitude);
-			this.position = this.position.add(delta);
+			const newPosition = this.position.add(delta);
+			if (
+				newPosition.x < -gameWidth / 2 ||
+				newPosition.x > gameWidth / 2 ||
+				newPosition.y < -gameHeight / 2 ||
+				newPosition.y > gameHeight / 2
+			) {
+				this.speed = 0;
+				this.game.target.visible = false;
+				return;
+			}
+			this.position = newPosition;
 			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
-			// this.game.useLife(ticker.deltaMS);
 			if (this.currentWeb) {
 				this.currentWeb.extendTo(this.position);
 			}
@@ -392,6 +402,7 @@ export class Web extends Container {
 				anchor: 0.5,
 				autoPlay: true,
 				animationSpeed: 15 / 60,
+				alpha: 0,
 			}),
 		);
 		this.previousWeb = options.previousWeb;
@@ -682,6 +693,7 @@ export class Game extends Container {
 			previousWeb: this.player.currentWeb,
 		});
 		this.player.currentWeb = this.webs.addChild(web);
+		this.player.speed = 0;
 	}
 
 	// useLife(amount: number) {

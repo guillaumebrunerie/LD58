@@ -140,14 +140,16 @@ export class Blueprint extends Container {
 				}),
 			),
 		);
-		const gap = 115;
+		const gap = 105;
 		if (this.items.length == 2) {
 			this.items[0].x = -gap;
 			this.items[1].x = gap;
 		} else if (this.items.length == 3) {
 			this.items[0].x = -gap;
+			this.items[0].y = (gap * Math.sqrt(3)) / 2;
 			this.items[1].x = gap;
-			this.items[2].y = -gap * Math.sqrt(3);
+			this.items[1].y = (gap * Math.sqrt(3)) / 2;
+			this.items[2].y = (-gap * Math.sqrt(3)) / 2;
 		}
 	}
 
@@ -161,13 +163,11 @@ export class Blueprint extends Container {
 
 export class HUD extends Container {
 	game: Game;
-	// lifebar: Lifebar;
 	blueprints: Container<Blueprint>;
 
 	constructor(options: { game: Game }) {
 		super();
 		this.game = options.game;
-		// this.lifebar = this.addChild(new Lifebar());
 
 		this.blueprints = this.addChild(new Container<Blueprint>());
 		this.game.wantedConfigurations.forEach((itemTypes) =>
@@ -181,16 +181,21 @@ export class HUD extends Container {
 	}
 
 	resize(width: number, height: number) {
-		// this.lifebar.position.set(width / 2, 80);
-		this.blueprints.position.set(0, height - 100);
+		if (width < height) {
+			// Portrait
+			this.blueprints.position.set(0, height - 100);
 
-		const gap = width / (this.blueprints.children.length + 1);
-		this.blueprints.children.forEach((blueprint, i) => {
-			blueprint.x = gap * (i + 1);
-		});
+			const gap = width / this.blueprints.children.length;
+			this.blueprints.children.forEach((blueprint, i) => {
+				blueprint.x = gap * (i + 1 / 2);
+			});
+		} else {
+			// Landscape
+			this.blueprints.position.set(1690, 0);
+			const gap = height / this.blueprints.children.length;
+			this.blueprints.children.forEach((blueprint, i) => {
+				blueprint.y = gap * (i + 1 / 2);
+			});
+		}
 	}
-
-	// updateLife(amount: number) {
-	// 	this.lifebar.updateLife(amount);
-	// }
 }
