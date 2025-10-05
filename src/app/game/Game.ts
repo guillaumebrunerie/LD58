@@ -57,25 +57,27 @@ export class Background extends Container {
 				);
 				bg.attach(tile);
 				this.tiles[0].push(tile);
-				const item = randomInt(1, 5);
-				const element = this.addChild(
-					new Sprite({
-						texture: Assets.get(`Bg_0${item}.png`),
-						anchor: 0.5,
-						x: i * width + randomInt(-200, 200),
-						y: j * width + randomInt(-200, 200),
-						scale: {
-							x: randomFloat(4, 6) / 10,
-							y: randomFloat(4, 6) / 10,
-						},
-						rotation: randomFloat(0, Math.PI * 2),
-					}),
-				);
-				this.tiles[item].push(element);
-				// this.addChild(
-				// 	new Graphics().rect(-400, -400, 800, 800).fill("green"),
-				// );
 			}
+		}
+		for (let i = 0; i < 5; i++) {
+			const item = randomInt(1, 5);
+			const element = this.addChild(
+				new Sprite({
+					texture: Assets.get(`Bg_0${item}.png`),
+					anchor: 0.5,
+					x: randomInt(-2000, 2000),
+					y: randomInt(-2000, 2000),
+					scale: {
+						x: randomFloat(4, 6),
+						y: randomFloat(4, 6),
+					},
+					rotation: randomFloat(0, Math.PI * 2),
+				}),
+			);
+			this.tiles[item].push(element);
+			// this.addChild(
+			// 	new Graphics().rect(-400, -400, 800, 800).fill("green"),
+			// );
 		}
 	}
 
