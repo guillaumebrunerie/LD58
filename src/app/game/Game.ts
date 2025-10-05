@@ -525,13 +525,22 @@ export class PolygonHighlight extends Container {
 
 		let sumX = 0;
 		let sumY = 0;
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
 		options.polygon.points.forEach((v, i) => {
 			if (i % 2 == 0) {
 				sumX += v;
+				minX = Math.min(minX, v);
+				maxX = Math.max(maxX, v);
 			} else {
 				sumY += v;
+				minY = Math.min(minY, v);
+				maxY = Math.max(maxY, v);
 			}
 		});
+		const size = Math.max(maxX - minX, maxY - minY);
 		const pointsCount = options.polygon.points.length / 2;
 		const centerX = sumX / pointsCount;
 		const centerY = sumY / pointsCount;
@@ -548,6 +557,8 @@ export class PolygonHighlight extends Container {
 					x: centerX,
 					y: centerY,
 				},
+				rotation: randomFloat(0, Math.PI * 2),
+				scale: size * 0.002,
 			}),
 		);
 
