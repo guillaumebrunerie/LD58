@@ -3,6 +3,7 @@ import {
 	FederatedWheelEvent,
 	Graphics,
 	Point,
+	Text,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
@@ -18,13 +19,14 @@ export class GameScreen extends Container {
 	game: Game;
 	hud: HUD;
 	touchArea: Graphics;
+	level: number = levels.length - 1;
 
 	constructor() {
 		super();
 
 		this.gameContainer = this.addChild(new Container());
 		this.game = this.gameContainer.addChild(
-			new Game(levels[levels.length - 1]),
+			new Game({ level: levels[this.level] }),
 		);
 
 		this.touchArea = this.addChild(
@@ -56,6 +58,20 @@ export class GameScreen extends Container {
 
 		this.hud = this.addChild(new HUD({ game: this.game }));
 		this.game.hud = this.hud;
+
+		this.gameContainer.addChild(
+			new Text({
+				text: `Level ${this.level + 1}`,
+				x: 0,
+				y: -500,
+				anchor: 0.5,
+				style: {
+					fontFamily: "Amatic SC",
+					fill: "white",
+					fontSize: 50,
+				},
+			}),
+		);
 	}
 
 	async show() {

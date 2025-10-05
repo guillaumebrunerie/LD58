@@ -3,6 +3,7 @@ import {
 	Point,
 	Polygon,
 	RenderLayer,
+	Text,
 	Ticker,
 	ViewContainerOptions,
 } from "pixi.js";
@@ -14,6 +15,7 @@ import { Web } from "./Web";
 import { Player } from "./Player";
 import { Insect, insectBounds } from "./Insect";
 import { Background } from "./Background";
+import { Level } from "./levels";
 
 export const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
@@ -149,11 +151,7 @@ export class Game extends Container {
 
 	wantedConfigurations: InsectType[][];
 
-	constructor(options: {
-		configurationTypes: ConfigurationType[];
-		multiples: number;
-		additional: number;
-	}) {
+	constructor(options: { level: Level }) {
 		super();
 		this.ticker = new Ticker();
 		this.addChild(new Background({ game: this }));
@@ -169,19 +167,19 @@ export class Game extends Container {
 		this.player = this.addChild(new Player({ game: this, scale: 0.3 }));
 
 		const antipool: InsectType[] = [];
-		this.wantedConfigurations = options.configurationTypes.map((type) =>
-			pickConfiguration(type, antipool),
+		this.wantedConfigurations = options.level.configurationTypes.map(
+			(type) => pickConfiguration(type, antipool),
 		);
 
 		this.insects = this.addChild(new Container<Insect>());
 		for (const configuration of this.wantedConfigurations) {
 			for (const type of configuration) {
-				for (let i = 0; i < options.multiples; i++) {
+				for (let i = 0; i < options.level.multiples; i++) {
 					this.spawnInsect(type);
 				}
 			}
 		}
-		for (let i = 0; i < options.additional; i++) {
+		for (let i = 0; i < options.level.additional; i++) {
 			this.spawnInsect();
 		}
 	}

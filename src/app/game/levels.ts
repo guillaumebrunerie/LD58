@@ -1,6 +1,6 @@
 import type { ConfigurationType } from "./Game";
 
-type Level = {
+export type Level = {
 	configurationTypes: ConfigurationType[];
 	multiples: number;
 	additional: number;
