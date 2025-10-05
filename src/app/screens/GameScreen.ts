@@ -121,7 +121,7 @@ export class GameScreen extends Container {
 		}
 
 		const tapDelay = 300;
-		const posThreshold = 10;
+		const posThreshold = 50;
 		const deltaT = Date.now() - pointerData.downTime;
 		const deltaPos = pointerData
 			.position!.subtract(pointerData.initialPosition!)
