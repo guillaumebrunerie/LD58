@@ -296,7 +296,7 @@ export class Item extends Container {
 		this.position = this.position.add(delta);
 
 		for (const web of this.game.webs.children) {
-			if (web.isDestroyed) {
+			if (web.isDestroyed || web.isFrozen) {
 				continue;
 			}
 			const { from, to } = web;
@@ -337,6 +337,8 @@ export class Web extends Container {
 	dot: AnimatedSprite;
 	previousWeb?: Web;
 	isDestroyed = false;
+	isFrozen = false;
+
 	constructor(
 		options: ViewContainerOptions & {
 			game: Game;
@@ -404,6 +406,8 @@ export class Web extends Container {
 		const result = this.findWebIntersection();
 		if (result) {
 			const { web, point } = result;
+			const previousTo = web.to.clone();
+			const previousFrom = this.from.clone();
 			web.extendTo(point.clone());
 			const points = [point.clone(), this.from.clone()];
 			this.from = point.clone();
@@ -411,8 +415,27 @@ export class Web extends Container {
 				const previousWeb = this.previousWeb;
 				this.previousWeb = previousWeb?.previousWeb;
 				points.push(previousWeb.from.clone());
-				previousWeb.destroy();
+				previousWeb.freeze();
 			}
+
+			const newWeb1 = new Web({
+				game: this.game,
+				from: previousFrom,
+				to: point.clone(),
+			});
+			this.parent!.addChild(newWeb1);
+			newWeb1.isDestroyed = true;
+			newWeb1.freeze();
+
+			const newWeb2 = new Web({
+				game: this.game,
+				from: point.clone(),
+				to: previousTo.clone(),
+			});
+			this.parent!.addChild(newWeb2);
+			newWeb1.isDestroyed = true;
+			newWeb2.freeze();
+
 			this.game.polygonCollect(new Polygon(points));
 		}
 
@@ -457,6 +480,9 @@ export class Web extends Container {
 
 	destroySpeed = 5;
 	update(ticker: Ticker) {
+		if (this.isFrozen) {
+			return;
+		}
 		if (this.isDestroyed) {
 			const vector = this.to.subtract(this.from);
 			const magnitude = Math.min(
@@ -474,6 +500,12 @@ export class Web extends Container {
 			this.extendTo(this.to.subtract(delta));
 		}
 	}
+
+	freeze() {
+		this.isFrozen = true;
+		this.line.stop();
+		this.dot.stop();
+	}
 }
 
 export class PolygonHighlight extends Container {
@@ -481,15 +513,40 @@ export class PolygonHighlight extends Container {
 		options: ViewContainerOptions & { game: Game; polygon: Polygon },
 	) {
 		super(options);
+
+		let sumX = 0;
+		let sumY = 0;
+		options.polygon.points.forEach((v, i) => {
+			if (i % 2 == 0) {
+				sumX += v;
+			} else {
+				sumY += v;
+			}
+		});
+		const pointsCount = options.polygon.points.length / 2;
+		const centerX = sumX / pointsCount;
+		const centerY = sumY / pointsCount;
+
+		const mask = this.addChild(
+			new Graphics().poly(options.polygon.points).fill(),
+		);
 		this.addChild(
-			new Graphics().poly(options.polygon.points).fill("white"),
+			new Sprite({
+				texture: Assets.get("WebStill.png"),
+				anchor: 0.5,
+				mask,
+				position: {
+					x: centerX,
+					y: centerY,
+				},
+			}),
 		);
 
-		this.animate<PolygonHighlight>(
-			this,
-			{ alpha: 0 },
-			{ duration: 0.5 },
-		).then(() => this.destroy());
+		// this.animate<PolygonHighlight>(
+		// 	this,
+		// 	{ alpha: 0 },
+		// 	{ duration: 0.5 },
+		// ).then(() => this.destroy());
 	}
 }
 
