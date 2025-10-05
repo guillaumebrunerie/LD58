@@ -85,6 +85,7 @@ export class GameScreen extends Container {
 						fontFamily: "Amatic SC",
 						fill: "red",
 						fontSize: 50,
+						fontWeight: "bold",
 					},
 				}),
 			}),
@@ -92,6 +93,24 @@ export class GameScreen extends Container {
 		reset.position.set(100, 500);
 		reset.on("pointertap", () => {
 			userSettings.resetLevel();
+			engine().navigation.showScreen(GameScreen);
+		});
+
+		const restart = this.addChild(
+			new FancyButton({
+				text: new Text({
+					text: `Restart`,
+					style: {
+						fontFamily: "Amatic SC",
+						fill: "white",
+						fontSize: 100,
+						fontWeight: "bold",
+					},
+				}),
+			}),
+		);
+		restart.position.set(100, 300);
+		restart.on("pointertap", () => {
 			engine().navigation.showScreen(GameScreen);
 		});
 	}
