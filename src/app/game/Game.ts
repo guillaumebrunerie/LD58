@@ -1,7 +1,9 @@
 import {
 	Assets,
+	Circle,
 	Graphics,
 	Point,
+	Polygon,
 	Sprite,
 	Ticker,
 	ViewContainerOptions,
@@ -158,6 +160,13 @@ export class Item extends Container {
 			}
 		}
 	}
+
+	collect() {
+		this.speed = 0;
+		this.animate<Item>(this, { alpha: 0 }, { duration: 1 }).then(() =>
+			this.destroy(),
+		);
+	}
 }
 
 export class Target extends Container {
@@ -207,24 +216,59 @@ export class Web extends Container {
 
 	extendTo(point: Point) {
 		this.to = point.clone();
+
+		const result = this.findWebIntersection();
+		if (result) {
+			const { web, point } = result;
+			web.extendTo(point.clone());
+			const points = [point.clone(), this.from.clone()];
+			this.from = point.clone();
+			while (this.previousWeb && this.previousWeb != web) {
+				const previousWeb = this.previousWeb;
+				this.previousWeb = previousWeb?.previousWeb;
+				points.push(previousWeb.from.clone());
+				previousWeb.destroy();
+			}
+			this.game.polygonCollect(new Polygon(points));
+		}
+
 		this.redraw();
+	}
+
+	findWebIntersection() {
+		for (const web of this.game.webs.children) {
+			if (web == this) {
+				continue;
+			}
+			const point = segmentIntersection(
+				this.from,
+				this.to,
+				web.from,
+				web.to,
+			);
+			if (point) {
+				return { web, point };
+			}
+		}
 	}
 
 	destroyAt(point: Point) {
 		if (this.isDestroyed) {
 			return;
 		}
+
 		const newWeb = new Web({
 			game: this.game,
 			from: this.from.clone(),
 			to: point.clone(),
 			previousWeb: this.previousWeb,
 		});
-		this.from = point.clone();
-		this.redraw();
-		this.previousWeb = newWeb;
 		this.parent!.addChild(newWeb);
 		newWeb.isDestroyed = true;
+
+		this.from = point.clone();
+		this.previousWeb = undefined;
+		this.redraw();
 	}
 
 	destroySpeed = 5;
@@ -248,12 +292,30 @@ export class Web extends Container {
 	}
 }
 
+export class PolygonHighlight extends Container {
+	constructor(
+		options: ViewContainerOptions & { game: Game; polygon: Polygon },
+	) {
+		super(options);
+		this.addChild(
+			new Graphics().poly(options.polygon.points).fill("white"),
+		);
+
+		this.animate<PolygonHighlight>(
+			this,
+			{ alpha: 0 },
+			{ duration: 0.5 },
+		).then(() => this.destroy());
+	}
+}
+
 export class Game extends Container {
 	ticker: Ticker;
 
 	player: Player;
 	webs: Container<Web>;
 	items: Container<Item>;
+	polygons: Container<PolygonHighlight>;
 	target: Target;
 	hud!: HUD;
 	lifeMax = 100000;
@@ -272,6 +334,7 @@ export class Game extends Container {
 		);
 		this.webs = this.addChild(new Container<Web>());
 		this.player = this.addChild(new Player({ game: this }));
+		this.polygons = this.addChild(new Container<PolygonHighlight>());
 
 		this.items = this.addChild(new Container<Item>());
 		for (let i = 0; i < 20; i++) {
@@ -317,5 +380,16 @@ export class Game extends Container {
 	useLife(amount: number) {
 		this.lifeCurrent -= amount;
 		this.hud.updateLife(this.lifeCurrent / this.lifeMax);
+	}
+
+	polygonCollect(polygon: Polygon) {
+		this.polygons.addChild(new PolygonHighlight({ game: this, polygon }));
+		const collectedItems = [];
+		for (const item of this.items.children) {
+			if (polygon.contains(item.x, item.y)) {
+				item.collect();
+				collectedItems.push(item);
+			}
+		}
 	}
 }
