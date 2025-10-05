@@ -12,12 +12,11 @@ import {
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
 import { randomFloat, randomInt, randomItem } from "../../engine/utils/random";
+import { tints } from "./configuration";
 
 const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
 };
-
-const tint = "#DD6666";
 
 export class Background extends Container {
 	constructor() {
@@ -37,13 +36,14 @@ export class Background extends Container {
 							x: mod(i, 2) == 1 ? -1 : 1,
 							y: mod(j, 2) == 1 ? -1 : 1,
 						},
-						tint,
+						tint: tints[0],
 					}),
 				);
 				bg.attach(tile);
+				const item = randomInt(1, 5);
 				this.addChild(
 					new Sprite({
-						texture: Assets.get(`Bg_0${randomInt(1, 5)}.png`),
+						texture: Assets.get(`Bg_0${item}.png`),
 						anchor: 0.5,
 						x: i * width + randomInt(-200, 200),
 						y: j * width + randomInt(-200, 200),
@@ -52,7 +52,7 @@ export class Background extends Container {
 							y: randomFloat(0.5, 2),
 						},
 						rotation: randomFloat(0, Math.PI * 2),
-						tint,
+						tint: tints[item],
 					}),
 				);
 				// this.addChild(
