@@ -201,7 +201,7 @@ export class Game extends Container {
 					randomFloat(insectBounds, -insectBounds),
 					randomFloat(insectBounds, -insectBounds),
 				),
-				scale: 0.3,
+				scale: 0.35,
 			}),
 		);
 	}
