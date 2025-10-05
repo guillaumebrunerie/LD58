@@ -4,6 +4,7 @@ import {
 	Graphics,
 	Assets,
 	Ticker,
+	Point,
 } from "pixi.js";
 import { randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
@@ -17,6 +18,7 @@ export class Insect extends Container {
 	shadow: Sprite;
 	rotationalSpeed = 0;
 	type: InsectType;
+	isEscaping = false;
 
 	constructor(options: ViewContainerOptions & { game: Game; type: string }) {
 		super(options);
@@ -69,17 +71,27 @@ export class Insect extends Container {
 		);
 
 		const r = this.getRotation();
-		if (this.x > bounds && Math.sin(r) > 0) {
-			this.setRotation(-r);
-		}
-		if (this.x < -bounds && Math.sin(r) < 0) {
-			this.setRotation(-r);
-		}
-		if (this.y > bounds && -Math.cos(r) > 0) {
-			this.setRotation(Math.PI - r);
-		}
-		if (this.y < -bounds && -Math.cos(r) < 0) {
-			this.setRotation(Math.PI - r);
+		if (this.isEscaping) {
+			if (
+				Math.abs(this.x) > 2 * bounds ||
+				Math.abs(this.y) > 2 * bounds
+			) {
+				this.destroy();
+				return;
+			}
+		} else {
+			if (this.x > bounds && Math.sin(r) > 0) {
+				this.setRotation(-r);
+			}
+			if (this.x < -bounds && Math.sin(r) < 0) {
+				this.setRotation(-r);
+			}
+			if (this.y > bounds && -Math.cos(r) > 0) {
+				this.setRotation(Math.PI - r);
+			}
+			if (this.y < -bounds && -Math.cos(r) < 0) {
+				this.setRotation(Math.PI - r);
+			}
 		}
 
 		const delta = {
@@ -103,6 +115,14 @@ export class Insect extends Container {
 				thread.destroyAt(intersection, this.game);
 			}
 		}
+
+		const distanceToPlayer = this.position
+			.subtract(this.game.player.position)
+			.magnitude();
+		const hitbox = 50;
+		if (distanceToPlayer < hitbox) {
+			this.escape(this.game.player.position);
+		}
 	}
 
 	collect() {
@@ -110,5 +130,13 @@ export class Insect extends Container {
 		this.animate<Insect>(this, { alpha: 0 }, { duration: 1 }).then(() =>
 			this.destroy(),
 		);
+	}
+
+	escape(from: Point) {
+		const vector = this.position.subtract(from);
+		const angle = Math.atan2(vector.y, vector.x);
+		this.setRotation(angle + Math.PI / 2);
+		this.speed = 1;
+		this.isEscaping = true;
 	}
 }

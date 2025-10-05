@@ -148,7 +148,7 @@ export class Game extends Container {
 		this.threads = this.addChild(new Container<Thread>());
 		this.shadows = this.addChild(new RenderLayer());
 		this.webs = this.addChild(new Container<Web>());
-		this.player = this.addChild(new Player({ game: this, scale: 0.4 }));
+		this.player = this.addChild(new Player({ game: this, scale: 0.3 }));
 
 		this.wantedConfigurations = [
 			pickConfiguration(),
@@ -162,9 +162,10 @@ export class Game extends Container {
 		for (const configuration of this.wantedConfigurations) {
 			for (const type of configuration) {
 				this.spawnInsect(type);
+				this.spawnInsect(type);
 			}
 		}
-		for (let i = 0; i < 10; i++) {
+		for (let i = 0; i < 5; i++) {
 			this.spawnInsect();
 		}
 	}

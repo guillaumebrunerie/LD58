@@ -49,7 +49,7 @@ export class Thread extends Container {
 				anchor: 0.5,
 				autoPlay: true,
 				animationSpeed: 15 / 60,
-				scale: 0.4,
+				scale: 0.4 * (options.scaleY ?? 1),
 				// alpha: 0,
 			}),
 		);
