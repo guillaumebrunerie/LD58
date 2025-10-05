@@ -8,6 +8,7 @@ import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 import { HUD } from "../ui/HUD";
 import { clamp } from "../../engine/utils/maths";
+import { Thread } from "../game/Thread";
 
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
@@ -31,6 +32,24 @@ export class GameScreen extends Container {
 		this.touchArea.on("pointermove", (e) => this.pointerMove(e));
 		this.touchArea.on("pointerup", (e) => this.pointerUp(e));
 		this.touchArea.on("wheel", (e) => this.wheel(e));
+
+		this.addChild(
+			new Graphics({ alpha: 0.3 })
+				.rect(0, 0, 1920, 1080)
+				.fill("black")
+				.rect(1920 / 2 - 500, 1080 / 2 - 500, 1000, 1000)
+				.cut(),
+		);
+		const a = new Point(1920 / 2 - 500, 1080 / 2 - 500);
+		const b = new Point(1920 / 2 + 500, 1080 / 2 - 500);
+		const c = new Point(1920 / 2 + 500, 1080 / 2 + 500);
+		const d = new Point(1920 / 2 - 500, 1080 / 2 + 500);
+		this.addChild(
+			new Thread({ from: a, to: b }),
+			new Thread({ from: b, to: c }),
+			new Thread({ from: c, to: d }),
+			new Thread({ from: d, to: a }),
+		);
 
 		this.hud = this.addChild(new HUD({ game: this.game }));
 		this.game.hud = this.hud;

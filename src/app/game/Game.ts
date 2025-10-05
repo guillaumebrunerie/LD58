@@ -1,5 +1,4 @@
 import {
-	AnimatedSprite,
 	Assets,
 	Color,
 	Graphics,
@@ -8,7 +7,6 @@ import {
 	Polygon,
 	RenderLayer,
 	Sprite,
-	Texture,
 	Ticker,
 	ViewContainerOptions,
 } from "pixi.js";
@@ -21,7 +19,9 @@ import {
 	randomItem,
 } from "../../engine/utils/random";
 import { timesOfDay } from "./configuration";
-import { clamp, lerp } from "../../engine/utils/maths";
+import { lerp } from "../../engine/utils/maths";
+import { Thread } from "./Thread";
+import { Web } from "./Web";
 
 const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
@@ -88,11 +88,11 @@ export class Background extends Container {
 		putBgElement(3, 1, -1);
 		putBgElement(4, -1, 1);
 		putBgElement(5, -1, -1);
-		this.addChild(
-			new Graphics()
-				.rect(-gameWidth / 2, -gameHeight / 2, gameWidth, gameHeight)
-				.stroke("blue"),
-		);
+		// this.addChild(
+		// 	new Graphics()
+		// 		.rect(-gameWidth / 2, -gameHeight / 2, gameWidth, gameHeight)
+		// 		.stroke("blue"),
+		// );
 	}
 
 	season = 0;
@@ -128,7 +128,7 @@ export class Background extends Container {
 
 export class Player extends Container {
 	game: Game;
-	currentWeb?: Web;
+	currentThread?: Thread;
 	constructor(options: ViewContainerOptions & { game: Game }) {
 		super(options);
 		this.addChild(
@@ -176,15 +176,15 @@ export class Player extends Container {
 			}
 			this.position = newPosition;
 			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
-			if (this.currentWeb) {
-				this.currentWeb.extendTo(this.position);
+			if (this.currentThread) {
+				this.currentThread.extendTo(this.position, this.game);
 			}
 		}
 	}
 }
 
 // Returns the intersection point of two line segments AB and CD, or null if none.
-const segmentIntersection = (
+export const segmentIntersection = (
 	a1: Point,
 	a2: Point,
 	b1: Point,
@@ -296,7 +296,7 @@ export class Insect extends Container {
 
 	rotationTimeout = 0;
 	update(ticker: Ticker) {
-		const bounds = gameWidth / 2;
+		const bounds = gameWidth / 2 - 15;
 		const dt = ticker.deltaMS;
 
 		this.rotationTimeout -= dt;
@@ -328,11 +328,11 @@ export class Insect extends Container {
 		};
 		this.position = this.position.add(delta);
 
-		for (const web of this.game.webs.children) {
-			if (web.isDestroyed || web.isFrozen) {
+		for (const thread of this.game.threads.children) {
+			if (thread.isDestroyed || thread.isFrozen) {
 				continue;
 			}
-			const { from, to } = web;
+			const { from, to } = thread;
 			const intersection = segmentIntersectsDisk(
 				from,
 				to,
@@ -340,7 +340,7 @@ export class Insect extends Container {
 				this.radius * this.scale.x,
 			);
 			if (intersection) {
-				web.destroyAt(intersection);
+				thread.destroyAt(intersection, this.game);
 			}
 		}
 	}
@@ -358,243 +358,6 @@ export class Target extends Container {
 		super(options);
 		// this.addChild(new Graphics().rect(-50, -5, 100, 10).fill("#00FF00"));
 		// this.addChild(new Graphics().rect(-5, -50, 10, 100).fill("#00FF00"));
-	}
-}
-
-export class Web extends Container {
-	game: Game;
-	from: Point;
-	to: Point;
-	// line: Graphics;
-	line: AnimatedSprite;
-	dot: AnimatedSprite;
-	previousWeb?: Web;
-	isDestroyed = false;
-	isFrozen = false;
-
-	constructor(
-		options: ViewContainerOptions & {
-			game: Game;
-			from: Point;
-			to: Point;
-			previousWeb?: Web;
-		},
-	) {
-		super(options);
-		this.game = options.game;
-		this.from = options.from.clone();
-		this.to = options.to.clone();
-		this.line = this.addChild(
-			new AnimatedSprite({
-				textures: Object.values(
-					Assets.get("WebLong").textures,
-				) as Texture[],
-				anchor: { x: 0, y: 0.5 },
-				autoPlay: true,
-				animationSpeed: 15 / 60,
-			}),
-		);
-		this.dot = this.addChild(
-			new AnimatedSprite({
-				textures: Object.values(
-					Assets.get("WebDot").textures,
-				) as Texture[],
-				anchor: 0.5,
-				autoPlay: true,
-				animationSpeed: 15 / 60,
-				alpha: 0,
-			}),
-		);
-		this.previousWeb = options.previousWeb;
-		this.extendTo(this.to);
-		this.game.addToTicker(this);
-	}
-
-	redraw() {
-		const vector = this.to.subtract(this.from);
-		const length = vector.magnitude();
-		// 200, 600, 1200, 1800
-		let web = "WebLong";
-		if (length < 350) {
-			web = "WebSuperShort";
-		} else if (length < 8500) {
-			web = "WebShort";
-		} else if (length < 1500) {
-			web = "WebMedium";
-		}
-		this.line.textures = Object.values(
-			Assets.get(web).textures,
-		) as Texture[];
-		this.line.position = this.from;
-		this.line.scale.set(length / Assets.get(`${web}_000.png`).width, 1);
-		this.line.rotation = Math.atan2(vector.y, vector.x);
-		this.line.play();
-
-		this.dot.position.set(this.from.x, this.from.y);
-		this.dot.play();
-	}
-
-	extendTo(point: Point) {
-		this.to = point.clone();
-
-		const result = this.findWebIntersection();
-		if (result) {
-			const { web, point } = result;
-			const previousTo = web.to.clone();
-			const previousFrom = this.from.clone();
-			web.extendTo(point.clone());
-			const points = [point.clone(), this.from.clone()];
-			this.from = point.clone();
-			while (this.previousWeb && this.previousWeb != web) {
-				const previousWeb = this.previousWeb;
-				this.previousWeb = previousWeb?.previousWeb;
-				points.push(previousWeb.from.clone());
-				previousWeb.freeze();
-			}
-
-			const newWeb1 = new Web({
-				game: this.game,
-				from: previousFrom,
-				to: point.clone(),
-			});
-			this.parent!.addChild(newWeb1);
-			newWeb1.isDestroyed = true;
-			newWeb1.freeze();
-
-			const newWeb2 = new Web({
-				game: this.game,
-				from: point.clone(),
-				to: previousTo.clone(),
-			});
-			this.parent!.addChild(newWeb2);
-			newWeb1.isDestroyed = true;
-			newWeb2.freeze();
-
-			this.game.polygonCollect(new Polygon(points));
-		}
-
-		this.redraw();
-	}
-
-	findWebIntersection() {
-		for (const web of this.game.webs.children) {
-			if (web == this || web.isDestroyed || web.isFrozen) {
-				continue;
-			}
-			const point = segmentIntersection(
-				this.from,
-				this.to,
-				web.from,
-				web.to,
-			);
-			if (point) {
-				return { web, point };
-			}
-		}
-	}
-
-	destroyAt(point: Point) {
-		if (this.isDestroyed) {
-			return;
-		}
-
-		const newWeb = new Web({
-			game: this.game,
-			from: this.from.clone(),
-			to: point.clone(),
-			previousWeb: this.previousWeb,
-		});
-		this.parent!.addChild(newWeb);
-		newWeb.isDestroyed = true;
-
-		this.from = point.clone();
-		this.previousWeb = undefined;
-		this.redraw();
-	}
-
-	destroySpeed = 5;
-	update(ticker: Ticker) {
-		if (this.isFrozen) {
-			return;
-		}
-		if (this.isDestroyed) {
-			const vector = this.to.subtract(this.from);
-			const magnitude = Math.min(
-				this.destroySpeed * ticker.deltaMS,
-				vector.magnitude(),
-			);
-			if (magnitude == 0) {
-				if (this.previousWeb) {
-					this.previousWeb.isDestroyed = true;
-				}
-				this.destroy();
-				return;
-			}
-			const delta = vector.normalize().multiplyScalar(magnitude);
-			this.extendTo(this.to.subtract(delta));
-		}
-	}
-
-	freeze() {
-		this.isFrozen = true;
-		this.line.stop();
-		this.dot.stop();
-	}
-}
-
-export class PolygonHighlight extends Container {
-	constructor(
-		options: ViewContainerOptions & { game: Game; polygon: Polygon },
-	) {
-		super(options);
-
-		let sumX = 0;
-		let sumY = 0;
-		let minX = Infinity;
-		let minY = Infinity;
-		let maxX = -Infinity;
-		let maxY = -Infinity;
-		options.polygon.points.forEach((v, i) => {
-			if (i % 2 == 0) {
-				sumX += v;
-				minX = Math.min(minX, v);
-				maxX = Math.max(maxX, v);
-			} else {
-				sumY += v;
-				minY = Math.min(minY, v);
-				maxY = Math.max(maxY, v);
-			}
-		});
-		const size = Math.max(maxX - minX, maxY - minY);
-		const pointsCount = options.polygon.points.length / 2;
-		const centerX = sumX / pointsCount;
-		const centerY = sumY / pointsCount;
-
-		const mask = this.addChild(
-			new Graphics().poly(options.polygon.points).fill(),
-		);
-		this.addChild(
-			new Sprite({
-				texture: Assets.get("WebStill.png"),
-				anchor: 0.5,
-				mask,
-				position: {
-					x: centerX,
-					y: centerY,
-				},
-				rotation: randomFloat(0, Math.PI * 2),
-				scale: {
-					x: size * 0.002 * randomFloat(0.8, 1.2),
-					y: size * 0.002 * randomFloat(0.8, 1.2),
-				},
-			}),
-		);
-
-		// this.animate<PolygonHighlight>(
-		// 	this,
-		// 	{ alpha: 0 },
-		// 	{ duration: 10 },
-		// ).then(() => this.destroy());
 	}
 }
 
@@ -625,10 +388,10 @@ export class Game extends Container {
 	ticker: Ticker;
 
 	player: Player;
-	webs: Container<Web>;
+	threads: Container<Thread>;
 	shadows: IRenderLayer;
 	insects: Container<Insect>;
-	polygons: Container<PolygonHighlight>;
+	webs: Container<Web>;
 	target: Target;
 	hud!: HUD;
 	lifeMax = 100000;
@@ -647,9 +410,9 @@ export class Game extends Container {
 				visible: false,
 			}),
 		);
-		this.webs = this.addChild(new Container<Web>());
+		this.threads = this.addChild(new Container<Thread>());
 		this.shadows = this.addChild(new RenderLayer());
-		this.polygons = this.addChild(new Container<PolygonHighlight>());
+		this.webs = this.addChild(new Container<Web>());
 		this.player = this.addChild(new Player({ game: this, scale: 0.2 }));
 
 		this.wantedConfigurations = [
@@ -695,13 +458,15 @@ export class Game extends Container {
 		const oldPosition = this.player.position.clone();
 		this.target.position = position;
 		this.target.visible = true;
-		const web = new Web({
-			game: this,
-			from: oldPosition,
-			to: oldPosition.clone(),
-			previousWeb: this.player.currentWeb,
-		});
-		this.player.currentWeb = this.webs.addChild(web);
+		const thread = this.threads.addChild(
+			new Thread({
+				from: oldPosition,
+				to: oldPosition.clone(),
+				previousThread: this.player.currentThread,
+			}),
+		);
+		this.addToTicker(thread);
+		this.player.currentThread = thread;
 		this.player.speed = 0;
 	}
 
@@ -710,8 +475,8 @@ export class Game extends Container {
 	// 	this.hud.updateLife(this.lifeCurrent / this.lifeMax);
 	// }
 
-	polygonCollect(polygon: Polygon) {
-		this.polygons.addChild(new PolygonHighlight({ game: this, polygon }));
+	webCollect(polygon: Polygon) {
+		this.webs.addChild(new Web({ game: this, polygon }));
 		const collectedInsects = [];
 		for (const insect of this.insects.children) {
 			if (polygon.contains(insect.x, insect.y)) {

@@ -18,3 +18,4 @@
 - Add insect corpses and dying animation?
 - Idle animations for insects
 - Better looking inventory
+- Add spider threads for the frame
