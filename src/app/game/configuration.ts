@@ -8,28 +8,65 @@ export const timesOfDay = [
 			"#d5eec3", // Bg_04
 			"#74a396", // Bg_05
 		],
-		duration: 1, // in seconds
+		duration: 20, // in seconds
 	},
 	{
 		tints: [
-			"#ff0000", // BgTile
-			"#ff0000", // Bg_01
-			"#ff0000", // Bg_02
-			"#ff0000", // Bg_03
-			"#ff0000", // Bg_04
-			"#ff0000", // Bg_05
+			"#6ea093", // BgTile
+			"#588c7e", // Bg_01
+			"#58ac95", // Bg_02
+			"#b1d0b2", // Bg_03
+			"#d5eec3", // Bg_04
+			"#74a396", // Bg_05
 		],
-		duration: 2,
+		duration: 10, // in seconds
+	},
+
+
+	{
+		tints: [
+			"#966a62", // BgTile
+			"#ec9e7c", // Bg_01
+			"#7e5a52", // Bg_02
+			"#ffb387", // Bg_03
+			"#30334e", // Bg_04
+			"#936861", // Bg_05
+		],
+		duration: 20,
+	},
+		{
+		tints: [
+			"#966a62", // BgTile
+			"#ec9e7c", // Bg_01
+			"#7e5a52", // Bg_02
+			"#ffb387", // Bg_03
+			"#30334e", // Bg_04
+			"#936861", // Bg_05
+		],
+		duration: 10,
+	},
+
+
+	{
+		tints: [
+			"#07152e", // BgTile
+			"#112537", // Bg_01
+			"#143352", // Bg_02
+			"#00254a", // Bg_03
+			"#0d3c64", // Bg_04
+			"#000b24", // Bg_05
+		],
+		duration: 20,
 	},
 	{
 		tints: [
-			"#000000", // BgTile
-			"#000088", // Bg_01
-			"#000000", // Bg_02
-			"#000088", // Bg_03
-			"#000000", // Bg_04
-			"#000088", // Bg_05
+			"#07152e", // BgTile
+			"#112537", // Bg_01
+			"#143352", // Bg_02
+			"#00254a", // Bg_03
+			"#0d3c64", // Bg_04
+			"#000b24", // Bg_05
 		],
-		duration: 3,
+		duration: 10,
 	},
 ];
