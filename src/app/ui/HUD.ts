@@ -183,17 +183,19 @@ export class HUD extends Container {
 	resize(width: number, height: number) {
 		if (width < height) {
 			// Portrait
-			this.blueprints.position.set(0, height - 100);
+			this.blueprints.position.set(0, 1690);
 
-			const gap = width / this.blueprints.children.length;
+			const gap = 1080 / this.blueprints.children.length;
 			this.blueprints.children.forEach((blueprint, i) => {
 				blueprint.x = gap * (i + 1 / 2);
+				blueprint.y = 0;
 			});
 		} else {
 			// Landscape
 			this.blueprints.position.set(1690, 0);
-			const gap = height / this.blueprints.children.length;
+			const gap = 1080 / this.blueprints.children.length;
 			this.blueprints.children.forEach((blueprint, i) => {
+				blueprint.x = 0;
 				blueprint.y = gap * (i + 1 / 2);
 			});
 		}

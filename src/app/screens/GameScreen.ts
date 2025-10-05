@@ -33,18 +33,18 @@ export class GameScreen extends Container {
 		this.touchArea.on("pointerup", (e) => this.pointerUp(e));
 		this.touchArea.on("wheel", (e) => this.wheel(e));
 
-		this.addChild(
+		this.gameContainer.addChild(
 			new Graphics({ alpha: 0.3 })
-				.rect(0, 0, 1920, 1080)
+				.rect(-1000, -1000, 2000, 2000)
 				.fill("black")
-				.rect(1920 / 2 - 500, 1080 / 2 - 500, 1000, 1000)
+				.rect(-500, -500, 1000, 1000)
 				.cut(),
 		);
-		const a = new Point(1920 / 2 - 500, 1080 / 2 - 500);
-		const b = new Point(1920 / 2 + 500, 1080 / 2 - 500);
-		const c = new Point(1920 / 2 + 500, 1080 / 2 + 500);
-		const d = new Point(1920 / 2 - 500, 1080 / 2 + 500);
-		this.addChild(
+		const a = new Point(-500, -500);
+		const b = new Point(+500, -500);
+		const c = new Point(+500, 500);
+		const d = new Point(-500, 500);
+		this.gameContainer.addChild(
 			new Thread({ from: a, to: b }),
 			new Thread({ from: b, to: c }),
 			new Thread({ from: c, to: d }),

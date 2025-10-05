@@ -37,10 +37,10 @@ export class Insect extends Container {
 			new Sprite({
 				texture: Assets.get(options.type),
 				anchor: 0.5,
-				x: 40,
+				x: 10,
 				y: 20,
 				tint: 0,
-				alpha: 0.5,
+				alpha: 0.3,
 			}),
 		);
 		this.game.shadows.attach(this.shadow);
@@ -63,8 +63,9 @@ export class Insect extends Container {
 
 		this.rotationTimeout -= dt;
 		if (this.rotationTimeout <= 0) {
-			this.rotationTimeout += randomFloat(1000, 3000);
-			this.rotationalSpeed = randomFloat(-1, 1);
+			this.rotationTimeout +=
+				(randomFloat(1000, 3000) * 0.05) / this.speed;
+			this.rotationalSpeed = (randomFloat(-1, 1) * this.speed) / 0.05;
 		}
 		this.setRotation(
 			(dt * this.rotationalSpeed) / 1000 + this.getRotation(),
@@ -137,6 +138,7 @@ export class Insect extends Container {
 		const angle = Math.atan2(vector.y, vector.x);
 		this.setRotation(angle + Math.PI / 2);
 		this.speed = 1;
+		this.rotationTimeout /= 10;
 		this.isEscaping = true;
 	}
 }
