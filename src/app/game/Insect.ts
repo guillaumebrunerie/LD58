@@ -20,6 +20,7 @@ export class Insect extends Container {
 	game: Game;
 	sprite: AnimatedSprite;
 	shadow: Sprite;
+	body: Sprite;
 	rotationalSpeed = 0;
 	type: InsectType;
 	isEscaping = false;
@@ -52,6 +53,14 @@ export class Insect extends Container {
 			}),
 		);
 		this.game.shadows.attach(this.shadow);
+
+		this.body = this.addChild(
+			new Sprite({
+				texture: Assets.get(options.type + "_Dead.png"),
+				anchor: 0.5,
+				visible: false,
+			}),
+		);
 
 		this.setRotation(Math.random() * Math.PI * 2);
 	}
@@ -143,9 +152,13 @@ export class Insect extends Container {
 
 	collect() {
 		this.speed = 0;
-		this.animate<Insect>(this, { alpha: 0 }, { duration: 1 }).then(() =>
-			this.destroy(),
-		);
+		this.sprite.visible = false;
+		this.body.visible = true;
+		this.animate<Insect>(
+			this,
+			{ alpha: 0 },
+			{ delay: 1, duration: 3 },
+		).then(() => this.destroy());
 	}
 
 	escape(from: Point) {
