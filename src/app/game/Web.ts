@@ -34,7 +34,7 @@ export class Web extends Container {
 			}
 		});
 		const size = Math.max(maxX - minX, maxY - minY);
-		const scale = size * 0.002;
+		const scale = Math.max(0.6, size * 0.002);
 		const pointsCount = points.length / 2;
 		const centerX = sumX / pointsCount;
 		const centerY = sumY / pointsCount;
