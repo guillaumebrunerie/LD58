@@ -4,7 +4,6 @@
 - Pause and various menus
 
 == Game design
-- Insects escaping
 - Winning
 - Level design
 - Rethink the controls

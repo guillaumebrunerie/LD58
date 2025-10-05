@@ -9,6 +9,7 @@ import { Game } from "../game/Game";
 import { HUD } from "../ui/HUD";
 import { clamp } from "../../engine/utils/maths";
 import { Thread } from "../game/Thread";
+import { levels } from "../game/levels";
 
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
@@ -22,7 +23,9 @@ export class GameScreen extends Container {
 		super();
 
 		this.gameContainer = this.addChild(new Container());
-		this.game = this.gameContainer.addChild(new Game());
+		this.game = this.gameContainer.addChild(
+			new Game(levels[levels.length - 1]),
+		);
 
 		this.touchArea = this.addChild(
 			new Graphics().rect(0, 0, 100, 100).fill("#00000001"),

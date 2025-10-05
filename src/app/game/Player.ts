@@ -1,10 +1,4 @@
-import {
-	ViewContainerOptions,
-	Sprite,
-	Assets,
-	Ticker,
-	AnimatedSprite,
-} from "pixi.js";
+import { ViewContainerOptions, Assets, Ticker, AnimatedSprite } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, gameWidth, gameHeight } from "./Game";
 import { Thread } from "./Thread";
@@ -29,9 +23,6 @@ export class Player extends Container {
 	acceleration = 0.01;
 	speed = 0;
 	update(ticker: Ticker) {
-		if (this.game.lifeCurrent <= 0) {
-			return;
-		}
 		if (this.game.target.visible) {
 			this.speed = Math.min(
 				this.speed + this.acceleration * ticker.deltaMS,

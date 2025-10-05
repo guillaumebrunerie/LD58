@@ -58,7 +58,7 @@ export class Insect extends Container {
 
 	rotationTimeout = 0;
 	update(ticker: Ticker) {
-		const bounds = gameWidth / 2 - 15;
+		const bounds = gameWidth / 2 - 100;
 		const dt = ticker.deltaMS;
 
 		this.rotationTimeout -= dt;
@@ -73,6 +73,7 @@ export class Insect extends Container {
 
 		const r = this.getRotation();
 		if (this.isEscaping) {
+			// Destroy if far enough out of bounds
 			if (
 				Math.abs(this.x) > 2 * bounds ||
 				Math.abs(this.y) > 2 * bounds
@@ -81,6 +82,7 @@ export class Insect extends Container {
 				return;
 			}
 		} else {
+			// Bounce off walls
 			if (this.x > bounds && Math.sin(r) > 0) {
 				this.setRotation(-r);
 			}
@@ -95,34 +97,39 @@ export class Insect extends Container {
 			}
 		}
 
+		// Move forward
 		const delta = {
 			x: Math.sin(r) * this.speed * ticker.deltaMS,
 			y: -Math.cos(r) * this.speed * ticker.deltaMS,
 		};
 		this.position = this.position.add(delta);
 
-		for (const thread of this.game.threads.children) {
-			if (thread.isDestroyed || thread.isFrozen) {
-				continue;
+		if (!this.isEscaping) {
+			// Destroy threads on contact
+			for (const thread of this.game.threads.children) {
+				if (thread.isDestroyed || thread.isFrozen) {
+					continue;
+				}
+				const { from, to } = thread;
+				const intersection = segmentIntersectsDisk(
+					from,
+					to,
+					this.position,
+					this.radius * this.scale.x,
+				);
+				if (intersection) {
+					thread.destroyAt(intersection, this.game);
+				}
 			}
-			const { from, to } = thread;
-			const intersection = segmentIntersectsDisk(
-				from,
-				to,
-				this.position,
-				this.radius * this.scale.x,
-			);
-			if (intersection) {
-				thread.destroyAt(intersection, this.game);
-			}
-		}
 
-		const distanceToPlayer = this.position
-			.subtract(this.game.player.position)
-			.magnitude();
-		const hitbox = 50;
-		if (distanceToPlayer < hitbox) {
-			this.escape(this.game.player.position);
+			// Escape if player is too close
+			const distanceToPlayer = this.position
+				.subtract(this.game.player.position)
+				.magnitude();
+			const hitbox = 30;
+			if (distanceToPlayer < hitbox) {
+				this.escape(this.game.player.position);
+			}
 		}
 	}
 

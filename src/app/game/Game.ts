@@ -8,7 +8,7 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
-import { randomBool, randomItem } from "../../engine/utils/random";
+import { randomItem } from "../../engine/utils/random";
 import { Thread } from "./Thread";
 import { Web } from "./Web";
 import { Player } from "./Player";
@@ -108,15 +108,32 @@ const pickInsectType = (): InsectType =>
 		"Fly_06.png",
 	]);
 
-const pickConfiguration = (): InsectType[] => {
-	if (randomBool()) {
-		return [pickInsectType()];
-		// eslint-disable-next-line no-dupe-else-if
-	} else if (randomBool()) {
-		return [pickInsectType(), pickInsectType()];
-	} else {
-		return [pickInsectType(), pickInsectType(), pickInsectType()];
+export type ConfigurationType = "a" | "aa" | "ab" | "aaa" | "aab" | "abc";
+
+const pickThreeInsectTypes = (antipool: InsectType[]): InsectType[] => {
+	const types = new Set<InsectType>();
+	while (types.size < 3) {
+		const type = pickInsectType();
+		const index = antipool.indexOf(type);
+		if (index >= 0) {
+			antipool.splice(index, 1);
+			continue;
+		}
+		types.add(type);
 	}
+	return Array.from(types);
+};
+
+const pickConfiguration = (
+	type: ConfigurationType,
+	antipool: InsectType[],
+): InsectType[] => {
+	const [a, b, c] = pickThreeInsectTypes(antipool);
+	const result = (type.split("") as ("a" | "b" | "c")[]).map(
+		(x: "a" | "b" | "c") => ({ a, b, c })[x],
+	);
+	antipool.push(...result);
+	return result;
 };
 
 export class Game extends Container {
@@ -129,12 +146,14 @@ export class Game extends Container {
 	webs: Container<Web>;
 	target: Target;
 	hud!: HUD;
-	lifeMax = 100000;
-	lifeCurrent = 100000;
 
 	wantedConfigurations: InsectType[][];
 
-	constructor() {
+	constructor(options: {
+		configurationTypes: ConfigurationType[];
+		multiples: number;
+		additional: number;
+	}) {
 		super();
 		this.ticker = new Ticker();
 		this.ticker.start();
@@ -150,22 +169,20 @@ export class Game extends Container {
 		this.webs = this.addChild(new Container<Web>());
 		this.player = this.addChild(new Player({ game: this, scale: 0.3 }));
 
-		this.wantedConfigurations = [
-			pickConfiguration(),
-			pickConfiguration(),
-			pickConfiguration(),
-			pickConfiguration(),
-			pickConfiguration(),
-		];
+		const antipool: InsectType[] = [];
+		this.wantedConfigurations = options.configurationTypes.map((type) =>
+			pickConfiguration(type, antipool),
+		);
 
 		this.insects = this.addChild(new Container<Insect>());
 		for (const configuration of this.wantedConfigurations) {
 			for (const type of configuration) {
-				this.spawnInsect(type);
-				this.spawnInsect(type);
+				for (let i = 0; i < options.multiples; i++) {
+					this.spawnInsect(type);
+				}
 			}
 		}
-		for (let i = 0; i < 5; i++) {
+		for (let i = 0; i < options.additional; i++) {
 			this.spawnInsect();
 		}
 	}

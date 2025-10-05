@@ -2,9 +2,9 @@ import "pixi.js/math-extras";
 import { sound } from "@pixi/sound";
 import { setEngine } from "./app/getEngine";
 import { LoadScreen } from "./app/screens/LoadScreen";
-import { GameScreen } from "./app/screens/GameScreen";
 import { userSettings } from "./app/utils/userSettings";
 import { CreationEngine } from "./engine/engine";
+import { StartScreen } from "./app/screens/StartScreen";
 
 /**
  * Importing these modules will automatically register their plugins with the engine.
@@ -32,5 +32,5 @@ setEngine(engine);
 	// Show the load screen
 	await engine.navigation.showScreen(LoadScreen);
 	// Show the main screen once the load screen is dismissed
-	await engine.navigation.showScreen(GameScreen);
+	await engine.navigation.showScreen(StartScreen);
 })();
