@@ -1,6 +1,12 @@
-import { Assets, Graphics, Sprite, ViewContainerOptions } from "pixi.js";
+import {
+	AnimatedSprite,
+	Assets,
+	Graphics,
+	Sprite,
+	ViewContainerOptions,
+} from "pixi.js";
 import { Container } from "../../PausableContainer";
-import { Game, ItemType } from "../game/Game";
+import { Game, InsectType } from "../game/Game";
 
 export class Lifebar extends Container {
 	background: Sprite;
@@ -66,35 +72,71 @@ export class Lifebar extends Container {
 	}
 }
 
-type InventoryItemType = string;
+export class BlueprintItem extends Container {
+	bg: AnimatedSprite;
+	icon: Sprite;
 
-export class InventoryItem extends Container {
-	constructor(options: ViewContainerOptions & { type: InventoryItemType }) {
+	constructor(options: ViewContainerOptions & { type: InsectType }) {
 		super(options);
-		this.addChild(
-			new Sprite({ texture: Assets.get("Inventory.png"), anchor: 0.5 }),
+		this.bg = this.addChild(
+			new AnimatedSprite({
+				textures: Object.values(Assets.get("InventoryLoop").textures),
+				autoPlay: true,
+				anchor: 0.5,
+				animationSpeed: 15 / 60,
+			}),
 		);
-		this.addChild(
+		this.icon = this.addChild(
 			new Sprite({
 				texture: Assets.get(options.type),
 				anchor: 0.5,
 			}),
 		);
 	}
+
+	complete() {
+		this.animate<BlueprintItem>(
+			this,
+			{ alpha: 0.9999 },
+			{ duration: 0.5 },
+		).then(() => {
+			this.bg.destroy();
+			this.bg = this.addChild(
+				new AnimatedSprite({
+					textures: Object.values(
+						Assets.get("InventoryEnd").textures,
+					),
+					anchor: 0.5,
+					animationSpeed: 15 / 60,
+					loop: false,
+				}),
+			);
+			this.bg.play();
+			this.bg.onComplete = () => {
+				this.destroy();
+			};
+			this.animate(this.icon, { alpha: 0 }, { duration: 1 });
+		});
+	}
 }
 
-export class Inventory extends Container {
-	itemTypes: ItemType[];
-	items: InventoryItem[];
-	constructor(options: ViewContainerOptions & { itemTypes: ItemType[] }) {
+export class Blueprint extends Container {
+	readonly combination: string;
+	insectTypes: InsectType[];
+	items: BlueprintItem[];
+	isComplete = false;
+
+	constructor(options: ViewContainerOptions & { insectTypes: InsectType[] }) {
 		super(options);
 
-		this.itemTypes = options.itemTypes;
+		options.insectTypes.sort();
+		this.insectTypes = options.insectTypes;
+		this.combination = this.insectTypes.join("/");
 
-		this.items = this.itemTypes.map((type) =>
+		this.items = this.insectTypes.map((type) =>
 			this.addChild(
-				new InventoryItem({
-					type: `Fly_0${type}.png`,
+				new BlueprintItem({
+					type,
 				}),
 			),
 		);
@@ -108,23 +150,30 @@ export class Inventory extends Container {
 			this.items[2].y = -gap * Math.sqrt(3);
 		}
 	}
+
+	complete() {
+		this.isComplete = true;
+		for (const item of this.items) {
+			item.complete();
+		}
+	}
 }
 
 export class HUD extends Container {
 	game: Game;
 	// lifebar: Lifebar;
-	inventories: Container<Inventory>;
+	blueprints: Container<Blueprint>;
 
 	constructor(options: { game: Game }) {
 		super();
 		this.game = options.game;
 		// this.lifebar = this.addChild(new Lifebar());
 
-		this.inventories = this.addChild(new Container<Inventory>());
+		this.blueprints = this.addChild(new Container<Blueprint>());
 		this.game.wantedConfigurations.forEach((itemTypes) =>
-			this.inventories.addChild(
-				new Inventory({
-					itemTypes,
+			this.blueprints.addChild(
+				new Blueprint({
+					insectTypes: itemTypes,
 					scale: 0.4,
 				}),
 			),
@@ -133,11 +182,11 @@ export class HUD extends Container {
 
 	resize(width: number, height: number) {
 		// this.lifebar.position.set(width / 2, 80);
-		this.inventories.position.set(0, height - 100);
+		this.blueprints.position.set(0, height - 100);
 
-		const gap = width / (this.inventories.children.length + 1);
-		this.inventories.children.forEach((inventory, i) => {
-			inventory.x = gap * (i + 1);
+		const gap = width / (this.blueprints.children.length + 1);
+		this.blueprints.children.forEach((blueprint, i) => {
+			blueprint.x = gap * (i + 1);
 		});
 	}
 

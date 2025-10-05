@@ -239,17 +239,19 @@ const segmentIntersectsDisk = (
 	}
 };
 
-export class Item extends Container {
+export class Insect extends Container {
 	speed = randomFloat(0.01, 0.05);
 	radius = 50;
 	game: Game;
 	sprite: Sprite;
 	shadow: Sprite;
 	rotationalSpeed = 0;
+	type: InsectType;
 
-	constructor(options: ViewContainerOptions & { game: Game; item: string }) {
+	constructor(options: ViewContainerOptions & { game: Game; type: string }) {
 		super(options);
 
+		this.type = options.type;
 		this.game = options.game;
 		this.game.addToTicker(this);
 
@@ -257,19 +259,19 @@ export class Item extends Container {
 			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF00"),
 		);
 		this.sprite = this.addChild(
-			new Sprite({ texture: Assets.get(options.item), anchor: 0.5 }),
+			new Sprite({ texture: Assets.get(options.type), anchor: 0.5 }),
 		);
 		this.shadow = this.addChild(
 			new Sprite({
-				texture: Assets.get(options.item),
+				texture: Assets.get(options.type),
 				anchor: 0.5,
-				x: 20,
-				y: 10,
+				x: 40,
+				y: 20,
 				tint: 0,
 				alpha: 0.5,
 			}),
 		);
-		this.game.itemShadows.attach(this.shadow);
+		this.game.shadows.attach(this.shadow);
 
 		this.setRotation(Math.random() * Math.PI * 2);
 	}
@@ -335,7 +337,7 @@ export class Item extends Container {
 
 	collect() {
 		this.speed = 0;
-		this.animate<Item>(this, { alpha: 0 }, { duration: 1 }).then(() =>
+		this.animate<Insect>(this, { alpha: 0 }, { duration: 1 }).then(() =>
 			this.destroy(),
 		);
 	}
@@ -580,23 +582,31 @@ export class PolygonHighlight extends Container {
 		// this.animate<PolygonHighlight>(
 		// 	this,
 		// 	{ alpha: 0 },
-		// 	{ duration: 0.5 },
+		// 	{ duration: 10 },
 		// ).then(() => this.destroy());
 	}
 }
 
-export type ItemType = 1 | 2 | 3 | 4 | 5 | 6;
+export type InsectType = string;
 
-const pickItem = (): ItemType => randomInt(1, 6) as ItemType;
+const pickInsectType = (): InsectType =>
+	randomItem([
+		"Fly_01.png",
+		"Fly_02.png",
+		"Fly_03.png",
+		"Fly_04.png",
+		"Fly_05.png",
+		"Fly_06.png",
+	]);
 
-const pickConfiguration = (): ItemType[] => {
+const pickConfiguration = (): InsectType[] => {
 	if (randomBool()) {
-		return [pickItem()];
+		return [pickInsectType()];
 		// eslint-disable-next-line no-dupe-else-if
 	} else if (randomBool()) {
-		return [pickItem(), pickItem()];
+		return [pickInsectType(), pickInsectType()];
 	} else {
-		return [pickItem(), pickItem(), pickItem()];
+		return [pickInsectType(), pickInsectType(), pickInsectType()];
 	}
 };
 
@@ -605,15 +615,15 @@ export class Game extends Container {
 
 	player: Player;
 	webs: Container<Web>;
-	itemShadows: IRenderLayer;
-	items: Container<Item>;
+	shadows: IRenderLayer;
+	insects: Container<Insect>;
 	polygons: Container<PolygonHighlight>;
 	target: Target;
 	hud!: HUD;
 	lifeMax = 100000;
 	lifeCurrent = 100000;
 
-	wantedConfigurations: ItemType[][];
+	wantedConfigurations: InsectType[][];
 
 	constructor() {
 		super();
@@ -627,23 +637,16 @@ export class Game extends Container {
 			}),
 		);
 		this.webs = this.addChild(new Container<Web>());
-		this.itemShadows = this.addChild(new RenderLayer());
+		this.shadows = this.addChild(new RenderLayer());
 		this.polygons = this.addChild(new Container<PolygonHighlight>());
 		this.player = this.addChild(new Player({ game: this, scale: 0.2 }));
 
-		this.items = this.addChild(new Container<Item>());
+		this.insects = this.addChild(new Container<Insect>());
 		for (let i = 0; i < 20; i++) {
-			this.items.addChild(
-				new Item({
+			this.insects.addChild(
+				new Insect({
 					game: this,
-					item: randomItem([
-						"Fly_01.png",
-						"Fly_02.png",
-						"Fly_03.png",
-						"Fly_04.png",
-						"Fly_05.png",
-						"Fly_06.png",
-					]),
+					type: pickInsectType(),
 					position: new Point(
 						Math.random() * gameWidth - gameWidth / 2,
 						Math.random() * gameHeight - gameHeight / 2,
@@ -688,12 +691,22 @@ export class Game extends Container {
 
 	polygonCollect(polygon: Polygon) {
 		this.polygons.addChild(new PolygonHighlight({ game: this, polygon }));
-		const collectedItems = [];
-		for (const item of this.items.children) {
-			if (polygon.contains(item.x, item.y)) {
-				item.collect();
-				collectedItems.push(item);
+		const collectedInsects = [];
+		for (const insect of this.insects.children) {
+			if (polygon.contains(insect.x, insect.y)) {
+				insect.collect();
+				collectedInsects.push(insect.type);
 			}
+		}
+		collectedInsects.sort();
+		const combination = collectedInsects.join("/");
+		const matchingIndex = this.hud.blueprints.children.findIndex(
+			(blueprint) =>
+				blueprint.combination == combination && !blueprint.isComplete,
+		);
+		if (matchingIndex >= 0) {
+			const blueprint = this.hud.blueprints.children[matchingIndex];
+			blueprint.complete();
 		}
 	}
 }
