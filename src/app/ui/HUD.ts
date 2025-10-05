@@ -1,6 +1,6 @@
 import { Assets, Graphics, Sprite, ViewContainerOptions } from "pixi.js";
 import { Container } from "../../PausableContainer";
-import { Game } from "../game/Game";
+import { Game, ItemType } from "../game/Game";
 
 export class Lifebar extends Container {
 	background: Sprite;
@@ -84,40 +84,61 @@ export class InventoryItem extends Container {
 }
 
 export class Inventory extends Container {
+	itemTypes: ItemType[];
 	items: InventoryItem[];
-	constructor(options?: ViewContainerOptions) {
+	constructor(options: ViewContainerOptions & { itemTypes: ItemType[] }) {
 		super(options);
 
-		const gap = 115;
-		this.items = [
-			this.addChild(new InventoryItem({ x: -gap, type: "Fly_05.png" })),
+		this.itemTypes = options.itemTypes;
+
+		this.items = this.itemTypes.map((type) =>
 			this.addChild(
 				new InventoryItem({
-					x: 0,
-					y: -(gap * Math.sqrt(3)),
-					type: "Fly_02.png",
+					type: `Fly_0${type}.png`,
 				}),
 			),
-			this.addChild(new InventoryItem({ x: gap, type: "Fly_04.png" })),
-		];
+		);
+		const gap = 115;
+		if (this.items.length == 2) {
+			this.items[0].x = -gap;
+			this.items[1].x = gap;
+		} else if (this.items.length == 3) {
+			this.items[0].x = -gap;
+			this.items[1].x = gap;
+			this.items[2].y = -gap * Math.sqrt(3);
+		}
 	}
 }
 
 export class HUD extends Container {
 	game: Game;
 	lifebar: Lifebar;
-	inventory: Inventory;
+	inventories: Container<Inventory>;
 
 	constructor(options: { game: Game }) {
 		super();
 		this.game = options.game;
 		this.lifebar = this.addChild(new Lifebar());
-		this.inventory = this.addChild(new Inventory({ scale: 0.75 }));
+
+		this.inventories = this.addChild(new Container<Inventory>());
+		this.game.wantedConfigurations.forEach((itemTypes) =>
+			this.inventories.addChild(
+				new Inventory({
+					itemTypes,
+					scale: 0.4,
+				}),
+			),
+		);
 	}
 
 	resize(width: number, height: number) {
 		this.lifebar.position.set(width / 2, 80);
-		this.inventory.position.set(width / 2, height - 100);
+		this.inventories.position.set(0, height - 100);
+
+		const gap = width / (this.inventories.children.length + 1);
+		this.inventories.children.forEach((inventory, i) => {
+			inventory.x = gap * (i + 1);
+		});
 	}
 
 	updateLife(amount: number) {

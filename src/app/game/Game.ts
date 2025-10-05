@@ -11,7 +11,12 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
-import { randomFloat, randomInt, randomItem } from "../../engine/utils/random";
+import {
+	randomBool,
+	randomFloat,
+	randomInt,
+	randomItem,
+} from "../../engine/utils/random";
 import { tints } from "./configuration";
 
 const mod = (a: number, b: number) => {
@@ -406,6 +411,21 @@ export class PolygonHighlight extends Container {
 	}
 }
 
+export type ItemType = 1 | 2 | 3 | 4 | 5 | 6;
+
+const pickItem = (): ItemType => randomInt(1, 6) as ItemType;
+
+const pickConfiguration = (): ItemType[] => {
+	if (randomBool()) {
+		return [pickItem()];
+		// eslint-disable-next-line no-dupe-else-if
+	} else if (randomBool()) {
+		return [pickItem(), pickItem()];
+	} else {
+		return [pickItem(), pickItem(), pickItem()];
+	}
+};
+
 export class Game extends Container {
 	ticker: Ticker;
 
@@ -418,6 +438,8 @@ export class Game extends Container {
 	hud!: HUD;
 	lifeMax = 100000;
 	lifeCurrent = 100000;
+
+	wantedConfigurations: ItemType[][];
 
 	constructor() {
 		super();
@@ -455,6 +477,14 @@ export class Game extends Container {
 				}),
 			);
 		}
+
+		this.wantedConfigurations = [
+			pickConfiguration(),
+			pickConfiguration(),
+			pickConfiguration(),
+			pickConfiguration(),
+			pickConfiguration(),
+		];
 	}
 
 	addToTicker(container: Container & { update(ticker: Ticker): void }) {
