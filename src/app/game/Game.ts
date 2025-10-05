@@ -652,21 +652,6 @@ export class Game extends Container {
 		this.polygons = this.addChild(new Container<PolygonHighlight>());
 		this.player = this.addChild(new Player({ game: this, scale: 0.2 }));
 
-		this.insects = this.addChild(new Container<Insect>());
-		for (let i = 0; i < 20; i++) {
-			this.insects.addChild(
-				new Insect({
-					game: this,
-					type: pickInsectType(),
-					position: new Point(
-						Math.random() * gameWidth - gameWidth / 2,
-						Math.random() * gameHeight - gameHeight / 2,
-					),
-					scale: 0.2,
-				}),
-			);
-		}
-
 		this.wantedConfigurations = [
 			pickConfiguration(),
 			pickConfiguration(),
@@ -674,6 +659,30 @@ export class Game extends Container {
 			pickConfiguration(),
 			pickConfiguration(),
 		];
+
+		this.insects = this.addChild(new Container<Insect>());
+		for (const configuration of this.wantedConfigurations) {
+			for (const type of configuration) {
+				this.spawnInsect(type);
+			}
+		}
+		for (let i = 0; i < 10; i++) {
+			this.spawnInsect();
+		}
+	}
+
+	spawnInsect(type = pickInsectType()) {
+		this.insects.addChild(
+			new Insect({
+				game: this,
+				type,
+				position: new Point(
+					Math.random() * gameWidth - gameWidth / 2,
+					Math.random() * gameHeight - gameHeight / 2,
+				),
+				scale: 0.2,
+			}),
+		);
 	}
 
 	addToTicker(container: Container & { update(ticker: Ticker): void }) {
