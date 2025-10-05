@@ -71,12 +71,16 @@ export class Insect extends Container {
 	setRotation(rotation: number) {
 		this.sprite.rotation = rotation;
 		this.shadow.rotation = rotation;
+		this.body.rotation = rotation;
 	}
 
 	rotationTimeout = 0;
 	update(ticker: Ticker) {
 		const bounds = insectBounds;
 		const dt = ticker.deltaMS;
+		if (this.speed == 0) {
+			return;
+		}
 
 		this.rotationTimeout -= dt;
 		if (this.rotationTimeout <= 0) {
