@@ -55,8 +55,8 @@ export class Background extends Container {
 						x: i * width + randomInt(-200, 200),
 						y: j * width + randomInt(-200, 200),
 						scale: {
-							x: randomFloat(0.5, 2),
-							y: randomFloat(0.5, 2),
+							x: randomFloat(4, 6),
+							y: randomFloat(4, 6),
 						},
 						rotation: randomFloat(0, Math.PI * 2),
 						tint: tints[item],
