@@ -31,7 +31,7 @@ export class BlueprintItem extends Container {
 			new Sprite({
 				texture: Assets.get(`${options.type}.png`),
 				anchor: 0.5,
-				scale: 0.6,
+				scale: 0.65,
 			}),
 		);
 	}
@@ -80,7 +80,7 @@ export class Blueprint extends Container {
 				}),
 			),
 		);
-		const gap = 50;
+		const gap = 45;
 		if (this.items.length == 2) {
 			this.items[0].x = -gap;
 			this.items[1].x = gap;
