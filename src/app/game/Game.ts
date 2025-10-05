@@ -62,14 +62,18 @@ export class Background extends Container {
 				this.tiles[0].push(tile);
 			}
 		}
-		for (let i = 0; i < 5; i++) {
-			const item = randomInt(1, 5);
+		const putBgElement = (item: number, cx: number, cy: number) => {
+			const x =
+				randomInt(-gameWidth / 4, gameWidth / 4) + (cx * gameWidth) / 4;
+			const y =
+				randomInt(-gameHeight / 4, gameHeight / 4) +
+				(cy * gameHeight) / 4;
 			const element = this.addChild(
 				new Sprite({
 					texture: Assets.get(`Bg_0${item}.png`),
 					anchor: 0.5,
-					x: randomInt(-gameWidth / 2, gameWidth / 2),
-					y: randomInt(-gameHeight / 2, gameHeight / 2),
+					x,
+					y,
 					scale: {
 						x: randomFloat(2, 3),
 						y: randomFloat(2, 3),
@@ -78,7 +82,12 @@ export class Background extends Container {
 				}),
 			);
 			this.tiles[item].push(element);
-		}
+		};
+		putBgElement(1, 0, 0);
+		putBgElement(2, 1, 1);
+		putBgElement(3, 1, -1);
+		putBgElement(4, -1, 1);
+		putBgElement(5, -1, -1);
 		this.addChild(
 			new Graphics()
 				.rect(-gameWidth / 2, -gameHeight / 2, gameWidth, gameHeight)
