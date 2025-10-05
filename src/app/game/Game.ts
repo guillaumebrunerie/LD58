@@ -17,6 +17,8 @@ const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
 };
 
+const tint = "#DD6666";
+
 export class Background extends Container {
 	constructor() {
 		super();
@@ -35,6 +37,7 @@ export class Background extends Container {
 							x: mod(i, 2) == 1 ? -1 : 1,
 							y: mod(j, 2) == 1 ? -1 : 1,
 						},
+						tint,
 					}),
 				);
 				bg.attach(tile);
@@ -49,6 +52,7 @@ export class Background extends Container {
 							y: randomFloat(0.5, 2),
 						},
 						rotation: randomFloat(0, Math.PI * 2),
+						tint,
 					}),
 				);
 				// this.addChild(
