@@ -49,7 +49,8 @@ export class Thread extends Container {
 				anchor: 0.5,
 				autoPlay: true,
 				animationSpeed: 15 / 60,
-				alpha: 0,
+				scale: 0.4,
+				// alpha: 0,
 			}),
 		);
 		this.previousThread = options.previousThread;

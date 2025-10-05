@@ -71,7 +71,7 @@ export class Web extends Container {
 			thread.freeze();
 		}
 
-		this.animate<Web>(this, { alpha: 0 }, { delay: 5, duration: 10 }).then(
+		this.animate<Web>(this, { alpha: 0 }, { delay: 1, duration: 3 }).then(
 			() => this.destroy(),
 		);
 	}
