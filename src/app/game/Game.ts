@@ -43,18 +43,26 @@ export class Player extends Container {
 		this.game = options.game;
 		this.game.addToTicker(this);
 	}
-	speed = 1.5;
+	maxSpeed = 3;
+	acceleration = 0.01;
+	speed = -1;
 	update(ticker: Ticker) {
 		if (this.game.lifeCurrent <= 0) {
 			return;
 		}
 		if (this.game.target.visible) {
+			this.speed = Math.min(
+				this.speed + this.acceleration * ticker.deltaMS,
+				this.maxSpeed,
+			);
 			const vector = this.game.target.position.subtract(this.position);
 			const magnitude = Math.min(
 				this.speed * ticker.deltaMS,
 				vector.magnitude(),
 			);
 			if (magnitude == 0) {
+				this.speed = -1;
+				this.game.target.visible = false;
 				return;
 			}
 			const delta = vector.normalize().multiplyScalar(magnitude);
