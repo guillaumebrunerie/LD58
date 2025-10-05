@@ -13,15 +13,25 @@ export const levels: Level[] = [
 		additional: 0,
 	}, // Tutorial
 	{
-		configurationTypes: ["a"],
-		multiples: 2,
-		additional: 5,
-	}, // Very easy
-	{
 		configurationTypes: ["a", "a"],
 		multiples: 2,
 		additional: 5,
-	}, // Multiple configurations
+	},
+	{
+		configurationTypes: ["aa", "ab"],
+		multiples: 2,
+		additional: 5,
+	},
+	{
+		configurationTypes: ["abc"],
+		multiples: 2,
+		additional: 5,
+	},
+	{
+		configurationTypes: ["aaa", "aaa", "aaa"],
+		multiples: 2,
+		additional: 0,
+	},
 	{
 		configurationTypes: ["a", "a", "ab", "aab", "abc"],
 		multiples: 2,

@@ -23,7 +23,7 @@ export class GameScreen extends Container {
 	game: Game;
 	hud: HUD;
 	touchArea: Graphics;
-	level: number = userSettings.getLevel();
+	level: number = Math.min(userSettings.getLevel(), levels.length - 1);
 
 	constructor() {
 		super();
