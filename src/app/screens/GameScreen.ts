@@ -60,59 +60,10 @@ export class GameScreen extends Container {
 			new Thread({ from: d, to: a }),
 		);
 
-		this.hud = this.addChild(new HUD({ game: this.game }));
+		this.hud = this.addChild(
+			new HUD({ game: this.game, level: this.level }),
+		);
 		this.game.hud = this.hud;
-
-		this.gameContainer.addChild(
-			new Text({
-				text: `Level ${this.level + 1}`,
-				x: 0,
-				y: -500,
-				anchor: 0.5,
-				style: {
-					fontFamily: "Amatic SC",
-					fill: "white",
-					fontSize: 50,
-				},
-			}),
-		);
-
-		const reset = this.addChild(
-			new FancyButton({
-				text: new Text({
-					text: `Reset`,
-					style: {
-						fontFamily: "Amatic SC",
-						fill: "red",
-						fontSize: 50,
-						fontWeight: "bold",
-					},
-				}),
-			}),
-		);
-		reset.position.set(100, 500);
-		reset.on("pointertap", () => {
-			userSettings.resetLevel();
-			engine().navigation.showScreen(GameScreen);
-		});
-
-		const restart = this.addChild(
-			new FancyButton({
-				text: new Text({
-					text: `Restart`,
-					style: {
-						fontFamily: "Amatic SC",
-						fill: "white",
-						fontSize: 100,
-						fontWeight: "bold",
-					},
-				}),
-			}),
-		);
-		restart.position.set(100, 300);
-		restart.on("pointertap", () => {
-			engine().navigation.showScreen(GameScreen);
-		});
 	}
 
 	async show() {
@@ -140,7 +91,8 @@ export class GameScreen extends Container {
 					style: {
 						fontFamily: "Amatic SC",
 						fill: "white",
-						fontSize: 200,
+						stroke: { color: "black", width: 6 },
+						fontSize: 150,
 					},
 				}),
 			}),

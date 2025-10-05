@@ -1,77 +1,17 @@
 import {
 	AnimatedSprite,
 	Assets,
-	Graphics,
 	Sprite,
+	Text,
 	ViewContainerOptions,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, InsectType } from "../game/Game";
 import { getAnimation, getIdleAnimation } from "../utils/animation";
-
-export class Lifebar extends Container {
-	background: Sprite;
-	life: Sprite;
-	barMask: Graphics;
-
-	fullWidth = 500;
-	fullHeight = 20;
-
-	constructor() {
-		super();
-
-		this.background = this.addChild(
-			new Sprite({
-				texture: Assets.get("EnergyBarBack.png"),
-				anchor: 0.5,
-			}),
-		);
-
-		this.life = this.addChild(
-			new Sprite({
-				texture: Assets.get("EnergyBar.png"),
-				anchor: 0.5,
-			}),
-		);
-		this.barMask = this.addChild(
-			new Graphics()
-				.rect(
-					-this.life.width / 2,
-					-this.life.height / 2,
-					this.life.width,
-					this.life.height,
-				)
-				.fill("white"),
-		);
-		this.life.mask = this.barMask;
-
-		// this.background = this.addChild(
-		// 	new Graphics()
-		// 		.rect(0, 0, this.fullWidth, this.fullHeight)
-		// 		.fill("red"),
-		// );
-		// this.background.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
-
-		// this.life = this.addChild(
-		// 	new Graphics()
-		// 		.rect(0, 0, this.fullWidth, this.fullHeight)
-		// 		.fill("green"),
-		// );
-		// this.life.position.set(-this.fullWidth / 2, -this.fullHeight / 2);
-	}
-
-	updateLife(amount: number) {
-		this.barMask
-			.clear()
-			.rect(
-				-this.life.width / 2,
-				-this.life.height / 2,
-				this.life.width * amount,
-				this.life.height,
-			)
-			.fill("white");
-	}
-}
+import { FancyButton } from "@pixi/ui";
+import { userSettings } from "../utils/userSettings";
+import { engine } from "../getEngine";
+import { GameScreen } from "../screens/GameScreen";
 
 export class BlueprintItem extends Container {
 	bg: AnimatedSprite;
@@ -163,8 +103,11 @@ export class Blueprint extends Container {
 export class HUD extends Container {
 	game: Game;
 	blueprints: Container<Blueprint>;
+	levelText: Text;
+	resetButton: FancyButton;
+	restartButton: FancyButton;
 
-	constructor(options: { game: Game }) {
+	constructor(options: { game: Game; level: number }) {
 		super();
 		this.game = options.game;
 
@@ -173,10 +116,58 @@ export class HUD extends Container {
 			this.blueprints.addChild(
 				new Blueprint({
 					insectTypes: itemTypes,
-					scale: 0.4,
 				}),
 			),
 		);
+
+		this.levelText = this.addChild(
+			new Text({
+				text: `Level ${options.level + 1}`,
+				x: 0,
+				y: -500,
+				anchor: 0.5,
+				style: {
+					fontFamily: "Amatic SC",
+					fill: "white",
+					fontSize: 50,
+				},
+			}),
+		);
+
+		this.resetButton = this.addChild(
+			new FancyButton({
+				text: new Text({
+					text: `Reset`,
+					style: {
+						fontFamily: "Amatic SC",
+						fill: "red",
+						fontSize: 50,
+						fontWeight: "bold",
+					},
+				}),
+			}),
+		);
+		this.resetButton.on("pointertap", () => {
+			userSettings.resetLevel();
+			engine().navigation.showScreen(GameScreen);
+		});
+
+		this.restartButton = this.addChild(
+			new FancyButton({
+				text: new Text({
+					text: `Restart`,
+					style: {
+						fontFamily: "Amatic SC",
+						fill: "white",
+						fontSize: 100,
+						fontWeight: "bold",
+					},
+				}),
+			}),
+		);
+		this.restartButton.on("pointertap", () => {
+			engine().navigation.showScreen(GameScreen);
+		});
 	}
 
 	resize(width: number, height: number) {
@@ -189,6 +180,12 @@ export class HUD extends Container {
 				blueprint.x = gap * (i + 1 / 2);
 				blueprint.y = 0;
 			});
+
+			this.levelText.position.set(width / 2, 200);
+
+			this.resetButton.position.set(width / 4, 400);
+
+			this.restartButton.position.set((width * 3) / 4, 400);
 		} else {
 			// Landscape
 			this.blueprints.position.set(1690, 0);
@@ -197,6 +194,12 @@ export class HUD extends Container {
 				blueprint.x = 0;
 				blueprint.y = gap * (i + 1 / 2);
 			});
+
+			this.levelText.position.set(200, 200);
+
+			this.resetButton.position.set(200, height - 200);
+
+			this.restartButton.position.set(200, height - 400);
 		}
 	}
 }

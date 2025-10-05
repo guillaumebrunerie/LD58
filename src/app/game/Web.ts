@@ -16,19 +16,15 @@ export class Web extends Container {
 
 		const points = options.polygon.points;
 
-		let sumX = 0;
-		let sumY = 0;
 		let minX = Infinity;
 		let minY = Infinity;
 		let maxX = -Infinity;
 		let maxY = -Infinity;
 		points.forEach((v, i) => {
 			if (i % 2 == 0) {
-				sumX += v;
 				minX = Math.min(minX, v);
 				maxX = Math.max(maxX, v);
 			} else {
-				sumY += v;
 				minY = Math.min(minY, v);
 				maxY = Math.max(maxY, v);
 			}
@@ -36,8 +32,8 @@ export class Web extends Container {
 		const size = Math.max(maxX - minX, maxY - minY);
 		const scale = Math.max(0.6, size * 0.0015);
 		const pointsCount = points.length / 2;
-		const centerX = sumX / pointsCount;
-		const centerY = sumY / pointsCount;
+		const centerX = (minX + maxX) / 2;
+		const centerY = (minY + maxY) / 2;
 
 		const mask = this.addChild(new Graphics().poly(points).fill());
 		this.addChild(
