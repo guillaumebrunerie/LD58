@@ -1,7 +1,8 @@
-import { ViewContainerOptions, Assets, Ticker, AnimatedSprite } from "pixi.js";
+import { ViewContainerOptions, Ticker, AnimatedSprite } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, gameWidth, gameHeight } from "./Game";
 import { Thread } from "./Thread";
+import { getIdleAnimation } from "../utils/animation";
 
 export class Player extends Container {
 	game: Game;
@@ -10,7 +11,7 @@ export class Player extends Container {
 		super(options);
 		this.addChild(
 			new AnimatedSprite({
-				textures: Object.values(Assets.get("SpiderIdle").textures),
+				textures: getIdleAnimation("SpiderIdle"),
 				animationSpeed: 15 / 60,
 				anchor: 0.5,
 				autoPlay: true,

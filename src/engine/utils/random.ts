@@ -110,6 +110,11 @@ export function randomShuffle<T>(array: T[], random = Math.random): T[] {
 	return array;
 }
 
+export const randomCyclic = <T>(array: T[]) => {
+	const offset = randomInt(0, array.length - 1);
+	return array.map((_, i) => array[(i + offset) % array.length]);
+};
+
 /**
  * Return a random string hash - not guaranteed to be unique
  * @param length - The length of the hash

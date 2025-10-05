@@ -7,6 +7,7 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, InsectType } from "../game/Game";
+import { getAnimation, getIdleAnimation } from "../utils/animation";
 
 export class Lifebar extends Container {
 	background: Sprite;
@@ -80,7 +81,7 @@ export class BlueprintItem extends Container {
 		super(options);
 		this.bg = this.addChild(
 			new AnimatedSprite({
-				textures: Object.values(Assets.get("InventoryLoop").textures),
+				textures: getIdleAnimation("InventoryLoop"),
 				autoPlay: true,
 				anchor: 0.5,
 				animationSpeed: 15 / 60,
@@ -103,9 +104,7 @@ export class BlueprintItem extends Container {
 			this.bg.destroy();
 			this.bg = this.addChild(
 				new AnimatedSprite({
-					textures: Object.values(
-						Assets.get("InventoryEnd").textures,
-					),
+					textures: getAnimation("InventoryEnd"),
 					anchor: 0.5,
 					animationSpeed: 15 / 60,
 					loop: false,

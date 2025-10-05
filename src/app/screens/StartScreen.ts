@@ -3,6 +3,7 @@ import { FancyButton } from "@pixi/ui";
 import { Label } from "../ui/Label";
 import { GameScreen } from "./GameScreen";
 import { engine } from "../getEngine";
+import { Graphics } from "pixi.js";
 
 export class StartScreen extends Container {
 	public static assetBundles = ["main"];
@@ -12,6 +13,7 @@ export class StartScreen extends Container {
 	constructor() {
 		super();
 
+		this.addChild(new Graphics().rect(0, 0, 1920, 1920).fill("darkblue"));
 		this.startButton = this.addChild(
 			new FancyButton({
 				text: new Label({
@@ -20,7 +22,6 @@ export class StartScreen extends Container {
 						fontFamily: "Amatic SC",
 						fill: "white",
 						fontSize: 100,
-						// fontWeight: "bold",
 					},
 				}),
 			}),
@@ -34,5 +35,9 @@ export class StartScreen extends Container {
 
 	async startGame() {
 		await engine().navigation.showScreen(GameScreen);
+	}
+
+	async hide() {
+		await this.animate(this.startButton, { alpha: 0 }, { duration: 1 });
 	}
 }

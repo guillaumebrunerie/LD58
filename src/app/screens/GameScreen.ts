@@ -58,6 +58,13 @@ export class GameScreen extends Container {
 		this.game.hud = this.hud;
 	}
 
+	async show() {
+		const playerY = this.game.player.y;
+		this.game.player.y -= 1000;
+		await this.animate(this.game.player, { y: playerY }, { duration: 1 });
+		this.game.start();
+	}
+
 	resize(width: number, height: number) {
 		this.gameContainer.position.set(width / 2, height / 2);
 		this.touchArea.clear().rect(0, 0, width, height).fill("#00000001");

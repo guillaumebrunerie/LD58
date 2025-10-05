@@ -1,42 +1,29 @@
-import { animate } from "motion";
-import type { ObjectTarget } from "motion/react";
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container } from "pixi.js";
+import { Label } from "../ui/Label";
 
-/** Screen shown while loading assets */
 export class LoadScreen extends Container {
-	/** Assets bundles required by this screen */
-	public static assetBundles = ["preload"];
-	private background: Sprite;
+	loadingText: Label;
 
 	constructor() {
 		super();
-		this.background = new Sprite({
-			texture: Texture.from("preload/Loading.jpg"),
-			anchor: 0.5,
-		});
-		this.addChild(this.background);
-	}
 
-	/** Resize the screen, fired whenever window size changes  */
-	public resize(width: number, height: number) {
-		this.background.position.set(width * 0.5, height * 0.5);
-		this.background.scale.set(
-			width / this.background.texture.width,
-			height / this.background.texture.height,
+		this.loadingText = this.addChild(
+			new Label({
+				text: "0%",
+				style: {
+					fontFamily: "Arial",
+					fill: "white",
+					fontSize: 100,
+				},
+			}),
 		);
 	}
 
-	/** Show screen with animations */
-	public async show() {
-		this.alpha = 1;
+	resize(width: number, height: number) {
+		this.loadingText.position.set(width / 2, (height * 3) / 4);
 	}
 
-	/** Hide screen with animations */
-	public async hide() {
-		await animate(this, { alpha: 0 } as ObjectTarget<this>, {
-			duration: 0.3,
-			ease: "linear",
-			delay: 1,
-		});
+	onLoad(progress: number) {
+		this.loadingText.text = `${Math.round(progress)}%`;
 	}
 }

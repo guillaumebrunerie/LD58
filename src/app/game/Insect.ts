@@ -8,7 +8,9 @@ import {
 } from "pixi.js";
 import { randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
-import { Game, InsectType, gameWidth, segmentIntersectsDisk } from "./Game";
+import { Game, InsectType, segmentIntersectsDisk } from "./Game";
+
+export const insectBounds = 400;
 
 export class Insect extends Container {
 	speed = randomFloat(0.01, 0.05);
@@ -58,7 +60,7 @@ export class Insect extends Container {
 
 	rotationTimeout = 0;
 	update(ticker: Ticker) {
-		const bounds = gameWidth / 2 - 100;
+		const bounds = insectBounds;
 		const dt = ticker.deltaMS;
 
 		this.rotationTimeout -= dt;

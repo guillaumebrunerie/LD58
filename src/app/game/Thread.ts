@@ -3,12 +3,12 @@ import {
 	AnimatedSprite,
 	ViewContainerOptions,
 	Assets,
-	Texture,
 	Polygon,
 	Ticker,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, segmentIntersection } from "./Game";
+import { getIdleAnimation } from "../utils/animation";
 
 export class Thread extends Container {
 	from: Point;
@@ -32,9 +32,7 @@ export class Thread extends Container {
 		this.to = options.to.clone();
 		this.line = this.addChild(
 			new AnimatedSprite({
-				textures: Object.values(
-					Assets.get("WebLong").textures,
-				) as Texture[],
+				textures: getIdleAnimation("WebLong"),
 				scale: { x: 1, y: options.scaleY ?? 1 },
 				anchor: { x: 0, y: 0.5 },
 				autoPlay: true,
@@ -43,14 +41,11 @@ export class Thread extends Container {
 		);
 		this.dot = this.addChild(
 			new AnimatedSprite({
-				textures: Object.values(
-					Assets.get("WebDot").textures,
-				) as Texture[],
+				textures: getIdleAnimation("WebDot"),
 				anchor: 0.5,
 				autoPlay: true,
 				animationSpeed: 15 / 60,
 				scale: 0.4 * (options.scaleY ?? 1),
-				// alpha: 0,
 			}),
 		);
 		this.previousThread = options.previousThread;
@@ -69,9 +64,7 @@ export class Thread extends Container {
 		} else if (length < 1500) {
 			web = "WebMedium";
 		}
-		this.line.textures = Object.values(
-			Assets.get(web).textures,
-		) as Texture[];
+		this.line.textures = getIdleAnimation(web);
 		this.line.position = this.from;
 		this.line.scale.x = length / Assets.get(`${web}_000.png`).width;
 		this.line.rotation = Math.atan2(vector.y, vector.x);

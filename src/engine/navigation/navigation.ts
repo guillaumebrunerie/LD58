@@ -153,16 +153,13 @@ export class Navigation {
 		}
 
 		// If there is a screen already created, hide and destroy it
-		const promises: Promise<void>[] = [];
 		if (this.currentScreen) {
-			promises.push(this.hideAndRemoveScreen(this.currentScreen));
+			await this.hideAndRemoveScreen(this.currentScreen);
 		}
 
 		// Create the new screen and add that to the stage
 		this.currentScreen = BigPool.get(ctor);
-		promises.push(this.addAndShowScreen(this.currentScreen));
-
-		await Promise.all(promises);
+		await this.addAndShowScreen(this.currentScreen);
 	}
 
 	/**

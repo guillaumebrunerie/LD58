@@ -8,11 +8,11 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
-import { randomItem } from "../../engine/utils/random";
+import { randomFloat, randomItem } from "../../engine/utils/random";
 import { Thread } from "./Thread";
 import { Web } from "./Web";
 import { Player } from "./Player";
-import { Insect } from "./Insect";
+import { Insect, insectBounds } from "./Insect";
 import { Background } from "./Background";
 
 export const mod = (a: number, b: number) => {
@@ -156,7 +156,6 @@ export class Game extends Container {
 	}) {
 		super();
 		this.ticker = new Ticker();
-		this.ticker.start();
 		this.addChild(new Background({ game: this }));
 		this.target = this.addChild(
 			new Target({
@@ -187,14 +186,18 @@ export class Game extends Container {
 		}
 	}
 
+	start() {
+		this.ticker.start();
+	}
+
 	spawnInsect(type = pickInsectType()) {
 		this.insects.addChild(
 			new Insect({
 				game: this,
 				type,
 				position: new Point(
-					Math.random() * gameWidth - gameWidth / 2,
-					Math.random() * gameHeight - gameHeight / 2,
+					randomFloat(insectBounds, -insectBounds),
+					randomFloat(insectBounds, -insectBounds),
 				),
 				scale: 0.3,
 			}),

@@ -70,21 +70,12 @@ export class Background extends Container {
 		putBgElement(3, 1, -1);
 		putBgElement(4, -1, 1);
 		putBgElement(5, -1, -1);
-		// this.addChild(
-		// 	new Graphics()
-		// 		.rect(-gameWidth / 2, -gameHeight / 2, gameWidth, gameHeight)
-		// 		.stroke("blue"),
-		// );
+		this.updateTint();
 	}
 
 	season = 0;
-	update(ticker: Ticker) {
-		this.lt += ticker.deltaMS / 1000;
-		const duration = timesOfDay[this.season].duration;
-		if (this.lt > duration) {
-			this.season = (this.season + 1) % timesOfDay.length;
-			this.lt -= duration;
-		}
+
+	updateTint() {
 		const nt = this.lt / timesOfDay[this.season].duration;
 		const getTint = (colorFrom: string, colorTo: string) => {
 			const rgbFrom = new Color(colorFrom).toRgb();
@@ -105,5 +96,15 @@ export class Background extends Container {
 				tile.tint = tint;
 			}
 		});
+	}
+
+	update(ticker: Ticker) {
+		this.lt += ticker.deltaMS / 1000;
+		const duration = timesOfDay[this.season].duration;
+		if (this.lt > duration) {
+			this.season = (this.season + 1) % timesOfDay.length;
+			this.lt -= duration;
+		}
+		this.updateTint();
 	}
 }
