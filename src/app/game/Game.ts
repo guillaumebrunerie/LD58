@@ -11,7 +11,7 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { HUD } from "../ui/HUD";
-import { randomItem } from "../../engine/utils/random";
+import { randomFloat, randomInt, randomItem } from "../../engine/utils/random";
 
 const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
@@ -21,9 +21,11 @@ export class Background extends Container {
 	constructor() {
 		super();
 		const width = 798;
+		const bg = this.addChild(new RenderLayer());
 		for (let i = -10; i <= 10; i++) {
 			for (let j = -10; j <= 10; j++) {
-				this.addChild(
+				const tile = this.addChild(
+					// new Graphics().rect(-400, -400, 800, 800).fill("green"),
 					new Sprite({
 						texture: Assets.get(`BgTile.jpg`),
 						anchor: 0.5,
@@ -35,6 +37,23 @@ export class Background extends Container {
 						},
 					}),
 				);
+				bg.attach(tile);
+				this.addChild(
+					new Sprite({
+						texture: Assets.get(`Bg_0${randomInt(1, 5)}.png`),
+						anchor: 0.5,
+						x: i * width + randomInt(-200, 200),
+						y: j * width + randomInt(-200, 200),
+						scale: {
+							x: randomFloat(0.5, 2),
+							y: randomFloat(0.5, 2),
+						},
+						rotation: randomFloat(0, Math.PI * 2),
+					}),
+				);
+				// this.addChild(
+				// 	new Graphics().rect(-400, -400, 800, 800).fill("green"),
+				// );
 			}
 		}
 	}
