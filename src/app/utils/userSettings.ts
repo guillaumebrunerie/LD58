@@ -5,6 +5,7 @@ import { engine } from "../getEngine";
 const KEY_VOLUME_MASTER = "volume-master";
 const KEY_VOLUME_BGM = "volume-bgm";
 const KEY_VOLUME_SFX = "volume-sfx";
+const KEY_LEVEL = "level";
 
 /**
  * Persistent user settings of volumes.
@@ -41,6 +42,17 @@ class UserSettings {
 	public setSfxVolume(value: number) {
 		engine().audio.sfx.setVolume(value);
 		storage.setNumber(KEY_VOLUME_SFX, value);
+	}
+
+	/** Level */
+	public getLevel() {
+		return storage.getNumber(KEY_LEVEL) ?? 0;
+	}
+	public setLevel(value: number) {
+		storage.setNumber(KEY_LEVEL, value);
+	}
+	public resetLevel() {
+		storage.reset(KEY_LEVEL);
 	}
 }
 

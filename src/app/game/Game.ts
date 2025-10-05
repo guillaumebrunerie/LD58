@@ -16,6 +16,10 @@ import { Player } from "./Player";
 import { Insect, insectBounds } from "./Insect";
 import { Background } from "./Background";
 import { Level } from "./levels";
+import { FancyButton } from "@pixi/ui";
+import { Label } from "../ui/Label";
+import { engine } from "../getEngine";
+import { GameScreen } from "../screens/GameScreen";
 
 export const mod = (a: number, b: number) => {
 	return ((a % b) + b) % b;
@@ -244,24 +248,7 @@ export class Game extends Container {
 			blueprint.complete();
 		}
 		if (this.hud.blueprints.children.every((b) => b.isComplete)) {
-			this.win();
+			(engine().navigation.currentScreen as GameScreen).win();
 		}
-	}
-
-	win() {
-		this.ticker.stop();
-		this.addChild(
-			new Text({
-				text: `CONGRATULATIONS`,
-				x: 0,
-				y: 0,
-				anchor: 0.5,
-				style: {
-					fontFamily: "Amatic SC",
-					fill: "white",
-					fontSize: 200,
-				},
-			}),
-		);
 	}
 }

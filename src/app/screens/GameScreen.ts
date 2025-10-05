@@ -11,6 +11,10 @@ import { HUD } from "../ui/HUD";
 import { clamp } from "../../engine/utils/maths";
 import { Thread } from "../game/Thread";
 import { levels } from "../game/levels";
+import { FancyButton } from "@pixi/ui";
+import { Label } from "../ui/Label";
+import { userSettings } from "../utils/userSettings";
+import { engine } from "../getEngine";
 
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
@@ -19,7 +23,7 @@ export class GameScreen extends Container {
 	game: Game;
 	hud: HUD;
 	touchArea: Graphics;
-	level: number = 0;
+	level: number = userSettings.getLevel();
 
 	constructor() {
 		super();
@@ -72,6 +76,24 @@ export class GameScreen extends Container {
 				},
 			}),
 		);
+
+		const reset = this.addChild(
+			new FancyButton({
+				text: new Text({
+					text: `Reset`,
+					style: {
+						fontFamily: "Amatic SC",
+						fill: "red",
+						fontSize: 50,
+					},
+				}),
+			}),
+		);
+		reset.position.set(100, 500);
+		reset.on("pointertap", () => {
+			userSettings.resetLevel();
+			engine().navigation.showScreen(GameScreen);
+		});
 	}
 
 	async show() {
@@ -81,10 +103,39 @@ export class GameScreen extends Container {
 		this.game.start();
 	}
 
+	widthX = 0;
+	heightX = 0;
 	resize(width: number, height: number) {
+		this.widthX = width;
+		this.heightX = height;
 		this.gameContainer.position.set(width / 2, height / 2);
 		this.touchArea.clear().rect(0, 0, width, height).fill("#00000001");
 		this.hud.resize(width, height);
+	}
+
+	win() {
+		const button = this.addChild(
+			new FancyButton({
+				text: new Label({
+					text: `CONGRATULATIONS`,
+					style: {
+						fontFamily: "Amatic SC",
+						fill: "white",
+						fontSize: 200,
+					},
+				}),
+			}),
+		);
+		button.position.set(this.widthX / 2, this.heightX / 2);
+		button.on("pointertap", () => {
+			button.destroy();
+			this.nextLevel();
+		});
+	}
+
+	nextLevel() {
+		userSettings.setLevel(this.level + 1);
+		engine().navigation.showScreen(GameScreen);
 	}
 
 	pointers: {

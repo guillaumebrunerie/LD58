@@ -52,6 +52,11 @@ class StorageWrapper {
 	public setObject(key: string, value: Record<string, unknown>) {
 		this.setString(key, JSON.stringify(value));
 	}
+
+	/** Reset a value */
+	public reset(key: string) {
+		localStorage.removeItem(key);
+	}
 }
 
 export const storage = new StorageWrapper();
