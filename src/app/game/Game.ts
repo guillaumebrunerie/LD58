@@ -1,8 +1,10 @@
 import {
 	Assets,
 	Graphics,
+	IRenderLayer,
 	Point,
 	Polygon,
+	RenderLayer,
 	Sprite,
 	Ticker,
 	ViewContainerOptions,
@@ -148,37 +150,63 @@ export class Item extends Container {
 	speed = 0.1;
 	radius = 50;
 	game: Game;
+	sprite: Sprite;
+	shadow: Sprite;
+
 	constructor(options: ViewContainerOptions & { game: Game; item: string }) {
 		super(options);
-		this.addChild(
-			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF44"),
-		);
-		this.addChild(
-			new Sprite({ texture: Assets.get(options.item), anchor: 0.5 }),
-		);
-		this.rotation = Math.random() * Math.PI * 2;
+
 		this.game = options.game;
 		this.game.addToTicker(this);
+
+		this.addChild(
+			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF00"),
+		);
+		this.sprite = this.addChild(
+			new Sprite({ texture: Assets.get(options.item), anchor: 0.5 }),
+		);
+		this.shadow = this.addChild(
+			new Sprite({
+				texture: Assets.get(options.item),
+				anchor: 0.5,
+				x: 20,
+				y: 10,
+				tint: 0,
+				alpha: 0.5,
+			}),
+		);
+		this.game.itemShadows.attach(this.shadow);
+
+		this.setRotation(Math.random() * Math.PI * 2);
+	}
+
+	getRotation() {
+		return this.sprite.rotation;
+	}
+	setRotation(rotation: number) {
+		this.sprite.rotation = rotation;
+		this.shadow.rotation = rotation;
 	}
 
 	update(ticker: Ticker) {
 		const bounds = 3000;
-		if (this.x > bounds && Math.sin(this.rotation) > 0) {
-			this.rotation = -this.rotation;
+		const r = this.getRotation();
+		if (this.x > bounds && Math.sin(r) > 0) {
+			this.setRotation(-r);
 		}
-		if (this.x < -bounds && Math.sin(this.rotation) < 0) {
-			this.rotation = -this.rotation;
+		if (this.x < -bounds && Math.sin(r) < 0) {
+			this.setRotation(-r);
 		}
-		if (this.y > bounds && -Math.cos(this.rotation) > 0) {
-			this.rotation = Math.PI - this.rotation;
+		if (this.y > bounds && -Math.cos(r) > 0) {
+			this.setRotation(Math.PI - r);
 		}
-		if (this.y < -bounds && -Math.cos(this.rotation) < 0) {
-			this.rotation = Math.PI - this.rotation;
+		if (this.y < -bounds && -Math.cos(r) < 0) {
+			this.setRotation(Math.PI - r);
 		}
 
 		const delta = {
-			x: Math.sin(this.rotation) * this.speed * ticker.deltaMS,
-			y: -Math.cos(this.rotation) * this.speed * ticker.deltaMS,
+			x: Math.sin(r) * this.speed * ticker.deltaMS,
+			y: -Math.cos(r) * this.speed * ticker.deltaMS,
 		};
 		this.position = this.position.add(delta);
 
@@ -275,7 +303,7 @@ export class Web extends Container {
 
 	findWebIntersection() {
 		for (const web of this.game.webs.children) {
-			if (web == this) {
+			if (web == this || web.isDestroyed) {
 				continue;
 			}
 			const point = segmentIntersection(
@@ -352,6 +380,7 @@ export class Game extends Container {
 
 	player: Player;
 	webs: Container<Web>;
+	itemShadows: IRenderLayer;
 	items: Container<Item>;
 	polygons: Container<PolygonHighlight>;
 	target: Target;
@@ -371,6 +400,7 @@ export class Game extends Container {
 			}),
 		);
 		this.webs = this.addChild(new Container<Web>());
+		this.itemShadows = this.addChild(new RenderLayer());
 		this.player = this.addChild(new Player({ game: this }));
 		this.polygons = this.addChild(new Container<PolygonHighlight>());
 
