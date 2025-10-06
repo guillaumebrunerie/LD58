@@ -82,10 +82,15 @@ export class GameScreen extends Container {
 			}),
 		);
 		const options = {
-			delay: 0.2,
+			delay: 0.5,
 			duration: this.isLandscape ? 0.6 : 1,
 			ease: (t: number) => 1 - (1 - t) * (1 - t),
 		};
+		const rectangle = this.addChild(
+			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
+		);
+		await this.animate(rectangle, { alpha: 0 }, { duration: 0.5 });
+		rectangle.destroy();
 		this.animate(thread, { to_y_redraw: playerY }, options);
 		await this.animate(this.game.player, { y: playerY }, options);
 		this.game.start();

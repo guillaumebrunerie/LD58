@@ -3,17 +3,26 @@ import { FancyButton } from "@pixi/ui";
 import { Label } from "../ui/Label";
 import { GameScreen } from "./GameScreen";
 import { engine } from "../getEngine";
-import { Graphics } from "pixi.js";
+import { Background } from "../game/Background";
+import { Assets, Graphics, Sprite } from "pixi.js";
 
 export class StartScreen extends Container {
 	public static assetBundles = ["main"];
 
+	background: Background;
+	logo: Sprite;
 	startButton: FancyButton;
 
 	constructor() {
 		super();
 
-		this.addChild(new Graphics().rect(0, 0, 1920, 1920).fill("darkblue"));
+		this.background = this.addChild(new Background());
+		this.logo = this.addChild(
+			new Sprite({
+				texture: Assets.get("Logo.png"),
+				anchor: 0.5,
+			}),
+		);
 		this.startButton = this.addChild(
 			new FancyButton({
 				text: new Label({
@@ -30,7 +39,9 @@ export class StartScreen extends Container {
 	}
 
 	resize(width: number, height: number) {
-		this.startButton.position.set(width / 2, height / 2);
+		this.startButton.position.set(width / 2, (2 * height) / 3);
+		this.logo.position.set(width / 2, height / 3);
+		this.background.position.set(width / 2, height / 2);
 	}
 
 	async startGame() {
@@ -38,6 +49,11 @@ export class StartScreen extends Container {
 	}
 
 	async hide() {
-		await this.animate(this.startButton, { alpha: 0 }, { duration: 1 });
+		const rectangle = this.addChild(
+			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
+		);
+		rectangle.alpha = 0;
+		await this.animate(rectangle, { alpha: 1 }, { duration: 0.5 });
+		rectangle.destroy();
 	}
 }

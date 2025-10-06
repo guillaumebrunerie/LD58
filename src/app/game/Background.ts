@@ -10,17 +10,14 @@ import { lerp } from "../../engine/utils/maths";
 import { randomInt, randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
 import { timesOfDay } from "./configuration";
-import { Game, mod, gameWidth, gameHeight } from "./Game";
+import { mod, gameWidth, gameHeight } from "./Game";
 
 export class Background extends Container {
-	game: Game;
 	tiles: Sprite[][];
 	lt = 0;
 
-	constructor(options: ViewContainerOptions & { game: Game }) {
+	constructor(options?: ViewContainerOptions) {
 		super(options);
-		this.game = options.game;
-		this.game.addToTicker(this);
 		const width = 798;
 		const bg = this.addChild(new RenderLayer());
 		this.tiles = timesOfDay[0].tints.map(() => []);

@@ -154,7 +154,8 @@ export class Game extends Container {
 	constructor(options: { level: Level }) {
 		super();
 		this.ticker = new Ticker();
-		this.addChild(new Background({ game: this }));
+		const background = this.addChild(new Background());
+		this.addToTicker(background);
 		this.target = this.addChild(
 			new Target({
 				game: this,
