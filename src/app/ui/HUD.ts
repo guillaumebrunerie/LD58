@@ -114,7 +114,7 @@ export class Blueprint extends Container {
 			this.items.forEach((item, i) => {
 				scale = this.items.length <= 4 ? 1 : 0.85;
 				const gap = 45 * scale;
-				item.position.set(
+				item.position?.set(
 					-gap * (this.items.length - 1) + i * gap * 2,
 					0,
 				);
@@ -122,38 +122,38 @@ export class Blueprint extends Container {
 		} else {
 			switch (this.items.length) {
 				case 1: {
-					this.items[0].position.set(0, 0);
+					this.items[0].position?.set(0, 0);
 					break;
 				}
 				case 2: {
 					const gap = 45;
-					this.items[0].position.set(-gap, 0);
-					this.items[1].position.set(gap, 0);
+					this.items[0].position?.set(-gap, 0);
+					this.items[1].position?.set(gap, 0);
 					break;
 				}
 				case 3: {
 					const gap = 45;
-					this.items[0].position.set(-gap, (gap * Math.sqrt(3)) / 2);
-					this.items[1].position.set(0, (-gap * Math.sqrt(3)) / 2);
-					this.items[2].position.set(gap, (gap * Math.sqrt(3)) / 2);
+					this.items[0].position?.set(-gap, (gap * Math.sqrt(3)) / 2);
+					this.items[1].position?.set(0, (-gap * Math.sqrt(3)) / 2);
+					this.items[2].position?.set(gap, (gap * Math.sqrt(3)) / 2);
 					break;
 				}
 				case 4: {
 					const gap = 45;
-					this.items[0].position.set(-gap, -gap);
-					this.items[1].position.set(-gap, gap);
-					this.items[2].position.set(gap, -gap);
-					this.items[3].position.set(gap, gap);
+					this.items[0].position?.set(-gap, -gap);
+					this.items[1].position?.set(-gap, gap);
+					this.items[2].position?.set(gap, -gap);
+					this.items[3].position?.set(gap, gap);
 					break;
 				}
 				case 5: {
 					scale = 0.85;
 					const gap = 45 * scale * Math.sqrt(2);
-					this.items[0].position.set(0, 0);
-					this.items[1].position.set(-gap, -gap);
-					this.items[2].position.set(-gap, gap);
-					this.items[3].position.set(gap, -gap);
-					this.items[4].position.set(gap, gap);
+					this.items[0].position?.set(0, 0);
+					this.items[1].position?.set(-gap, -gap);
+					this.items[2].position?.set(-gap, gap);
+					this.items[3].position?.set(gap, -gap);
+					this.items[4].position?.set(gap, gap);
 					break;
 				}
 			}
@@ -161,7 +161,7 @@ export class Blueprint extends Container {
 			// item.y = -gap * (this.items.length - 1) + i * gap * 2;
 		}
 		this.items.forEach((item) => {
-			item.scale.set(scale);
+			item.scale?.set(scale);
 		});
 	}
 
