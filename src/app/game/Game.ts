@@ -250,7 +250,9 @@ export class Game extends Container {
 		if (matchingIndex >= 0) {
 			const blueprint = this.hud.blueprints.children[matchingIndex];
 			blueprint.complete();
-			engine().audio.playSound("InventoryCollect2");
+			setTimeout(() => {
+				engine().audio.playSound("InventoryCollect2");
+			}, 500);
 		}
 		if (this.hud.blueprints.children.every((b) => b.isComplete)) {
 			(engine().navigation.currentScreen as GameScreen).win();

@@ -221,6 +221,7 @@ export class HUD extends Container {
 			}),
 		);
 		this.resetButton.on("pointertap", () => {
+			engine().audio.playSound("Click");
 			userSettings.resetLevel();
 			engine().navigation.showScreen(GameScreen);
 		});
@@ -239,6 +240,7 @@ export class HUD extends Container {
 			}),
 		);
 		this.restartButton.on("pointertap", () => {
+			engine().audio.playSound("Click");
 			engine().navigation.showScreen(GameScreen);
 		});
 	}

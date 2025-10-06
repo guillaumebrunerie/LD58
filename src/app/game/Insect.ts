@@ -10,6 +10,7 @@ import { randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
 import { Game, InsectType, segmentIntersectsDisk } from "./Game";
 import { getIdleAnimation } from "../utils/animation";
+import { engine } from "../getEngine";
 
 export const insectBounds = 400;
 
@@ -39,7 +40,7 @@ export class Insect extends Container {
 		);
 		this.shadow = this.addChild(
 			new Sprite({
-				texture: Assets.get(options.type),
+				texture: Assets.get(`${options.type}.png`),
 				anchor: 0.5,
 				x: 10,
 				y: 20,
@@ -161,6 +162,8 @@ export class Insect extends Container {
 	}
 
 	escape(from: Point) {
+		// console.log("SPIDER HIT");
+		engine().audio.playSound("SpiderHit");
 		const vector = this.position.subtract(from);
 		const angle = Math.atan2(vector.y, vector.x);
 		this.setRotation(angle + Math.PI / 2);

@@ -73,24 +73,36 @@ export class GameScreen extends Container {
 	}
 
 	async show() {
+		// Move player away
 		const playerY = this.game.player.y;
 		this.game.player.y -= this.isLandscape ? 600 : 1000;
+
+		// Fade from black
+		const rectangle = this.addChild(
+			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
+		);
+		await this.animate(rectangle, { alpha: 0 }, { duration: 0.5 });
+		rectangle.destroy();
+
+		// Play sound
+		setTimeout(() => {
+			engine().audio.playSound("WebStart");
+		}, 500);
+
+		// Add thread
 		const thread = this.game.threads.addChild(
 			new Thread({
 				from: this.game.player.position.clone(),
 				to: this.game.player.position.clone(),
 			}),
 		);
+
+		// Move player and thread back
 		const options = {
 			delay: 0.5,
 			duration: this.isLandscape ? 0.6 : 1,
 			ease: (t: number) => 1 - (1 - t) * (1 - t),
 		};
-		const rectangle = this.addChild(
-			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
-		);
-		await this.animate(rectangle, { alpha: 0 }, { duration: 0.5 });
-		rectangle.destroy();
 		this.animate(thread, { to_y_redraw: playerY }, options);
 		await this.animate(this.game.player, { y: playerY }, options);
 		this.game.start();
@@ -110,7 +122,9 @@ export class GameScreen extends Container {
 	}
 
 	win() {
-		engine().audio.playSound("CompleteLevel");
+		setTimeout(() => {
+			engine().audio.playSound("CompleteLevel");
+		}, 1000);
 		const button = this.addChild(
 			new FancyButton({
 				text: new Label({

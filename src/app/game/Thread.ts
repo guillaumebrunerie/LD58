@@ -9,6 +9,8 @@ import {
 import { Container } from "../../PausableContainer";
 import { Game, segmentIntersection } from "./Game";
 import { getIdleAnimation } from "../utils/animation";
+import { engine } from "../getEngine";
+import { randomInt } from "../../engine/utils/random";
 
 export class Thread extends Container {
 	from: Point;
@@ -147,6 +149,10 @@ export class Thread extends Container {
 		this.from = point.clone();
 		this.previousThread = undefined;
 		this.redraw();
+
+		if (newThread.size() > 50) {
+			engine().audio.playSound(`WebRemove${randomInt(1, 4)}`);
+		}
 	}
 
 	destroySpeed = 5;
@@ -177,5 +183,12 @@ export class Thread extends Container {
 		this.isFrozen = true;
 		this.line.stop();
 		this.dot.stop();
+	}
+
+	size(): number {
+		return (
+			this.to.subtract(this.from).magnitude() +
+			(this.previousThread?.size() ?? 0)
+		);
 	}
 }
