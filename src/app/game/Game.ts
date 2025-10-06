@@ -213,6 +213,8 @@ export class Game extends Container {
 	}
 
 	click(position: Point) {
+		engine().audio.playSound("WebStart");
+
 		const oldPosition = this.player.threadPosition();
 		this.target.position = position;
 		this.target.visible = true;
@@ -229,6 +231,8 @@ export class Game extends Container {
 	}
 
 	webCollect(polygon: Polygon) {
+		engine().audio.playSound("WebCollect");
+
 		this.webs.addChild(new Web({ polygon }));
 		const collectedInsects = [];
 		for (const insect of this.insects.children) {
@@ -246,6 +250,7 @@ export class Game extends Container {
 		if (matchingIndex >= 0) {
 			const blueprint = this.hud.blueprints.children[matchingIndex];
 			blueprint.complete();
+			engine().audio.playSound("InventoryCollect2");
 		}
 		if (this.hud.blueprints.children.every((b) => b.isComplete)) {
 			(engine().navigation.currentScreen as GameScreen).win();

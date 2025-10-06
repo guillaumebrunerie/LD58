@@ -11,10 +11,9 @@ export class LoadScreen extends Container {
 			new Label({
 				text: "0%",
 				style: {
-					fontFamily: "Arial",
+					fontFamily: "Helvetica",
 					fill: "white",
 					fontSize: 70,
-					fontWeight: "bold",
 				},
 			}),
 		);

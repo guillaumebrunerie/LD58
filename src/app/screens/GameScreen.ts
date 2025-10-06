@@ -110,6 +110,7 @@ export class GameScreen extends Container {
 	}
 
 	win() {
+		engine().audio.playSound("CompleteLevel");
 		const button = this.addChild(
 			new FancyButton({
 				text: new Label({
@@ -127,6 +128,7 @@ export class GameScreen extends Container {
 		button.on("pointertap", () => {
 			button.destroy();
 			this.nextLevel();
+			engine().audio.playSound("Click");
 		});
 	}
 
