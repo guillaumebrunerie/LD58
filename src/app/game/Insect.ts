@@ -127,7 +127,7 @@ export class Insect extends Container {
 					continue;
 				}
 				const { from, to } = thread;
-				const radius = 60;
+				const radius = 50;
 				const intersection = segmentIntersectsDisk(
 					from,
 					to,
