@@ -126,6 +126,7 @@ export class Navigation {
 		if (screen.reset) {
 			screen.reset();
 		}
+		screen.destroy({ children: true });
 	}
 
 	/**

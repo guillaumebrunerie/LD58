@@ -162,6 +162,7 @@ export class Insect extends Container {
 	}
 
 	escape(from: Point) {
+		console.log("SPIDER HIT");
 		engine().audio.playSound("SpiderHit");
 		const vector = this.position.subtract(from);
 		const angle = Math.atan2(vector.y, vector.x);

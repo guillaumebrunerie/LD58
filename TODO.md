@@ -3,7 +3,7 @@
 - Sound on/off button
 - Pause and various menus
 - Promo stuff
-- Keep background time running
+- Flies should avoid the walls in a smarter way
 
 == Game design
 - Level design
@@ -12,3 +12,5 @@
 - Inventory when collected
 - Inventory in portrait
 - Rotating shadows
+- Keep background time running
+- Avoid making the web outside the rectangle

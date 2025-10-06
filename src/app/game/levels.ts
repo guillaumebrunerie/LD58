@@ -11,20 +11,40 @@ export const levels: Level[] = [
 		configurationTypes: ["a"],
 		multiples: 3,
 		additional: 0,
-	}, // Tutorial
-	{
-		configurationTypes: ["a", "a"],
-		multiples: 2,
-		additional: 5,
 	},
 	{
-		configurationTypes: ["aa", "ab"],
+		configurationTypes: ["a", "a"],
+		multiples: 3,
+		additional: 0,
+	},
+	{
+		configurationTypes: ["a", "a"],
+		multiples: 1,
+		additional: 4,
+	},
+	{
+		configurationTypes: ["a", "a", "a", "a"],
+		multiples: 3,
+		additional: 2,
+	},
+	{
+		configurationTypes: ["aa", "aa"],
 		multiples: 2,
-		additional: 5,
+		additional: 3,
+	},
+	{
+		configurationTypes: ["ab", "aa"],
+		multiples: 2,
+		additional: 3,
+	},
+	{
+		configurationTypes: ["ab", "aa", "ab"],
+		multiples: 1,
+		additional: 0,
 	},
 	{
 		configurationTypes: ["abc"],
-		multiples: 2,
+		multiples: 1,
 		additional: 5,
 	},
 	{
@@ -33,18 +53,8 @@ export const levels: Level[] = [
 		additional: 0,
 	},
 	{
-		configurationTypes: ["a", "a", "ab", "aab", "abc"],
+		configurationTypes: ["aa", "abc", "aa"],
 		multiples: 1,
 		additional: 0,
-	},
-	{
-		configurationTypes: ["a", "a", "ab", "aab", "abc"],
-		multiples: 4,
-		additional: 0,
-	},
-	{
-		configurationTypes: ["a", "ab", "abc", "abcd", "abcde"],
-		multiples: 2,
-		additional: 5,
 	},
 ];
