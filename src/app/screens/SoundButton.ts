@@ -1,6 +1,5 @@
 import { FancyButton } from "@pixi/ui";
 import { Assets, Container, ViewContainerOptions } from "pixi.js";
-import { Label } from "../ui/Label";
 import { userSettings } from "../utils/userSettings";
 
 export class SoundButton extends Container {
@@ -21,6 +20,7 @@ export class SoundButton extends Container {
 	}
 
 	updateButton() {
+		this.button.anchor.set(0.5);
 		this.button.defaultView =
 			this.isSoundOn() ?
 				Assets.get("SoundOnButton.png")
