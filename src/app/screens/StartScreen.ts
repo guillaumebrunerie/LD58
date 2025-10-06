@@ -26,19 +26,8 @@ export class StartScreen extends Container {
 		);
 		this.startButton = this.addChild(
 			new FancyButton({
-				text: new Label({
-					text: "Start",
-					style: {
-						fontFamily: "SueEllenFrancisco",
-						fill: "white",
-						fontSize: 100,
-						dropShadow: {
-							distance: 6,
-							angle: Math.PI / 2,
-							color: "black",
-						},
-					},
-				}),
+				defaultView: Assets.get("StartButton.png"),
+				anchor: 0.5,
 			}),
 		);
 		this.startButton.on("pointertap", () => this.startGame());
