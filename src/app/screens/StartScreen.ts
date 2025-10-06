@@ -45,6 +45,8 @@ export class StartScreen extends Container {
 	}
 
 	async startGame() {
+		engine().audio.playMusic("Music");
+		engine().audio.playSound("Click");
 		await engine().navigation.showScreen(GameScreen);
 	}
 

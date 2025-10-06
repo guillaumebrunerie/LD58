@@ -42,7 +42,7 @@ export class BGM {
 		animate(
 			this.current,
 			{ volume: this.volume },
-			{ duration: 1, ease: "linear" },
+			{ duration: 3, ease: (t) => t * t },
 		);
 	}
 

@@ -5,7 +5,7 @@ export default {
 	pipes: [
 		...pixiPipes({
 			cacheBust: false,
-			compress: { jpg: false },
+			compress: {},
 			manifest: {
 				output: "./src/manifest.json",
 				createShortcuts: true,
