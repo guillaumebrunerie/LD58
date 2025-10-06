@@ -7,7 +7,7 @@ import {
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, segmentIntersection } from "./Game";
-import { getIdleAnimation } from "../utils/animation";
+import { getAnimation, getIdleAnimation } from "../utils/animation";
 import { engine } from "../getEngine";
 import { randomInt } from "../../engine/utils/random";
 
@@ -166,7 +166,7 @@ export class Thread extends Container {
 		this.isBreaking = true;
 		this.previousThread?.break();
 
-		this.line.textures = getIdleAnimation(this.getAssetName() + "Break");
+		this.line.textures = getAnimation(this.getAssetName() + "Break");
 		this.line.loop = false;
 		this.line.animationSpeed = 15 / 60;
 		this.line.play();

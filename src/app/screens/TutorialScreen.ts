@@ -42,7 +42,7 @@ export class TutorialScreen extends Container {
 			new Text({
 				text: instructions[this.pageIndex - 1] || "",
 				style,
-				anchor: 0.5,
+				anchor: { x: 0.5, y: 0 },
 			}),
 		);
 
@@ -68,7 +68,7 @@ export class TutorialScreen extends Container {
 
 	resize(width: number, height: number) {
 		this.page.position.set(width / 2, height / 2);
-		this.text.position.set(width / 2, 850);
+		this.text.position.set(width / 2, 750);
 	}
 
 	async hide() {
