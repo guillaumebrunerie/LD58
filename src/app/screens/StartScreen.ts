@@ -39,7 +39,7 @@ export class StartScreen extends Container {
 	}
 
 	resize(width: number, height: number) {
-		this.startButton.position.set(width / 2, (4 * height) / 5);
+		this.startButton.position.set(width / 2, (3 * height) / 4);
 		this.logo.position.set(width / 2, height / 3);
 		this.background.position.set(width / 2, height / 2);
 	}
