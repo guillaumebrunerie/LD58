@@ -134,7 +134,7 @@ export class Insect extends Container {
 
 			// Destroy threads on contact
 			for (const thread of this.game.threads.children) {
-				if (thread.isDestroyed || thread.isFrozen) {
+				if (thread.isBreaking || thread.isFrozen) {
 					continue;
 				}
 				const { from, to } = thread;
@@ -146,7 +146,7 @@ export class Insect extends Container {
 					radius * this.scale.x,
 				);
 				if (intersection) {
-					thread.destroyAt(intersection, this.game);
+					thread.destroyAt(intersection);
 				}
 			}
 		}

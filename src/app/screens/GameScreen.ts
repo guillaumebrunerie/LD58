@@ -14,8 +14,6 @@ import { FancyButton } from "@pixi/ui";
 import { Label } from "../ui/Label";
 import { userSettings } from "../utils/userSettings";
 import { engine } from "../getEngine";
-import { randomInt } from "../../engine/utils/random";
-
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
 

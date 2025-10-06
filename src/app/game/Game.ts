@@ -225,7 +225,6 @@ export class Game extends Container {
 				previousThread: this.player.currentThread,
 			}),
 		);
-		this.addToTicker(thread);
 		this.player.currentThread = thread;
 		this.player.speed = 0;
 	}

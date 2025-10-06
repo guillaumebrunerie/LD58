@@ -4,7 +4,6 @@ import {
 	ViewContainerOptions,
 	Assets,
 	Polygon,
-	Ticker,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game, segmentIntersection } from "./Game";
@@ -18,7 +17,7 @@ export class Thread extends Container {
 	line: AnimatedSprite;
 	dot: AnimatedSprite;
 	previousThread?: Thread;
-	isDestroyed = false;
+	isBreaking = false;
 	isFrozen = false;
 
 	get to_y_redraw() {
@@ -63,21 +62,28 @@ export class Thread extends Container {
 		this.redraw();
 	}
 
-	redraw() {
+	getAssetName() {
 		const vector = this.to.subtract(this.from);
 		const length = vector.magnitude();
 		// 200, 600, 1200, 1800
-		let web = "WebLong";
 		if (length < 350) {
-			web = "WebSuperShort";
-		} else if (length < 8500) {
-			web = "WebShort";
+			return "WebSuperShort";
+		} else if (length < 850) {
+			return "WebShort";
 		} else if (length < 1500) {
-			web = "WebMedium";
+			return "WebMedium";
+		} else {
+			return "WebLong";
 		}
-		this.line.textures = getIdleAnimation(web);
+	}
+
+	redraw() {
+		const vector = this.to.subtract(this.from);
+		const length = vector.magnitude();
+		this.line.textures = getIdleAnimation(this.getAssetName());
 		this.line.position = this.from;
-		this.line.scale.x = length / Assets.get(`${web}_000.png`).width;
+		this.line.scale.x =
+			length / Assets.get(`${this.getAssetName()}_000.png`).width;
 		this.line.rotation = Math.atan2(vector.y, vector.x);
 		this.line.play();
 
@@ -117,7 +123,7 @@ export class Thread extends Container {
 
 	findThreadIntersection(threads: Thread[]) {
 		for (const thread of threads) {
-			if (thread == this || thread.isDestroyed || thread.isFrozen) {
+			if (thread == this || thread.isBreaking || thread.isFrozen) {
 				continue;
 			}
 			const point = segmentIntersection(
@@ -132,8 +138,8 @@ export class Thread extends Container {
 		}
 	}
 
-	destroyAt(point: Point, game: Game) {
-		if (this.isDestroyed) {
+	destroyAt(point: Point) {
+		if (this.isBreaking) {
 			return;
 		}
 
@@ -143,8 +149,7 @@ export class Thread extends Container {
 			previousThread: this.previousThread,
 		});
 		this.parent!.addChild(newThread);
-		newThread.isDestroyed = true;
-		game.addToTicker(newThread);
+		newThread.break();
 
 		this.from = point.clone();
 		this.previousThread = undefined;
@@ -156,27 +161,16 @@ export class Thread extends Container {
 	}
 
 	destroySpeed = 5;
-	update(ticker: Ticker) {
-		if (this.isFrozen) {
-			return;
-		}
-		if (this.isDestroyed) {
-			const vector = this.to.subtract(this.from);
-			const magnitude = Math.min(
-				this.destroySpeed * ticker.deltaMS,
-				vector.magnitude(),
-			);
-			if (magnitude == 0) {
-				if (this.previousThread) {
-					this.previousThread.isDestroyed = true;
-				}
-				this.destroy();
-				return;
-			}
-			const delta = vector.normalize().multiplyScalar(magnitude);
-			this.to = this.to.subtract(delta);
-			this.redraw();
-		}
+
+	break() {
+		this.isBreaking = true;
+		this.previousThread?.break();
+
+		this.line.textures = getIdleAnimation(this.getAssetName() + "Break");
+		this.line.loop = false;
+		this.line.animationSpeed = 15 / 60;
+		this.line.play();
+		this.line.onComplete = () => this.destroy();
 	}
 
 	freeze() {
