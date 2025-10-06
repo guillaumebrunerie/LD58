@@ -118,41 +118,49 @@ export class GameScreen extends Container {
 	}
 
 	isLandscape = true;
-	widthX = 0;
-	heightX = 0;
 	resize(width: number, height: number) {
-		this.widthX = width;
-		this.heightX = height;
 		this.gameContainer.position.set(width / 2, height / 2);
 		this.touchArea.clear().rect(0, 0, width, height).fill("#00000001");
 		this.hud.resize(width, height);
 		this.isLandscape = width > height;
 		this.soundButton.resize(width, height);
+		this.positionNextLevelButton();
 	}
 
+	positionNextLevelButton() {
+		if (this.nextLevelButton) {
+			if (this.isLandscape) {
+				this.nextLevelButton.position.set(1690, 1080 / 2);
+			} else {
+				this.nextLevelButton.position.set(1080 / 2, 1690);
+			}
+		}
+	}
+
+	nextLevelButton?: FancyButton;
 	win() {
 		setTimeout(() => {
 			engine().audio.playSound("CompleteLevel");
-		}, 1000);
-		const button = this.addChild(
-			new FancyButton({
-				text: new Label({
-					text: `CONGRATULATIONS`,
-					style: {
-						fontFamily: "SueEllenFrancisco",
-						fill: "white",
-						stroke: { color: "black", width: 6 },
-						fontSize: 150,
-					},
+			this.nextLevelButton = this.addChild(
+				new FancyButton({
+					text: new Label({
+						text: `Next Level`,
+						style: {
+							fontFamily: "SueEllenFrancisco",
+							fill: "white",
+							// stroke: { color: "black", width: 6 },
+							fontSize: 100,
+						},
+					}),
 				}),
-			}),
-		);
-		button.position.set(this.widthX / 2, this.heightX / 2);
-		button.on("pointertap", () => {
-			button.destroy();
-			this.nextLevel();
-			engine().audio.playSound("Click");
-		});
+			);
+			this.positionNextLevelButton();
+			this.nextLevelButton.on("pointertap", () => {
+				this.nextLevelButton?.destroy();
+				this.nextLevel();
+				engine().audio.playSound("Click");
+			});
+		}, 1000);
 	}
 
 	nextLevel() {
