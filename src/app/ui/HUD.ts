@@ -256,11 +256,12 @@ export class HUD extends Container {
 				blueprint.resize("portrait");
 			});
 
-			this.levelText.position.set(width / 2, 150);
+			this.levelText.position.set(250, 300);
 
 			this.resetButton.position.set(width / 4, 50);
+			this.resetButton.visible = false;
 
-			this.restartButton.position.set((width * 3) / 4, 300);
+			this.restartButton.position.set(1080 - 250, 300);
 		} else {
 			// Landscape
 			this.blueprints.position.set(1690, 0);
@@ -271,11 +272,12 @@ export class HUD extends Container {
 				blueprint.resize("landscape");
 			});
 
-			this.levelText.position.set(200, 200);
+			this.levelText.position.set(200, 400);
 
 			this.resetButton.position.set(200, height - 200);
+			this.resetButton.visible = false;
 
-			this.restartButton.position.set(200, height - 400);
+			this.restartButton.position.set(200, height - 300);
 		}
 	}
 }

@@ -1,6 +1,4 @@
 == Framework
-- Start screen
-- Sound on/off button
 - Pause and various menus
 - Promo stuff
 

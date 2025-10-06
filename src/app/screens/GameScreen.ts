@@ -137,7 +137,7 @@ export class GameScreen extends Container {
 				text: new Label({
 					text: `CONGRATULATIONS`,
 					style: {
-						fontFamily: "Sue Ellen Francisco",
+						fontFamily: "SueEllenFrancisco",
 						fill: "white",
 						stroke: { color: "black", width: 6 },
 						fontSize: 150,

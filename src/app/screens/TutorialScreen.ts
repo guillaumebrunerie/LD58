@@ -25,7 +25,8 @@ export class TutorialScreen extends Container {
 	public static assetBundles = ["main"];
 
 	background: Background;
-	page: Sprite;
+	page: Container;
+	sprite: Sprite;
 	pageIndex: number = 1;
 	text: Text;
 
@@ -33,7 +34,8 @@ export class TutorialScreen extends Container {
 		super();
 
 		this.background = this.addChild(new Background());
-		this.page = this.addChild(
+		this.page = this.addChild(new Container());
+		this.sprite = this.page.addChild(
 			new Sprite({
 				texture: Assets.get(`Instruction_Page_0${this.pageIndex}.png`),
 				anchor: 0.5,
@@ -64,7 +66,7 @@ export class TutorialScreen extends Container {
 			return;
 		}
 		this.pageIndex++;
-		this.page.texture = Assets.get(
+		this.sprite.texture = Assets.get(
 			`Instruction_Page_0${this.pageIndex}.png`,
 		);
 		this.text.text = instructions[this.pageIndex - 1] || "";
