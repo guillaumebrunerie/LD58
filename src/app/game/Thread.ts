@@ -19,6 +19,15 @@ export class Thread extends Container {
 	isDestroyed = false;
 	isFrozen = false;
 
+	get to_y_redraw() {
+		return this.to.y;
+	}
+
+	set to_y_redraw(y: number) {
+		this.to.y = y;
+		this.redraw();
+	}
+
 	constructor(
 		options: ViewContainerOptions & {
 			from: Point;

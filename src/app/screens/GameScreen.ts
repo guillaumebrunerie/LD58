@@ -74,11 +74,25 @@ export class GameScreen extends Container {
 
 	async show() {
 		const playerY = this.game.player.y;
-		this.game.player.y -= 1000;
-		await this.animate(this.game.player, { y: playerY }, { duration: 1 });
+		this.game.player.y -= this.isLandscape ? 600 : 1000;
+		const thread = this.game.threads.addChild(
+			new Thread({
+				from: this.game.player.position.clone(),
+				to: this.game.player.position.clone(),
+			}),
+		);
+		const options = {
+			delay: 0.2,
+			duration: this.isLandscape ? 0.6 : 1,
+			ease: (t: number) => 1 - (1 - t) * (1 - t),
+		};
+		this.animate(thread, { to_y_redraw: playerY }, options);
+		await this.animate(this.game.player, { y: playerY }, options);
 		this.game.start();
+		thread.destroy();
 	}
 
+	isLandscape = true;
 	widthX = 0;
 	heightX = 0;
 	resize(width: number, height: number) {
@@ -87,6 +101,7 @@ export class GameScreen extends Container {
 		this.gameContainer.position.set(width / 2, height / 2);
 		this.touchArea.clear().rect(0, 0, width, height).fill("#00000001");
 		this.hud.resize(width, height);
+		this.isLandscape = width > height;
 	}
 
 	win() {
