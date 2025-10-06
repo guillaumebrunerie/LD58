@@ -25,24 +25,6 @@ export class SoundButton extends Container {
 			this.isSoundOn() ?
 				Assets.get("SoundOnButton.png")
 			:	Assets.get("SoundOffButton.png");
-		// this.button.textView = new Label({
-		// 	text: this.isSoundOn() ? "SOUND ON" : "SOUND OFF",
-		// 	style: {
-		// 		// stroke: {
-		// 		// 	width: 3,
-		// 		// 	color: "#333",
-		// 		// },
-		// 		align: "center",
-		// 		fontWeight: "bold",
-		// 		fontSize: 60,
-		// 		fontFamily: "SueEllenFrancisco",
-		// 		fill: this.isSoundOn() ? "#DDD" : "#448",
-		// 		dropShadow: {
-		// 			angle: 90,
-		// 			distance: 3,
-		// 		},
-		// 	},
-		// });
 	}
 
 	prepare() {}
