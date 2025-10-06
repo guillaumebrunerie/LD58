@@ -1,10 +1,10 @@
 import { Container } from "../../PausableContainer";
 import { FancyButton } from "@pixi/ui";
 import { Label } from "../ui/Label";
-import { GameScreen } from "./GameScreen";
 import { engine } from "../getEngine";
 import { Background } from "../game/Background";
 import { Assets, Graphics, Sprite } from "pixi.js";
+import { TutorialScreen } from "./TutorialScreen";
 
 export class StartScreen extends Container {
 	public static assetBundles = ["main"];
@@ -47,7 +47,7 @@ export class StartScreen extends Container {
 	async startGame() {
 		engine().audio.playMusic("Music", { volume: 0.3 });
 		engine().audio.playSound("Click");
-		await engine().navigation.showScreen(GameScreen);
+		await engine().navigation.showScreen(TutorialScreen);
 	}
 
 	async hide() {
