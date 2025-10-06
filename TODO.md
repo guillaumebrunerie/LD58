@@ -2,11 +2,12 @@
 - Start screen
 - Sounds/music/sound on/off button
 - Pause and various menus
+- Promo stuff
 
 == Game design
 - Level design
 
 == Cosmetics
-- Rotating shadows
-- Inventory in portrait
 - Inventory when collected
+- Inventory in portrait
+- Rotating shadows

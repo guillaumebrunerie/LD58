@@ -109,16 +109,58 @@ export class Blueprint extends Container {
 	}
 
 	resize(uimode: "portrait" | "landscape") {
-		this.items.forEach((item, i) => {
-			const scale = this.items.length <= 4 ? 1 : 0.85;
-			const gap = 45 * scale;
-			if (uimode == "portrait") {
-				item.x = 0;
-				item.y = -gap * (this.items.length - 1) + i * gap * 2;
-			} else {
-				item.x = -gap * (this.items.length - 1) + i * gap * 2;
-				item.y = 0;
+		let scale = 1;
+		if (uimode == "landscape") {
+			this.items.forEach((item, i) => {
+				scale = this.items.length <= 4 ? 1 : 0.85;
+				const gap = 45 * scale;
+				item.position.set(
+					-gap * (this.items.length - 1) + i * gap * 2,
+					0,
+				);
+			});
+		} else {
+			switch (this.items.length) {
+				case 1: {
+					this.items[0].position.set(0, 0);
+					break;
+				}
+				case 2: {
+					const gap = 45;
+					this.items[0].position.set(-gap, 0);
+					this.items[1].position.set(gap, 0);
+					break;
+				}
+				case 3: {
+					const gap = 45;
+					this.items[0].position.set(-gap, (gap * Math.sqrt(3)) / 2);
+					this.items[1].position.set(0, (-gap * Math.sqrt(3)) / 2);
+					this.items[2].position.set(gap, (gap * Math.sqrt(3)) / 2);
+					break;
+				}
+				case 4: {
+					const gap = 45;
+					this.items[0].position.set(-gap, -gap);
+					this.items[1].position.set(-gap, gap);
+					this.items[2].position.set(gap, -gap);
+					this.items[3].position.set(gap, gap);
+					break;
+				}
+				case 5: {
+					scale = 0.85;
+					const gap = 45 * scale * Math.sqrt(2);
+					this.items[0].position.set(0, 0);
+					this.items[1].position.set(-gap, -gap);
+					this.items[2].position.set(-gap, gap);
+					this.items[3].position.set(gap, -gap);
+					this.items[4].position.set(gap, gap);
+					break;
+				}
 			}
+			// item.x = 0;
+			// item.y = -gap * (this.items.length - 1) + i * gap * 2;
+		}
+		this.items.forEach((item) => {
 			item.scale.set(scale);
 		});
 	}
@@ -209,7 +251,7 @@ export class HUD extends Container {
 			const gap = 1080 / this.blueprints.children.length;
 			this.blueprints.children.forEach((blueprint, i) => {
 				blueprint.x = gap * (i + 1 / 2);
-				blueprint.y = 0;
+				blueprint.y = 0; //i % 2 == 0 ? -75 : 75;
 				blueprint.resize("portrait");
 			});
 

@@ -64,6 +64,12 @@ export class GameScreen extends Container {
 			new HUD({ game: this.game, level: this.level }),
 		);
 		this.game.hud = this.hud;
+
+		window.addEventListener("keyup", (event) => {
+			if (event.code == "KeyR") {
+				this.win();
+			}
+		});
 	}
 
 	async show() {

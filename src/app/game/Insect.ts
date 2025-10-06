@@ -121,6 +121,16 @@ export class Insect extends Container {
 		this.position = this.position.add(delta);
 
 		if (!this.isEscaping) {
+			// Escape if player is too close
+			const distanceToPlayer = this.position
+				.subtract(this.game.player.position)
+				.magnitude();
+			const hitbox = 30;
+			if (distanceToPlayer < hitbox) {
+				this.escape(this.game.player.position);
+				return;
+			}
+
 			// Destroy threads on contact
 			for (const thread of this.game.threads.children) {
 				if (thread.isDestroyed || thread.isFrozen) {
@@ -137,15 +147,6 @@ export class Insect extends Container {
 				if (intersection) {
 					thread.destroyAt(intersection, this.game);
 				}
-			}
-
-			// Escape if player is too close
-			const distanceToPlayer = this.position
-				.subtract(this.game.player.position)
-				.magnitude();
-			const hitbox = 30;
-			if (distanceToPlayer < hitbox) {
-				this.escape(this.game.player.position);
 			}
 		}
 	}
