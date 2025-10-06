@@ -3,7 +3,6 @@
 - Promo stuff
 
 == Game design
-- Level design
 - Win flow
 
 == Cosmetics
