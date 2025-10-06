@@ -80,17 +80,47 @@ export class Blueprint extends Container {
 				}),
 			),
 		);
-		const gap = 45;
-		if (this.items.length == 2) {
-			this.items[0].x = -gap;
-			this.items[1].x = gap;
-		} else if (this.items.length == 3) {
-			this.items[0].x = -gap;
-			this.items[0].y = (gap * Math.sqrt(3)) / 2;
-			this.items[1].x = gap;
-			this.items[1].y = (gap * Math.sqrt(3)) / 2;
-			this.items[2].y = (-gap * Math.sqrt(3)) / 2;
-		}
+		// if (this.items.length == 2) {
+		// 	this.items[0].x = -gap;
+		// 	this.items[1].x = gap;
+		// } else if (this.items.length == 3) {
+		// 	this.items[0].x = -gap;
+		// 	this.items[0].y = (gap * Math.sqrt(3)) / 2;
+		// 	this.items[1].x = gap;
+		// 	this.items[1].y = (gap * Math.sqrt(3)) / 2;
+		// 	this.items[2].y = (-gap * Math.sqrt(3)) / 2;
+		// 	// this.items[0].x = -gap * 2;
+		// 	// this.items[2].x = gap * 2;
+		// } else if (this.items.length == 4) {
+		// 	this.items[0].x = -gap * 3;
+		// 	this.items[1].x = -gap;
+		// 	this.items[2].x = gap;
+		// 	this.items[3].x = gap * 3;
+		// } else if (this.items.length == 5) {
+		// 	const newGap = gap * 0.85;
+		// 	this.items[0].x = -newGap * 4;
+		// 	this.items[1].x = -newGap * 2;
+		// 	this.items[3].x = newGap * 2;
+		// 	this.items[4].x = newGap * 4;
+		// 	for (const item of this.items) {
+		// 		item.scale.set(0.85);
+		// 	}
+		// }
+	}
+
+	resize(uimode: "portrait" | "landscape") {
+		this.items.forEach((item, i) => {
+			const scale = this.items.length <= 4 ? 1 : 0.85;
+			const gap = 45 * scale;
+			if (uimode == "portrait") {
+				item.x = 0;
+				item.y = -gap * (this.items.length - 1) + i * gap * 2;
+			} else {
+				item.x = -gap * (this.items.length - 1) + i * gap * 2;
+				item.y = 0;
+			}
+			item.scale.set(scale);
+		});
 	}
 
 	complete() {
@@ -180,6 +210,7 @@ export class HUD extends Container {
 			this.blueprints.children.forEach((blueprint, i) => {
 				blueprint.x = gap * (i + 1 / 2);
 				blueprint.y = 0;
+				blueprint.resize("portrait");
 			});
 
 			this.levelText.position.set(width / 2, 200);
@@ -190,10 +221,11 @@ export class HUD extends Container {
 		} else {
 			// Landscape
 			this.blueprints.position.set(1690, 0);
-			const gap = 1080 / this.blueprints.children.length;
+			const gap = 1080 / (this.blueprints.children.length + 1);
 			this.blueprints.children.forEach((blueprint, i) => {
 				blueprint.x = 0;
-				blueprint.y = gap * (i + 1 / 2);
+				blueprint.y = gap * (i + 1);
+				blueprint.resize("landscape");
 			});
 
 			this.levelText.position.set(200, 200);

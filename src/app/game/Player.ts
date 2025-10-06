@@ -54,8 +54,15 @@ export class Player extends Container {
 			this.position = newPosition;
 			this.rotation = Math.atan2(vector.y, vector.x) + Math.PI / 2;
 			if (this.currentThread) {
-				this.currentThread.extendTo(this.position, this.game);
+				this.currentThread.extendTo(this.threadPosition(), this.game);
 			}
 		}
+	}
+	threadPosition() {
+		const deltaFront = -20;
+		return this.position.add({
+			x: -Math.sin(this.rotation) * deltaFront,
+			y: Math.cos(this.rotation) * deltaFront,
+		});
 	}
 }

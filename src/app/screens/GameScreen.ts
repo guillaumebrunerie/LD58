@@ -3,7 +3,6 @@ import {
 	FederatedWheelEvent,
 	Graphics,
 	Point,
-	Text,
 } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
@@ -40,6 +39,7 @@ export class GameScreen extends Container {
 		this.touchArea.on("pointerdown", (e) => this.pointerDown(e));
 		this.touchArea.on("pointermove", (e) => this.pointerMove(e));
 		this.touchArea.on("pointerup", (e) => this.pointerUp(e));
+		this.touchArea.on("pointerupoutside", (e) => this.pointerUp(e));
 		this.touchArea.on("wheel", (e) => this.wheel(e));
 
 		this.gameContainer.addChild(

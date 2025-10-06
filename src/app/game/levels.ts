@@ -42,4 +42,9 @@ export const levels: Level[] = [
 		multiples: 4,
 		additional: 0,
 	},
+	{
+		configurationTypes: ["aaaaa", "bbbbb"],
+		multiples: 2,
+		additional: 5,
+	},
 ];

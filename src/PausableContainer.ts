@@ -15,7 +15,9 @@ export class Container<
 		super(options);
 	}
 
+	// @ts-expect-error Magic
 	animate: typeof animate = function (this: Container, ...args) {
+		// @ts-expect-error Magic
 		const controls = animate(...args);
 		this.#controls.push(controls);
 		controls.then(() => {

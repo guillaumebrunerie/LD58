@@ -1,7 +1,6 @@
 import {
 	Sprite,
 	ViewContainerOptions,
-	Graphics,
 	Assets,
 	Ticker,
 	Point,
@@ -16,7 +15,6 @@ export const insectBounds = 400;
 
 export class Insect extends Container {
 	speed = randomFloat(0.02, 0.05);
-	radius = 50;
 	game: Game;
 	sprite: AnimatedSprite;
 	shadow: Sprite;
@@ -32,9 +30,6 @@ export class Insect extends Container {
 		this.game = options.game;
 		this.game.addToTicker(this);
 
-		this.addChild(
-			new Graphics().circle(0, 0, this.radius).fill("#FFFFFF00"),
-		);
 		this.sprite = this.addChild(
 			new AnimatedSprite({
 				textures: getIdleAnimation(`${options.type}_Idle`),
@@ -132,11 +127,12 @@ export class Insect extends Container {
 					continue;
 				}
 				const { from, to } = thread;
+				const radius = 60;
 				const intersection = segmentIntersectsDisk(
 					from,
 					to,
 					this.position,
-					this.radius * this.scale.x,
+					radius * this.scale.x,
 				);
 				if (intersection) {
 					thread.destroyAt(intersection, this.game);

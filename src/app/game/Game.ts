@@ -3,7 +3,6 @@ import {
 	Point,
 	Polygon,
 	RenderLayer,
-	Text,
 	Ticker,
 	ViewContainerOptions,
 } from "pixi.js";
@@ -16,8 +15,6 @@ import { Player } from "./Player";
 import { Insect, insectBounds } from "./Insect";
 import { Background } from "./Background";
 import { Level } from "./levels";
-import { FancyButton } from "@pixi/ui";
-import { Label } from "../ui/Label";
 import { engine } from "../getEngine";
 import { GameScreen } from "../screens/GameScreen";
 
@@ -58,6 +55,8 @@ export const segmentIntersection = (
 	return null; // no intersection within segment bounds
 };
 
+// Returns the point nearest to `to` that intersects the disk. It should not be
+// within epsilon of from or we get weird infinite loops.
 export const segmentIntersectsDisk = (
 	from: Point,
 	to: Point,
@@ -68,30 +67,25 @@ export const segmentIntersectsDisk = (
 	const segLenSq = segment.magnitudeSquared();
 
 	if (segLenSq == 0) {
-		if (to.subtract(center).magnitudeSquared() <= radius * radius) {
-			return to;
-		} else {
-			return;
-		}
+		return;
 	}
 
 	const vector = center.subtract(from);
 	const t = vector.dot(segment) / segLenSq;
 	const projection = from.add(segment.multiplyScalar(t));
+	const distanceToLineSq = projection.subtract(center).magnitudeSquared();
 
-	if (
-		projection.subtract(center).magnitudeSquared() <= radius * radius &&
-		t > 0.001 &&
-		t < 0.999
-	) {
-		return projection;
-	} else if (from.subtract(center).magnitudeSquared() <= radius * radius) {
-		return from;
-	} else if (to.subtract(center).magnitudeSquared() <= radius * radius) {
-		return to;
-	} else {
+	if (distanceToLineSq >= radius * radius) {
 		return;
 	}
+	const delta = Math.sqrt((radius * radius - distanceToLineSq) / segLenSq);
+	const uMin = t - delta;
+	const uMax = t + delta;
+	if (uMax < 0.001 || uMin >= 1) {
+		return;
+	}
+	const u = Math.min(1, uMax);
+	return from.add<Point>(segment.multiplyScalar(u));
 };
 
 export class Target extends Container {
@@ -107,32 +101,41 @@ export type InsectType = string;
 const pickInsectType = (): InsectType =>
 	randomItem(["Fly_01", "Fly_02", "Fly_03", "Fly_04", "Fly_05", "Fly_06"]);
 
-export type ConfigurationType = "a" | "aa" | "ab" | "aaa" | "aab" | "abc";
+export type ConfigurationType = string;
 
-const pickThreeInsectTypes = (antipool: InsectType[]): InsectType[] => {
-	const types = new Set<InsectType>();
-	while (types.size < 3) {
-		const type = pickInsectType();
-		const index = antipool.indexOf(type);
-		if (index >= 0) {
-			antipool.splice(index, 1);
-			continue;
-		}
-		types.add(type);
-	}
-	return Array.from(types);
+const pickInsectTypes = (
+	antipool: InsectType[],
+	letters: string[],
+): Record<string, InsectType> => {
+	const pickedTypes = new Set<InsectType>();
+	return Object.fromEntries(
+		letters.map((letter) => {
+			while (true) {
+				const type = pickInsectType();
+				if (pickedTypes.has(type)) {
+					continue;
+				}
+				const index = antipool.indexOf(type);
+				if (index >= 0) {
+					antipool.splice(index, 1);
+					continue;
+				}
+				pickedTypes.add(type);
+				return [letter, type];
+			}
+		}),
+	);
 };
 
 const pickConfiguration = (
 	type: ConfigurationType,
 	antipool: InsectType[],
 ): InsectType[] => {
-	const [a, b, c] = pickThreeInsectTypes(antipool);
-	const result = (type.split("") as ("a" | "b" | "c")[]).map(
-		(x: "a" | "b" | "c") => ({ a, b, c })[x],
-	);
-	antipool.push(...result);
-	return result;
+	const characters = [...new Set(type.split(""))];
+	const result = pickInsectTypes(antipool, characters);
+	const result2 = type.split("").map((x) => result[x]);
+	antipool.push(...result2);
+	return result2;
 };
 
 export class Game extends Container {
@@ -209,7 +212,7 @@ export class Game extends Container {
 	}
 
 	click(position: Point) {
-		const oldPosition = this.player.position.clone();
+		const oldPosition = this.player.threadPosition();
 		this.target.position = position;
 		this.target.visible = true;
 		const thread = this.threads.addChild(

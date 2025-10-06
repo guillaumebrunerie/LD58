@@ -89,8 +89,16 @@ export class Thread extends Container {
 				points.push(previousThread.from.clone());
 				previousThread.destroy();
 			}
+			const polygon = new Polygon(points);
+			if (polygon.contains(thread.from.x, thread.from.y)) {
+				while (this.previousThread) {
+					const previousThread = this.previousThread;
+					this.previousThread = previousThread?.previousThread;
+					previousThread.destroy();
+				}
+			}
 
-			game.webCollect(new Polygon(points));
+			game.webCollect(polygon);
 		}
 
 		this.redraw();
