@@ -149,7 +149,7 @@ export class GameScreen extends Container {
 							fontFamily: "SueEllenFrancisco",
 							fill: "white",
 							// stroke: { color: "black", width: 6 },
-							fontSize: 100,
+							fontSize: 70,
 						},
 					}),
 				}),
