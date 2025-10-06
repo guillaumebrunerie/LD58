@@ -14,6 +14,7 @@ import { FancyButton } from "@pixi/ui";
 import { Label } from "../ui/Label";
 import { userSettings } from "../utils/userSettings";
 import { engine } from "../getEngine";
+import { randomInt } from "../../engine/utils/random";
 
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
@@ -101,8 +102,9 @@ export class GameScreen extends Container {
 		const options = {
 			delay: 0.5,
 			duration: this.isLandscape ? 0.6 : 1,
-			ease: (t: number) => 1 - (1 - t) * (1 - t),
-		};
+			type: "spring",
+			bounce: 0.5,
+		} as const;
 		this.animate(thread, { to_y_redraw: playerY }, options);
 		await this.animate(this.game.player, { y: playerY }, options);
 		this.game.start();
