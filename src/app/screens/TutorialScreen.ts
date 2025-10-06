@@ -3,10 +3,11 @@ import { Background } from "../game/Background";
 import { Assets, Graphics, Sprite, Text, TextStyleOptions } from "pixi.js";
 import { engine } from "../getEngine";
 import { GameScreen } from "./GameScreen";
+import { SoundButton } from "./SoundButton";
 
 const style: TextStyleOptions = {
-	fontFamily: "Amatic SC",
-	fill: "black",
+	fontFamily: "SueEllenFrancisco", //"Amatic SC",
+	fill: "white",
 	fontSize: 70,
 	wordWrap: true,
 	wordWrapWidth: 1000,
@@ -14,7 +15,7 @@ const style: TextStyleOptions = {
 };
 
 const instructions = [
-	"Click/tap to move the spider",
+	"Click / tap to move the spider",
 	"Keep clicking to make the spider web grow",
 	"Surround some insects to catch them",
 	"Make sure to follow the patterns",
@@ -53,6 +54,8 @@ export class TutorialScreen extends Container {
 		touchArea.interactive = true;
 		touchArea.cursor = "pointer";
 		touchArea.on("pointertap", () => this.nextPage());
+
+		this.addChild(new SoundButton());
 	}
 
 	nextPage() {
@@ -68,7 +71,15 @@ export class TutorialScreen extends Container {
 	}
 
 	resize(width: number, height: number) {
-		this.page.position.set(width / 2, height / 2);
+		if (width < height) {
+			// Portrait
+			this.page.position.set(width / 2, 850);
+			this.page.scale.set(1.1);
+		} else {
+			// Landscape
+			this.page.position.set(width / 2, 450);
+			this.page.scale.set(1);
+		}
 	}
 
 	async hide() {

@@ -14,6 +14,7 @@ import { FancyButton } from "@pixi/ui";
 import { Label } from "../ui/Label";
 import { userSettings } from "../utils/userSettings";
 import { engine } from "../getEngine";
+import { SoundButton } from "./SoundButton";
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
 
@@ -64,11 +65,7 @@ export class GameScreen extends Container {
 		);
 		this.game.hud = this.hud;
 
-		window.addEventListener("keyup", (event) => {
-			if (event.code == "KeyR") {
-				this.win();
-			}
-		});
+		this.addChild(new SoundButton());
 	}
 
 	async show() {
@@ -140,7 +137,7 @@ export class GameScreen extends Container {
 				text: new Label({
 					text: `CONGRATULATIONS`,
 					style: {
-						fontFamily: "Amatic SC",
+						fontFamily: "Sue Ellen Francisco",
 						fill: "white",
 						stroke: { color: "black", width: 6 },
 						fontSize: 150,

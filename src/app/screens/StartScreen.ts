@@ -5,6 +5,7 @@ import { engine } from "../getEngine";
 import { Background } from "../game/Background";
 import { Assets, Graphics, Sprite } from "pixi.js";
 import { TutorialScreen } from "./TutorialScreen";
+import { SoundButton } from "./SoundButton";
 
 export class StartScreen extends Container {
 	public static assetBundles = ["main"];
@@ -28,14 +29,21 @@ export class StartScreen extends Container {
 				text: new Label({
 					text: "Start",
 					style: {
-						fontFamily: "Amatic SC",
+						fontFamily: "SueEllenFrancisco",
 						fill: "white",
 						fontSize: 100,
+						dropShadow: {
+							distance: 6,
+							angle: Math.PI / 2,
+							color: "black",
+						},
 					},
 				}),
 			}),
 		);
 		this.startButton.on("pointertap", () => this.startGame());
+
+		this.addChild(new SoundButton());
 	}
 
 	resize(width: number, height: number) {

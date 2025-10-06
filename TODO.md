@@ -11,5 +11,4 @@
 == Cosmetics
 - Inventory when collected
 - Inventory in portrait
-- Rotating shadows
 - Flies should avoid the walls in a smarter way

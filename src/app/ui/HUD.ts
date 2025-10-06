@@ -200,19 +200,36 @@ export class HUD extends Container {
 				y: -500,
 				anchor: 0.5,
 				style: {
-					fontFamily: "Amatic SC",
+					fontFamily: "SueEllenFrancisco",
 					fill: "white",
-					fontSize: 50,
+					fontSize: 100,
 				},
 			}),
 		);
+
+		this.restartButton = this.addChild(
+			new FancyButton({
+				text: new Text({
+					text: `Restart`,
+					style: {
+						fontFamily: "SueEllenFrancisco",
+						fill: "white",
+						fontSize: 100,
+					},
+				}),
+			}),
+		);
+		this.restartButton.on("pointertap", () => {
+			engine().audio.playSound("Click");
+			engine().navigation.showScreen(GameScreen);
+		});
 
 		this.resetButton = this.addChild(
 			new FancyButton({
 				text: new Text({
 					text: `Reset`,
 					style: {
-						fontFamily: "Amatic SC",
+						fontFamily: "SueEllenFrancisco",
 						fill: "red",
 						fontSize: 50,
 						fontWeight: "bold",
@@ -223,24 +240,6 @@ export class HUD extends Container {
 		this.resetButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
 			userSettings.resetLevel();
-			engine().navigation.showScreen(GameScreen);
-		});
-
-		this.restartButton = this.addChild(
-			new FancyButton({
-				text: new Text({
-					text: `Restart`,
-					style: {
-						fontFamily: "Amatic SC",
-						fill: "white",
-						fontSize: 100,
-						fontWeight: "bold",
-					},
-				}),
-			}),
-		);
-		this.restartButton.on("pointertap", () => {
-			engine().audio.playSound("Click");
 			engine().navigation.showScreen(GameScreen);
 		});
 	}
@@ -257,11 +256,11 @@ export class HUD extends Container {
 				blueprint.resize("portrait");
 			});
 
-			this.levelText.position.set(width / 2, 200);
+			this.levelText.position.set(width / 2, 150);
 
-			this.resetButton.position.set(width / 4, 400);
+			this.resetButton.position.set(width / 4, 50);
 
-			this.restartButton.position.set((width * 3) / 4, 400);
+			this.restartButton.position.set((width * 3) / 4, 300);
 		} else {
 			// Landscape
 			this.blueprints.position.set(1690, 0);
