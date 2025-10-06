@@ -13,6 +13,7 @@ export class StartScreen extends Container {
 	background: Background;
 	logo: Sprite;
 	startButton: FancyButton;
+	soundButton: SoundButton;
 
 	constructor() {
 		super();
@@ -32,13 +33,14 @@ export class StartScreen extends Container {
 		);
 		this.startButton.on("pointertap", () => this.startGame());
 
-		this.addChild(new SoundButton());
+		this.soundButton = this.addChild(new SoundButton());
 	}
 
 	resize(width: number, height: number) {
 		this.startButton.position.set(width / 2, (3 * height) / 4);
 		this.logo.position.set(width / 2, height / 3);
 		this.background.position.set(width / 2, height / 2);
+		this.soundButton.resize(width, height);
 	}
 
 	async startGame() {

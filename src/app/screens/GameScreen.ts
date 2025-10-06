@@ -23,6 +23,7 @@ export class GameScreen extends Container {
 	hud: HUD;
 	touchArea: Graphics;
 	level: number = Math.min(userSettings.getLevel(), levels.length - 1);
+	soundButton: SoundButton;
 
 	constructor() {
 		super();
@@ -65,7 +66,7 @@ export class GameScreen extends Container {
 		);
 		this.game.hud = this.hud;
 
-		this.addChild(new SoundButton());
+		this.soundButton = this.addChild(new SoundButton());
 	}
 
 	async show() {
@@ -126,6 +127,7 @@ export class GameScreen extends Container {
 		this.touchArea.clear().rect(0, 0, width, height).fill("#00000001");
 		this.hud.resize(width, height);
 		this.isLandscape = width > height;
+		this.soundButton.resize(width, height);
 	}
 
 	win() {

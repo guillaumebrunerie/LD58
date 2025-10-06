@@ -29,6 +29,7 @@ export class TutorialScreen extends Container {
 	sprite: Sprite;
 	pageIndex: number = 1;
 	text: Text;
+	soundButton: SoundButton;
 
 	constructor() {
 		super();
@@ -57,7 +58,7 @@ export class TutorialScreen extends Container {
 		touchArea.cursor = "pointer";
 		touchArea.on("pointertap", () => this.nextPage());
 
-		this.addChild(new SoundButton());
+		this.soundButton = this.addChild(new SoundButton());
 	}
 
 	nextPage() {
@@ -82,6 +83,7 @@ export class TutorialScreen extends Container {
 			this.page.position.set(width / 2, 450);
 			this.page.scale.set(1);
 		}
+		this.soundButton.resize(width, height);
 	}
 
 	async hide() {

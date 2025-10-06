@@ -7,12 +7,15 @@ export class SoundButton extends Container {
 	constructor(options?: ViewContainerOptions) {
 		super(options);
 		this.button = new FancyButton({});
-		this.position.set(120, 70);
 		this.button.onPress.connect(() => {
 			this.toggleSound();
 		});
 		this.updateButton();
 		this.addChild(this.button);
+	}
+
+	resize(width: number, _height: number) {
+		this.position.set(width - 80, 70);
 	}
 
 	isSoundOn() {
