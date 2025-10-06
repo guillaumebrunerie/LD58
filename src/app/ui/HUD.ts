@@ -197,26 +197,19 @@ export class HUD extends Container {
 			new Text({
 				text: `Level ${options.level + 1}`,
 				x: 0,
-				y: -500,
 				anchor: 0.5,
 				style: {
 					fontFamily: "SueEllenFrancisco",
 					fill: "white",
-					fontSize: 100,
+					fontSize: 70,
 				},
 			}),
 		);
 
 		this.restartButton = this.addChild(
 			new FancyButton({
-				text: new Text({
-					text: `Restart`,
-					style: {
-						fontFamily: "SueEllenFrancisco",
-						fill: "white",
-						fontSize: 100,
-					},
-				}),
+				defaultView: Assets.get("RestartButton.png"),
+				anchor: 0.5,
 			}),
 		);
 		this.restartButton.on("pointertap", () => {
@@ -272,12 +265,12 @@ export class HUD extends Container {
 				blueprint.resize("landscape");
 			});
 
-			this.levelText.position.set(200, 400);
+			this.levelText.position.set(230, 350);
 
 			this.resetButton.position.set(200, height - 200);
 			this.resetButton.visible = false;
 
-			this.restartButton.position.set(200, height - 300);
+			this.restartButton.position.set(230, height - 300);
 		}
 	}
 }
