@@ -1,5 +1,5 @@
 import { FancyButton } from "@pixi/ui";
-import { Container, ViewContainerOptions } from "pixi.js";
+import { Assets, Container, ViewContainerOptions } from "pixi.js";
 import { Label } from "../ui/Label";
 import { userSettings } from "../utils/userSettings";
 
@@ -21,24 +21,28 @@ export class SoundButton extends Container {
 	}
 
 	updateButton() {
-		this.button.textView = new Label({
-			text: this.isSoundOn() ? "SOUND ON" : "SOUND OFF",
-			style: {
-				// stroke: {
-				// 	width: 3,
-				// 	color: "#333",
-				// },
-				align: "center",
-				fontWeight: "bold",
-				fontSize: 60,
-				fontFamily: "SueEllenFrancisco",
-				fill: this.isSoundOn() ? "#DDD" : "#448",
-				dropShadow: {
-					angle: 90,
-					distance: 3,
-				},
-			},
-		});
+		this.button.defaultView =
+			this.isSoundOn() ?
+				Assets.get("SoundOnButton.png")
+			:	Assets.get("SoundOffButton.png");
+		// this.button.textView = new Label({
+		// 	text: this.isSoundOn() ? "SOUND ON" : "SOUND OFF",
+		// 	style: {
+		// 		// stroke: {
+		// 		// 	width: 3,
+		// 		// 	color: "#333",
+		// 		// },
+		// 		align: "center",
+		// 		fontWeight: "bold",
+		// 		fontSize: 60,
+		// 		fontFamily: "SueEllenFrancisco",
+		// 		fill: this.isSoundOn() ? "#DDD" : "#448",
+		// 		dropShadow: {
+		// 			angle: 90,
+		// 			distance: 3,
+		// 		},
+		// 	},
+		// });
 	}
 
 	prepare() {}

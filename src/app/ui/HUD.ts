@@ -245,7 +245,7 @@ export class HUD extends Container {
 			const gap = 1080 / this.blueprints.children.length;
 			this.blueprints.children.forEach((blueprint, i) => {
 				blueprint.x = gap * (i + 1 / 2);
-				blueprint.y = 0; //i % 2 == 0 ? -75 : 75;
+				blueprint.y = 0;
 				blueprint.resize("portrait");
 			});
 
