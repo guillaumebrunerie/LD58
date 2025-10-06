@@ -13,14 +13,15 @@ export class LoadScreen extends Container {
 				style: {
 					fontFamily: "Arial",
 					fill: "white",
-					fontSize: 100,
+					fontSize: 70,
+					fontWeight: "bold",
 				},
 			}),
 		);
 	}
 
 	resize(width: number, height: number) {
-		this.loadingText.position.set(width / 2, (height * 3) / 4);
+		this.loadingText.position.set(width / 2, height / 2);
 	}
 
 	onLoad(progress: number) {

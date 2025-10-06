@@ -29,7 +29,9 @@
 			background-color: rgb(1 2 20);
 		}
 		#pixi-container {
-			display: contents;
+			background-image: url(assets/preload/Loading.jpg);
+			background-position: center center;
+			background-size: cover;
 		}
 		canvas {
 			display: block;
@@ -40,7 +42,7 @@
 			max-width: 56.25vh;
 			z-index: 1;
 		}
-		#pixi-container img {
+		#pixi-container {
 			position: absolute;
 			width: 100%;
 			max-height: 177.77vw;
@@ -49,16 +51,14 @@
 		}
 		@media (orientation: landscape) {
 			canvas,
-			#pixi-container img {
+			#pixi-container {
 				max-height: 56.25vw;
 				max-width: 177.77vh;
 			}
 		}
 	</style>
 	<body>
-		<div id="pixi-container">
-			<img src="assets/preload/Loading.jpg" />
-		</div>
+		<div id="pixi-container"></div>
 		<!-- <div id="app"> -->
 		<!-- 	<div id="pixi-container"></div> -->
 		<!-- </div> -->
