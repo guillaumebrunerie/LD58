@@ -1,8 +1,9 @@
 == Framework
 - Start screen
-- Sounds/music/sound on/off button
+- Sound on/off button
 - Pause and various menus
 - Promo stuff
+- Keep background time running
 
 == Game design
 - Level design

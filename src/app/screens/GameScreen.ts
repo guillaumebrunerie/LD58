@@ -111,6 +111,16 @@ export class GameScreen extends Container {
 		thread.destroy();
 	}
 
+	async hide() {
+		// Fade to black
+		const rectangle = this.addChild(
+			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
+		);
+		rectangle.alpha = 0;
+		await this.animate(rectangle, { alpha: 1 }, { duration: 0.5 });
+		rectangle.destroy();
+	}
+
 	isLandscape = true;
 	widthX = 0;
 	heightX = 0;

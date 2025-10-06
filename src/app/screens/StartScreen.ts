@@ -26,7 +26,7 @@ export class StartScreen extends Container {
 		this.startButton = this.addChild(
 			new FancyButton({
 				text: new Label({
-					text: "Start game",
+					text: "Start",
 					style: {
 						fontFamily: "Amatic SC",
 						fill: "white",
@@ -39,7 +39,7 @@ export class StartScreen extends Container {
 	}
 
 	resize(width: number, height: number) {
-		this.startButton.position.set(width / 2, (2 * height) / 3);
+		this.startButton.position.set(width / 2, (4 * height) / 5);
 		this.logo.position.set(width / 2, height / 3);
 		this.background.position.set(width / 2, height / 2);
 	}

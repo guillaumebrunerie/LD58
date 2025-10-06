@@ -13,7 +13,7 @@ export class LoadScreen extends Container {
 				style: {
 					fontFamily: "Helvetica",
 					fill: "white",
-					fontSize: 70,
+					fontSize: 30,
 				},
 			}),
 		);
