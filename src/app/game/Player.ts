@@ -1,8 +1,10 @@
 import { ViewContainerOptions, Ticker, AnimatedSprite } from "pixi.js";
 import { Container } from "../../PausableContainer";
-import { Game, gameWidth, gameHeight } from "./Game";
+import { Game } from "./Game";
 import { Thread } from "./Thread";
 import { getIdleAnimation } from "../utils/animation";
+
+const bounds = 495;
 
 export class Player extends Container {
 	game: Game;
@@ -42,10 +44,10 @@ export class Player extends Container {
 			const delta = vector.normalize().multiplyScalar(magnitude);
 			const newPosition = this.position.add(delta);
 			if (
-				newPosition.x < -gameWidth / 2 ||
-				newPosition.x > gameWidth / 2 ||
-				newPosition.y < -gameHeight / 2 ||
-				newPosition.y > gameHeight / 2
+				newPosition.x < -bounds ||
+				newPosition.x > bounds ||
+				newPosition.y < -bounds ||
+				newPosition.y > bounds
 			) {
 				this.speed = 0;
 				this.game.target.visible = false;

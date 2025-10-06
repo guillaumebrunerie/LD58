@@ -193,14 +193,22 @@ export class Game extends Container {
 	}
 
 	spawnInsect(type = pickInsectType()) {
+		const pickPosition = (): Point => {
+			const position = new Point(
+				randomFloat(insectBounds, -insectBounds),
+				randomFloat(insectBounds, -insectBounds),
+			);
+			if (position.magnitude() < 150) {
+				return pickPosition();
+			} else {
+				return position;
+			}
+		};
 		this.insects.addChild(
 			new Insect({
 				game: this,
 				type,
-				position: new Point(
-					randomFloat(insectBounds, -insectBounds),
-					randomFloat(insectBounds, -insectBounds),
-				),
+				position: pickPosition(),
 				scale: 0.35,
 			}),
 		);

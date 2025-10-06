@@ -11,10 +11,10 @@ import { randomInt, randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
 import { timesOfDay } from "./configuration";
 import { mod, gameWidth, gameHeight } from "./Game";
+import { clock } from "./Clock";
 
 export class Background extends Container {
 	tiles: Sprite[][];
-	lt = 0;
 
 	constructor(options?: ViewContainerOptions) {
 		super(options);
@@ -70,10 +70,8 @@ export class Background extends Container {
 		this.updateTint();
 	}
 
-	season = 0;
-
 	updateTint() {
-		const nt = this.lt / timesOfDay[this.season].duration;
+		const nt = clock.lt / timesOfDay[clock.season].duration;
 		const getTint = (colorFrom: string, colorTo: string) => {
 			const rgbFrom = new Color(colorFrom).toRgb();
 			const rgbTo = new Color(colorTo).toRgb();
@@ -86,8 +84,8 @@ export class Background extends Container {
 
 		this.tiles.forEach((tiles, index) => {
 			const tint = getTint(
-				timesOfDay[this.season].tints[index],
-				timesOfDay[(this.season + 1) % timesOfDay.length].tints[index],
+				timesOfDay[clock.season].tints[index],
+				timesOfDay[(clock.season + 1) % timesOfDay.length].tints[index],
 			);
 			for (const tile of tiles) {
 				tile.tint = tint;
@@ -96,12 +94,7 @@ export class Background extends Container {
 	}
 
 	update(ticker: Ticker) {
-		this.lt += ticker.deltaMS / 1000;
-		const duration = timesOfDay[this.season].duration;
-		if (this.lt > duration) {
-			this.season = (this.season + 1) % timesOfDay.length;
-			this.lt -= duration;
-		}
+		clock.update(ticker);
 		this.updateTint();
 	}
 }

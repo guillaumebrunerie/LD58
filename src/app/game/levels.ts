@@ -54,7 +54,7 @@ export const levels: Level[] = [
 	},
 	{
 		configurationTypes: ["aa", "abc", "aa"],
-		multiples: 1,
+		multiples: 10,
 		additional: 0,
 	},
 ];
