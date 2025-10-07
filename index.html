@@ -16,45 +16,29 @@
 			user-select: none;
 		}
 		body {
-			display: flex;
-			display: -webkit-flex;
-			-webkit-justify-content: center;
-			justify-content: center;
-			-webkit-align-items: center;
-			align-items: center;
-			/* transition: background-color 0.1s; */
+			display: grid;
+			place-items: center;
 			background-color: rgb(49 49 49);
-		}
-		body.levelSelect {
-			background-color: rgb(1 2 20);
 		}
 		#pixi-container {
 			background-color: #6ea093;
 			background-image: url(assets/preload/Loading.png);
 			background-position: center center;
 			background-size: cover;
+			width: min(100vw, 100vh * 9/16);
+			height: min(100vh, 100vw * 16/9);
 		}
 		canvas {
 			display: block;
 			outline: none;
 			height: 100%;
-			max-height: 177.77vw;
 			width: 100%;
-			max-width: 56.25vh;
 			z-index: 1;
 		}
-		#pixi-container {
-			position: absolute;
-			width: 100%;
-			max-height: 177.77vw;
-			height: 100%;
-			max-width: 56.25vh;
-		}
 		@media (orientation: landscape) {
-			canvas,
 			#pixi-container {
-				max-height: 56.25vw;
-				max-width: 177.77vh;
+				width: min(100vw, 100vh * 16/9);
+				height: min(100vh, 100vw * 9/16);
 			}
 		}
 	</style>

@@ -128,8 +128,8 @@ export class CreationResizePlugin {
 				app.resizeOptions.letterbox,
 			);
 
-			app.renderer.canvas.style.width = `${canvasWidth}px`;
-			app.renderer.canvas.style.height = `${canvasHeight}px`;
+			// app.renderer.canvas.style.width = `${canvasWidth}px`;
+			// app.renderer.canvas.style.height = `${canvasHeight}px`;
 			window.scrollTo(0, 0);
 
 			app.renderer.resize(width, height);
