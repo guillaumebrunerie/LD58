@@ -25,18 +25,20 @@
 			background-image: url(assets/preload/Loading.png);
 			background-position: center center;
 			background-size: cover;
-			width: min(100vw, 100vh * 9/16);
-			height: min(100vh, 100vw * 16/9);
 		}
 		canvas {
 			display: block;
 			outline: none;
-			height: 100%;
-			width: 100%;
 			z-index: 1;
 		}
+		#pixi-container,
+		canvas {
+			width: min(100vw, 100vh * 9/16);
+			height: min(100vh, 100vw * 16/9);
+		}
 		@media (orientation: landscape) {
-			#pixi-container {
+			#pixi-container,
+			canvas {
 				width: min(100vw, 100vh * 16/9);
 				height: min(100vh, 100vw * 9/16);
 			}
