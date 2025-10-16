@@ -18,7 +18,7 @@ export class Insect extends Container {
 	speed = randomFloat(0.02, 0.05);
 	game: Game;
 	sprite: AnimatedSprite;
-	shadow: Sprite;
+	shadow: AnimatedSprite;
 	body: Sprite;
 	rotationalSpeed = 0;
 	type: InsectType;
@@ -31,17 +31,19 @@ export class Insect extends Container {
 		this.game = options.game;
 		this.game.addToTicker(this);
 
+		const textures = getIdleAnimation(`${options.type}_Idle`);
 		this.sprite = this.addChild(
 			new AnimatedSprite({
-				textures: getIdleAnimation(`${options.type}_Idle`),
+				textures,
 				anchor: 0.5,
 				animationSpeed: 0.3,
 			}),
 		);
 		this.shadow = this.addChild(
-			new Sprite({
-				texture: Assets.get(`${options.type}.png`),
+			new AnimatedSprite({
+				textures,
 				anchor: 0.5,
+				animationSpeed: 0.3,
 				x: 10,
 				y: 20,
 				tint: 0,
@@ -155,6 +157,7 @@ export class Insect extends Container {
 	collect() {
 		this.speed = 0;
 		this.sprite.visible = false;
+		this.shadow.visible = false;
 		this.body.visible = true;
 		this.animate<Insect>(this, { alpha: 0 }, { duration: 3 }).then(() =>
 			this.destroy(),
@@ -173,5 +176,6 @@ export class Insect extends Container {
 
 	start() {
 		this.sprite.play();
+		this.shadow.play();
 	}
 }
