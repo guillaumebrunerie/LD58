@@ -15,11 +15,7 @@ export class PauseButton extends Container {
 		);
 		this.button.onPress.connect(() => {
 			engine().navigation.presentPopup(PausePopup);
-			engine().navigation.currentScreen?.pause();
+			engine().navigation.currentScreen?.pause?.();
 		});
-	}
-
-	resize() {
-		this.position.set(70, 70);
 	}
 }

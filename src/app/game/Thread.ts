@@ -60,6 +60,8 @@ export class Thread extends Container {
 		);
 		this.previousThread = options.previousThread;
 		this.redraw();
+		this.line.play();
+		this.dot.play();
 	}
 
 	getAssetName() {
@@ -85,10 +87,8 @@ export class Thread extends Container {
 		this.line.scale.x =
 			length / Assets.get(`${this.getAssetName()}_000.png`).width;
 		this.line.rotation = Math.atan2(vector.y, vector.x);
-		this.line.play();
 
 		this.dot.position.set(this.from.x, this.from.y);
-		this.dot.play();
 	}
 
 	extendTo(point: Point, game: Game) {
@@ -119,6 +119,8 @@ export class Thread extends Container {
 		}
 
 		this.redraw();
+		this.line.play();
+		this.dot.play();
 	}
 
 	findThreadIntersection(threads: Thread[]) {
@@ -154,6 +156,8 @@ export class Thread extends Container {
 		this.from = point.clone();
 		this.previousThread = undefined;
 		this.redraw();
+		this.line.play();
+		this.dot.play();
 
 		if (newThread.size() > 50) {
 			engine().audio.playSound(`WebRemove${randomInt(1, 4)}`);

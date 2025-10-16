@@ -1,13 +1,7 @@
-import {
-	FederatedPointerEvent,
-	FederatedWheelEvent,
-	Graphics,
-	Point,
-} from "pixi.js";
+import { FederatedPointerEvent, Graphics, Point } from "pixi.js";
 import { Container } from "../../PausableContainer";
 import { Game } from "../game/Game";
 import { HUD } from "../ui/HUD";
-import { clamp } from "../../engine/utils/maths";
 import { Thread } from "../game/Thread";
 import { levels } from "../game/levels";
 import { FancyButton } from "@pixi/ui";
@@ -16,6 +10,7 @@ import { userSettings } from "../utils/userSettings";
 import { engine } from "../getEngine";
 import { SoundButton } from "./SoundButton";
 import { PauseButton } from "./PauseButton";
+import { PausePopup } from "../popups/PausePopup";
 
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
@@ -24,7 +19,8 @@ export class GameScreen extends Container {
 	game: Game;
 	hud: HUD;
 	touchArea: Graphics;
-	level: number = Math.min(userSettings.getLevel(), levels.length - 1);
+	level: number = userSettings.getCurrentLevel();
+	maxLevel: number = userSettings.getMaxLevel();
 	pauseButton: PauseButton;
 	soundButton: SoundButton;
 
@@ -41,10 +37,6 @@ export class GameScreen extends Container {
 		);
 		this.touchArea.interactive = true;
 		this.touchArea.on("pointerdown", (e) => this.pointerDown(e));
-		this.touchArea.on("pointermove", (e) => this.pointerMove(e));
-		this.touchArea.on("pointerup", (e) => this.pointerUp(e));
-		this.touchArea.on("pointerupoutside", (e) => this.pointerUp(e));
-		this.touchArea.on("wheel", (e) => this.wheel(e));
 
 		this.gameContainer.addChild(
 			new Graphics({ alpha: 0.3 })
@@ -65,25 +57,36 @@ export class GameScreen extends Container {
 		);
 
 		this.hud = this.addChild(
-			new HUD({ game: this.game, level: this.level }),
+			new HUD({
+				game: this.game,
+				level: this.level,
+				maxLevel: this.maxLevel,
+			}),
 		);
 		this.game.hud = this.hud;
 
-		this.pauseButton = this.addChild(new PauseButton());
+		this.pauseButton = this.addChild(
+			new PauseButton({
+				x: 50,
+				y: 50,
+			}),
+		);
 		this.soundButton = this.addChild(new SoundButton());
 	}
 
-	async show() {
+	async show({ instant = false } = {}) {
 		// Move player away
 		const playerY = this.game.player.y;
 		this.game.player.y -= this.isLandscape ? 600 : 1000;
 
-		// Fade from black
-		const rectangle = this.addChild(
-			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
-		);
-		await this.animate(rectangle, { alpha: 0 }, { duration: 0.5 });
-		rectangle.destroy();
+		if (!instant) {
+			// Fade from black
+			const rectangle = this.addChild(
+				new Graphics().rect(0, 0, 1920, 1920).fill("black"),
+			);
+			await this.animate(rectangle, { alpha: 0 }, { duration: 0.5 });
+			rectangle.destroy();
+		}
 
 		// Play sound
 		setTimeout(() => {
@@ -106,19 +109,28 @@ export class GameScreen extends Container {
 			bounce: 0.5,
 		} as const;
 		this.animate(thread, { to_y_redraw: playerY }, options);
-		await this.animate(this.game.player, { y: playerY }, options);
-		this.game.start();
-		thread.destroy();
+		this.animate(this.game.player, { y: playerY }, options).then(() => {
+			this.game.start();
+			thread.destroy();
+		});
 	}
 
-	async hide() {
-		// Fade to black
-		const rectangle = this.addChild(
-			new Graphics().rect(0, 0, 1920, 1920).fill("black"),
-		);
-		rectangle.alpha = 0;
-		await this.animate(rectangle, { alpha: 1 }, { duration: 0.5 });
-		rectangle.destroy();
+	async hide({ instant = false } = {}) {
+		if (!instant) {
+			// Fade to black
+			const rectangle = this.addChild(
+				new Graphics().rect(0, 0, 1920, 1920).fill("black"),
+			);
+			rectangle.alpha = 0;
+			await this.animate(rectangle, { alpha: 1 }, { duration: 0.5 });
+			rectangle.destroy();
+		}
+	}
+
+	blur() {
+		if (!engine().navigation.currentPopup) {
+			engine().navigation.presentPopup(PausePopup);
+		}
 	}
 
 	isLandscape = true;
@@ -168,115 +180,11 @@ export class GameScreen extends Container {
 	}
 
 	nextLevel() {
-		userSettings.setLevel(this.level + 1);
+		userSettings.setLevelAndUnlock(this.level + 1);
 		engine().navigation.showScreen(GameScreen);
 	}
 
-	pointers: {
-		[id: string]: {
-			position: Point;
-			initialPosition: Point;
-			downTime: number;
-		};
-	} = {};
-
 	pointerDown(event: FederatedPointerEvent) {
-		const position = event.getLocalPosition(this.touchArea);
-		this.pointers[event.pointerId] = {
-			position,
-			initialPosition: position,
-			downTime: Date.now(),
-		};
-	}
-
-	pointerMove(event: FederatedPointerEvent) {
-		return;
-		const pointerData = this.pointers[event.pointerId];
-		if (!pointerData) {
-			return;
-		}
-
-		const oldPosition = pointerData.position;
-		const newPosition = event.getLocalPosition(this.touchArea);
-		pointerData.position = newPosition;
-		const pointerIds = Object.keys(this.pointers);
-		if (pointerIds.length == 2) {
-			const otherPointerId = pointerIds.find(
-				(id) => id != `${event.pointerId}`,
-			);
-			const otherPointerData = this.pointers[otherPointerId!];
-			const otherPosition = otherPointerData.position;
-			const previousVector = otherPosition.subtract(oldPosition);
-			const previousDistance = previousVector.magnitude();
-			const previousAngle = Math.atan2(
-				previousVector.y,
-				previousVector.x,
-			);
-			const newVector = otherPosition.subtract(newPosition);
-			const newDistance = newVector.magnitude();
-			const newAngle = Math.atan2(newVector.y, newVector.x);
-			const scaleFactor = newDistance / previousDistance;
-			const otherPositionL = this.game.toLocal(
-				otherPosition,
-				this.touchArea,
-			);
-			this.multiplyScale(scaleFactor);
-			this.game.rotation =
-				this.game.rotation + (newAngle - previousAngle);
-			const otherPositionL2 = this.game.toLocal(
-				otherPosition,
-				this.touchArea,
-			);
-			const delta2 = this.gameContainer
-				.toLocal(otherPositionL2, this.game)
-				.subtract(
-					this.gameContainer.toLocal(otherPositionL, this.game),
-				);
-			this.game.position = this.game.position.add(delta2);
-		} else {
-			this.game.position = this.game.position.add(
-				newPosition.subtract(oldPosition),
-			);
-		}
-	}
-
-	multiplyScale(factor: number) {
-		const newScale = clamp(this.game.scale.x * factor, 1, 3);
-		this.game.scale.set(newScale);
-	}
-
-	pointerUp(event: FederatedPointerEvent) {
-		const pointerData = this.pointers[event.pointerId];
-		if (!pointerData) {
-			return;
-		}
-
-		const tapDelay = 300;
-		const posThreshold = 50;
-		const deltaT = Date.now() - pointerData.downTime;
-		const deltaPos = pointerData
-			.position!.subtract(pointerData.initialPosition!)
-			.magnitude();
-		if (
-			Object.keys(this.pointers).length === 1 &&
-			pointerData.position &&
-			deltaT < tapDelay &&
-			deltaPos < posThreshold
-		) {
-			this.game.click(event.getLocalPosition(this.game));
-		}
-
-		delete this.pointers[event.pointerId];
-	}
-
-	wheel(event: FederatedWheelEvent) {
-		// const position = event.getLocalPosition(this.touchArea);
-		// const otherPositionL = this.game.toLocal(position, this.touchArea);
-		// this.multiplyScale(1 - event.deltaY * 0.001);
-		// const otherPositionL2 = this.game.toLocal(position, this.touchArea);
-		// const delta2 = this.gameContainer
-		// 	.toLocal(otherPositionL2, this.game)
-		// 	.subtract(this.gameContainer.toLocal(otherPositionL, this.game));
-		// this.game.position = this.game.position.add(delta2);
+		this.game.click(event.getLocalPosition(this.game));
 	}
 }

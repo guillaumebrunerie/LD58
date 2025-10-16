@@ -5,7 +5,8 @@ import { engine } from "../getEngine";
 const KEY_VOLUME_MASTER = "volume-master";
 const KEY_VOLUME_BGM = "volume-bgm";
 const KEY_VOLUME_SFX = "volume-sfx";
-const KEY_LEVEL = "level";
+const KEY_MAX_LEVEL = "max-level";
+const KEY_CURRENT_LEVEL = "current-level";
 
 /**
  * Persistent user settings of volumes.
@@ -44,15 +45,42 @@ class UserSettings {
 		storage.setNumber(KEY_VOLUME_SFX, value);
 	}
 
-	/** Level */
-	public getLevel() {
-		return storage.getNumber(KEY_LEVEL) ?? 0;
+	/** Levels */
+	public getMaxLevel() {
+		const maxLevel = storage.getNumber(KEY_MAX_LEVEL) ?? 0;
+		if (maxLevel < 0) {
+			return 0;
+		} else {
+			return Math.round(maxLevel);
+		}
 	}
-	public setLevel(value: number) {
-		storage.setNumber(KEY_LEVEL, value);
+	public getCurrentLevel() {
+		const currentLevel = storage.getNumber(KEY_CURRENT_LEVEL) ?? 0;
+		const maxLevel = this.getMaxLevel();
+		if (currentLevel < 0) {
+			return 0;
+		} else if (currentLevel > maxLevel) {
+			return maxLevel;
+		} else {
+			return Math.round(currentLevel);
+		}
 	}
-	public resetLevel() {
-		storage.reset(KEY_LEVEL);
+	public setCurrentLevel(value: number) {
+		const maxLevel = this.getMaxLevel();
+		storage.setNumber(
+			KEY_CURRENT_LEVEL,
+			Math.min(Math.max(0, Math.round(value)), maxLevel),
+		);
+	}
+	public setLevelAndUnlock(value: number) {
+		const newCurrentLevel = Math.max(0, Math.round(value));
+		const newMaxLevel = Math.max(this.getMaxLevel(), newCurrentLevel);
+		storage.setNumber(KEY_CURRENT_LEVEL, newCurrentLevel);
+		storage.setNumber(KEY_MAX_LEVEL, newMaxLevel);
+	}
+	public resetLevels() {
+		storage.reset(KEY_CURRENT_LEVEL);
+		storage.reset(KEY_MAX_LEVEL);
 	}
 }
 

@@ -1,8 +1,8 @@
-- Pause button
-- Pause menu
-- Reset all progress button
-- Auto pause
-- Previous/next levels
+- Pause button: need asset and proper positioning
+- Pause menu: test and review
+- Reset all progress button: test and review
+- Previous and next levels: need assets and proper positioning
+
 - Game over screen
 - Wrong collection posting
 

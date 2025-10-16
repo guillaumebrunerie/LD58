@@ -6,9 +6,9 @@ import type { CreationEngine } from "../engine";
 /** Interface for app screens */
 interface AppScreen extends Container {
 	/** Show the screen */
-	show?(): Promise<void> | void;
+	show?(data?: unknown): Promise<void> | void;
 	/** Hide the screen */
-	hide?(): Promise<void> | void;
+	hide?(data?: unknown): Promise<void> | void;
 	/** Pause the screen */
 	pause?(): Promise<void> | void;
 	/** Resume the screen */
@@ -69,7 +69,7 @@ export class Navigation {
 	}
 
 	/** Add screen to the stage, link update & resize functions */
-	private async addAndShowScreen(screen: AppScreen) {
+	private async addAndShowScreen(screen: AppScreen, data?: unknown) {
 		// Add navigation container to stage if it does not have a parent yet
 		if (!this.container.parent) {
 			this.app.stage.addChild(this.container);
@@ -97,19 +97,19 @@ export class Navigation {
 		// Show the new screen
 		if (screen.show) {
 			screen.interactiveChildren = false;
-			await screen.show();
+			await screen.show(data);
 			screen.interactiveChildren = true;
 		}
 	}
 
 	/** Remove screen from the stage, unlink update & resize functions */
-	private async hideAndRemoveScreen(screen: AppScreen) {
+	private async hideAndRemoveScreen(screen: AppScreen, data?: unknown) {
 		// Prevent interaction in the screen
 		screen.interactiveChildren = false;
 
 		// Hide screen if method is available
 		if (screen.hide) {
-			await screen.hide();
+			await screen.hide(data);
 		}
 
 		// Unlink update function if method is available
@@ -133,7 +133,7 @@ export class Navigation {
 	 * Hide current screen (if there is one) and present a new screen.
 	 * Any class that matches AppScreen interface can be used here.
 	 */
-	public async showScreen(ctor: AppScreenConstructor) {
+	public async showScreen(ctor: AppScreenConstructor, data?: unknown) {
 		// Block interactivity in current screen
 		if (this.currentScreen) {
 			this.currentScreen.interactiveChildren = false;
@@ -155,12 +155,12 @@ export class Navigation {
 
 		// If there is a screen already created, hide and destroy it
 		if (this.currentScreen) {
-			await this.hideAndRemoveScreen(this.currentScreen);
+			await this.hideAndRemoveScreen(this.currentScreen, data);
 		}
 
 		// Create the new screen and add that to the stage
 		this.currentScreen = BigPool.get(ctor);
-		await this.addAndShowScreen(this.currentScreen);
+		await this.addAndShowScreen(this.currentScreen, data);
 	}
 
 	/**

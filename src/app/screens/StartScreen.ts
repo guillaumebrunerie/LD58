@@ -1,6 +1,5 @@
 import { Container } from "../../PausableContainer";
 import { FancyButton } from "@pixi/ui";
-import { Label } from "../ui/Label";
 import { engine } from "../getEngine";
 import { Background } from "../game/Background";
 import { Assets, Graphics, Sprite } from "pixi.js";

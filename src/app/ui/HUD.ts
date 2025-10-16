@@ -11,6 +11,8 @@ import { getAnimation, getIdleAnimation } from "../utils/animation";
 import { FancyButton } from "@pixi/ui";
 import { engine } from "../getEngine";
 import { GameScreen } from "../screens/GameScreen";
+import { userSettings } from "../utils/userSettings";
+import { levels } from "../game/levels";
 
 export class BlueprintItem extends Container {
 	bg: AnimatedSprite;
@@ -175,10 +177,10 @@ export class Blueprint extends Container {
 export class HUD extends Container {
 	game: Game;
 	blueprints: Container<Blueprint>;
-	levelText: Text;
+	levelTextContainer: Container;
 	restartButton: FancyButton;
 
-	constructor(options: { game: Game; level: number }) {
+	constructor(options: { game: Game; level: number; maxLevel: number }) {
 		super();
 		this.game = options.game;
 
@@ -191,10 +193,10 @@ export class HUD extends Container {
 			),
 		);
 
-		this.levelText = this.addChild(
+		this.levelTextContainer = this.addChild(new Container());
+		this.levelTextContainer.addChild(
 			new Text({
-				text: `Level ${options.level + 1}`,
-				x: 0,
+				text: `Level ${options.level + 1} / ${levels.length}`,
 				anchor: 0.5,
 				style: {
 					fontFamily: "SueEllenFrancisco",
@@ -203,6 +205,46 @@ export class HUD extends Container {
 				},
 			}),
 		);
+
+		const previousLevelButton = this.levelTextContainer.addChild(
+			new FancyButton({
+				defaultView: Assets.get("SoundOnButton.png"),
+				anchor: 0.5,
+			}),
+		);
+		if (options.level == 0) {
+			previousLevelButton.enabled = false;
+			previousLevelButton.alpha = 0.5;
+		}
+		previousLevelButton.x = -50;
+		previousLevelButton.y = 50;
+		previousLevelButton.on("pointertap", () => {
+			engine().audio.playSound("Click");
+			if (options.level > 0) {
+				userSettings.setCurrentLevel(options.level - 1);
+				engine().navigation.showScreen(GameScreen, { instant: true });
+			}
+		});
+
+		const nextLevelButton = this.levelTextContainer.addChild(
+			new FancyButton({
+				defaultView: Assets.get("SoundOnButton.png"),
+				anchor: 0.5,
+			}),
+		);
+		if (options.level == options.maxLevel) {
+			nextLevelButton.enabled = false;
+			nextLevelButton.alpha = 0.5;
+		}
+		nextLevelButton.x = 50;
+		nextLevelButton.y = 50;
+		nextLevelButton.on("pointertap", () => {
+			engine().audio.playSound("Click");
+			if (options.level < options.maxLevel) {
+				userSettings.setCurrentLevel(options.level + 1);
+				engine().navigation.showScreen(GameScreen, { instant: true });
+			}
+		});
 
 		this.restartButton = this.addChild(
 			new FancyButton({
@@ -228,7 +270,7 @@ export class HUD extends Container {
 				blueprint.resize("portrait");
 			});
 
-			this.levelText.position.set(250, 300);
+			this.levelTextContainer.position.set(250, 300);
 
 			this.restartButton.position.set(1080 - 250, 300);
 		} else {
@@ -241,7 +283,7 @@ export class HUD extends Container {
 				blueprint.resize("landscape");
 			});
 
-			this.levelText.position.set(230, 350);
+			this.levelTextContainer.position.set(230, 350);
 
 			this.restartButton.position.set(230, height - 300);
 		}

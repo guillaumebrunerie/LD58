@@ -4,6 +4,7 @@ import {
 	ContainerChild,
 	ContainerOptions,
 	AnimatedSprite,
+	DestroyOptions,
 } from "pixi.js";
 
 export class Container<
@@ -14,6 +15,15 @@ export class Container<
 
 	constructor(options?: ContainerOptions<C>) {
 		super(options);
+	}
+
+	destroy(options?: DestroyOptions) {
+		for (const control of this.#controls) {
+			control.stop();
+		}
+		requestAnimationFrame(() => {
+			super.destroy(options);
+		});
 	}
 
 	// @ts-expect-error Magic

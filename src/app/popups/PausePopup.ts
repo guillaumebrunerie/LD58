@@ -1,4 +1,3 @@
-import { animate } from "motion";
 import { BlurFilter, Container, Graphics, Point } from "pixi.js";
 
 import { engine } from "../getEngine";
@@ -78,7 +77,7 @@ export class PausePopup extends Container {
 		resetButton.y = 75;
 		resetButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
-			userSettings.resetLevel();
+			userSettings.resetLevels();
 			engine().navigation.dismissPopup();
 			engine().navigation.showScreen(GameScreen);
 		});
@@ -91,19 +90,19 @@ export class PausePopup extends Container {
 	}
 
 	/** Present the popup, animated */
-	public async show() {
+	public show() {
 		const currentEngine = engine();
 		if (currentEngine.navigation.currentScreen) {
 			currentEngine.navigation.currentScreen.filters = [
-				new BlurFilter({ strength: 5 }),
+				new BlurFilter({ strength: 3 }),
 			];
 		}
-		this.alpha = 0;
-		await animate<PausePopup>(
-			this,
-			{ alpha: 1 },
-			{ duration: 0.2, ease: "linear" },
-		);
+		// this.alpha = 0;
+		// await animate<PausePopup>(
+		// 	this,
+		// 	{ alpha: 1 },
+		// 	{ duration: 0.2, ease: "linear" },
+		// );
 	}
 
 	/** Dismiss the popup, animated */
@@ -112,10 +111,10 @@ export class PausePopup extends Container {
 		if (currentEngine.navigation.currentScreen) {
 			currentEngine.navigation.currentScreen.filters = [];
 		}
-		await animate<PausePopup>(
-			this,
-			{ alpha: 0 },
-			{ duration: 0.2, ease: "linear" },
-		);
+		// await animate<PausePopup>(
+		// 	this,
+		// 	{ alpha: 0 },
+		// 	{ duration: 0.2, ease: "linear" },
+		// );
 	}
 }

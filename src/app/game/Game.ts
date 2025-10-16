@@ -1,4 +1,5 @@
 import {
+	DestroyOptions,
 	IRenderLayer,
 	Point,
 	Polygon,
@@ -208,7 +209,10 @@ export class Game extends Container {
 				randomFloat(insectBounds, -insectBounds),
 				randomFloat(insectBounds, -insectBounds),
 			);
-			if (position.magnitude() < 150) {
+			if (
+				position.magnitude() < 150 ||
+				(position.y < 0 && Math.abs(position.x) < 50)
+			) {
 				return pickPosition();
 			} else {
 				return position;
@@ -224,13 +228,26 @@ export class Game extends Container {
 		);
 	}
 
+	destroy(options?: DestroyOptions) {
+		this.ticker.destroy();
+		super.destroy(options);
+	}
+
 	addToTicker(container: Container & { update(ticker: Ticker): void }) {
 		const callback = () => container.update(this.ticker);
 		this.ticker.add(callback);
-		container.on("destroyed", () => this.ticker.remove(callback));
+		container.on("destroyed", () => {
+			if (!this.destroyed) {
+				this.ticker.remove(callback);
+			}
+		});
 	}
 
 	click(position: Point) {
+		if (!this.ticker.started) {
+			return;
+		}
+
 		engine().audio.playSound("WebStart");
 
 		const oldPosition = this.player.threadPosition();
