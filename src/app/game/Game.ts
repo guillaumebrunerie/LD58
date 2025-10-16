@@ -192,6 +192,16 @@ export class Game extends Container {
 		}
 	}
 
+	pause() {
+		super.pause();
+		this.ticker.stop();
+	}
+
+	resume() {
+		super.resume();
+		this.ticker.start();
+	}
+
 	spawnInsect(type = pickInsectType()) {
 		const pickPosition = (): Point => {
 			const position = new Point(

@@ -3,6 +3,7 @@ import {
 	Container as PixiContainer,
 	ContainerChild,
 	ContainerOptions,
+	AnimatedSprite,
 } from "pixi.js";
 
 export class Container<
@@ -35,6 +36,9 @@ export class Container<
 			if (child instanceof Container) {
 				child.pause();
 			}
+			if (child instanceof AnimatedSprite) {
+				child.stop();
+			}
 		}
 	}
 
@@ -46,6 +50,9 @@ export class Container<
 		for (const child of this.children) {
 			if (child instanceof Container) {
 				child.resume();
+			}
+			if (child instanceof AnimatedSprite) {
+				child.play();
 			}
 		}
 	}

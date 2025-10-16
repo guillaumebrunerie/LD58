@@ -15,6 +15,8 @@ import { Label } from "../ui/Label";
 import { userSettings } from "../utils/userSettings";
 import { engine } from "../getEngine";
 import { SoundButton } from "./SoundButton";
+import { PauseButton } from "./PauseButton";
+
 export class GameScreen extends Container {
 	public static assetBundles = ["main"];
 
@@ -23,6 +25,7 @@ export class GameScreen extends Container {
 	hud: HUD;
 	touchArea: Graphics;
 	level: number = Math.min(userSettings.getLevel(), levels.length - 1);
+	pauseButton: PauseButton;
 	soundButton: SoundButton;
 
 	constructor() {
@@ -66,6 +69,7 @@ export class GameScreen extends Container {
 		);
 		this.game.hud = this.hud;
 
+		this.pauseButton = this.addChild(new PauseButton());
 		this.soundButton = this.addChild(new SoundButton());
 	}
 

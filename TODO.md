@@ -1,11 +1,11 @@
-== Framework
-- Pause and various menus
-- Promo stuff
+- Pause button
+- Pause menu
+- Reset all progress button
+- Auto pause
+- Previous/next levels
+- Game over screen
+- Wrong collection posting
 
-== Game design
-- Win flow
-
-== Cosmetics
-- Inventory when collected
-- Inventory in portrait
-- Flies should avoid the walls in a smarter way
+- Maybe better win flow
+- Better inventory in portrait, on several lines and stuff
+- More levels

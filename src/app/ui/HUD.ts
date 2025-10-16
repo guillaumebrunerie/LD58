@@ -9,7 +9,6 @@ import { Container } from "../../PausableContainer";
 import { Game, InsectType } from "../game/Game";
 import { getAnimation, getIdleAnimation } from "../utils/animation";
 import { FancyButton } from "@pixi/ui";
-import { userSettings } from "../utils/userSettings";
 import { engine } from "../getEngine";
 import { GameScreen } from "../screens/GameScreen";
 
@@ -177,7 +176,6 @@ export class HUD extends Container {
 	game: Game;
 	blueprints: Container<Blueprint>;
 	levelText: Text;
-	resetButton: FancyButton;
 	restartButton: FancyButton;
 
 	constructor(options: { game: Game; level: number }) {
@@ -216,25 +214,6 @@ export class HUD extends Container {
 			engine().audio.playSound("Click");
 			engine().navigation.showScreen(GameScreen);
 		});
-
-		this.resetButton = this.addChild(
-			new FancyButton({
-				text: new Text({
-					text: `Reset`,
-					style: {
-						fontFamily: "SueEllenFrancisco",
-						fill: "red",
-						fontSize: 50,
-						fontWeight: "bold",
-					},
-				}),
-			}),
-		);
-		this.resetButton.on("pointertap", () => {
-			engine().audio.playSound("Click");
-			userSettings.resetLevel();
-			engine().navigation.showScreen(GameScreen);
-		});
 	}
 
 	resize(width: number, height: number) {
@@ -251,9 +230,6 @@ export class HUD extends Container {
 
 			this.levelText.position.set(250, 300);
 
-			this.resetButton.position.set(width / 4, 50);
-			this.resetButton.visible = false;
-
 			this.restartButton.position.set(1080 - 250, 300);
 		} else {
 			// Landscape
@@ -266,9 +242,6 @@ export class HUD extends Container {
 			});
 
 			this.levelText.position.set(230, 350);
-
-			this.resetButton.position.set(200, height - 200);
-			this.resetButton.visible = false;
 
 			this.restartButton.position.set(230, height - 300);
 		}
