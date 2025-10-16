@@ -9,10 +9,10 @@ export class PauseButton extends Container {
 		super(options);
 		this.button = this.addChild(
 			new FancyButton({
-				anchor: 0.5,
-				defaultView: Assets.get("SoundOnButton.png"),
+				defaultView: Assets.get("PauseButton.png"),
 			}),
 		);
+		this.button.anchor.set(0.5);
 		this.button.onPress.connect(() => {
 			engine().navigation.presentPopup(PausePopup);
 			engine().navigation.currentScreen?.pause?.();

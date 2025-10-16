@@ -15,7 +15,7 @@ export class SoundButton extends Container {
 	}
 
 	resize(width: number, _height: number) {
-		this.position.set(width - 80, 70);
+		this.position.set(width - 60, 70);
 	}
 
 	isSoundOn() {

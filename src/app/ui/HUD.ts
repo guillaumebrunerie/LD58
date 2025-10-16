@@ -1,6 +1,7 @@
 import {
 	AnimatedSprite,
 	Assets,
+	Rectangle,
 	Sprite,
 	Text,
 	ViewContainerOptions,
@@ -208,7 +209,7 @@ export class HUD extends Container {
 
 		const previousLevelButton = this.levelTextContainer.addChild(
 			new FancyButton({
-				defaultView: Assets.get("SoundOnButton.png"),
+				defaultView: Assets.get("PreviousLevelButton.png"),
 				anchor: 0.5,
 			}),
 		);
@@ -216,8 +217,8 @@ export class HUD extends Container {
 			previousLevelButton.enabled = false;
 			previousLevelButton.alpha = 0.5;
 		}
-		previousLevelButton.x = -50;
-		previousLevelButton.y = 50;
+		previousLevelButton.x = -60;
+		previousLevelButton.y = 80;
 		previousLevelButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
 			if (options.level > 0) {
@@ -228,7 +229,7 @@ export class HUD extends Container {
 
 		const nextLevelButton = this.levelTextContainer.addChild(
 			new FancyButton({
-				defaultView: Assets.get("SoundOnButton.png"),
+				defaultView: Assets.get("NextLevelButton.png"),
 				anchor: 0.5,
 			}),
 		);
@@ -236,8 +237,8 @@ export class HUD extends Container {
 			nextLevelButton.enabled = false;
 			nextLevelButton.alpha = 0.5;
 		}
-		nextLevelButton.x = 50;
-		nextLevelButton.y = 50;
+		nextLevelButton.x = 60;
+		nextLevelButton.y = 80;
 		nextLevelButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
 			if (options.level < options.maxLevel) {
