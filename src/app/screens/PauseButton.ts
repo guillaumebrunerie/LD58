@@ -13,7 +13,7 @@ export class PauseButton extends Container {
 			}),
 		);
 		this.button.anchor.set(0.5);
-		this.button.onPress.connect(() => {
+		this.button.on("pointertap", () => {
 			engine().navigation.presentPopup(PausePopup);
 			engine().navigation.currentScreen?.pause?.();
 		});
