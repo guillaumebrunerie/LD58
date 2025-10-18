@@ -6,6 +6,6 @@
 - Game over screen
 - Wrong collection posting
 
-- Maybe better win flow
 - Better inventory in portrait, on several lines and stuff
+- Maybe better win flow
 - More levels

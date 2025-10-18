@@ -1,4 +1,5 @@
 import { storage } from "../../engine/utils/storage";
+import { levels } from "../game/levels";
 import { engine } from "../getEngine";
 
 // Keys for saved items in storage
@@ -48,8 +49,11 @@ class UserSettings {
 	/** Levels */
 	public getMaxLevel() {
 		const maxLevel = storage.getNumber(KEY_MAX_LEVEL) ?? 0;
+		const numberOfLevels = levels.length;
 		if (maxLevel < 0) {
 			return 0;
+		} else if (maxLevel >= numberOfLevels) {
+			return numberOfLevels - 1;
 		} else {
 			return Math.round(maxLevel);
 		}
