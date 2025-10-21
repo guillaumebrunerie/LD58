@@ -17,6 +17,7 @@ export class Web extends Container {
 		options: ViewContainerOptions & {
 			polygon: Polygon;
 			message: string;
+			success: boolean;
 			messageLayer: IRenderLayer;
 		},
 	) {
@@ -83,16 +84,15 @@ export class Web extends Container {
 					text: options.message,
 					style: {
 						fontFamily: "SueEllenFrancisco",
-						fill: "#DD0000",
-						// stroke: { color: "black", width: 6 },
-						fontSize: 50,
+						fill: options.success ? "#006600" : "#DD0000",
+						fontSize: 60,
 					},
 				}),
 			);
 			options.messageLayer.attach(errorMessage);
 		}
 
-		this.animate<Web>(this, { alpha: 0 }, { duration: 3 }).then(() =>
+		this.animate<Web>(this, { alpha: 0 }, { duration: 4 }).then(() =>
 			this.destroy(),
 		);
 	}

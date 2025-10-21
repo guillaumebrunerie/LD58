@@ -152,6 +152,7 @@ export class Game extends Container {
 	errorMessages: IRenderLayer;
 
 	wantedConfigurations: InsectType[][];
+	insectsNeededByType: Record<InsectType, number> = {};
 
 	constructor(options: { level: Level }) {
 		super();
@@ -177,6 +178,8 @@ export class Game extends Container {
 		this.insects = this.addChild(new Container<Insect>());
 		for (const configuration of this.wantedConfigurations) {
 			for (const type of configuration) {
+				this.insectsNeededByType[type] ||= 0;
+				this.insectsNeededByType[type]++;
 				for (let i = 0; i < options.level.multiples; i++) {
 					this.spawnInsect(type);
 				}
@@ -187,6 +190,7 @@ export class Game extends Container {
 		}
 
 		this.errorMessages = this.addChild(new RenderLayer());
+		this.addToTicker(this);
 	}
 
 	start() {
@@ -246,6 +250,22 @@ export class Game extends Container {
 		});
 	}
 
+	update() {
+		for (const [type, needed] of Object.entries(this.insectsNeededByType)) {
+			if (
+				needed >
+				this.insects.children.filter(
+					(insect) =>
+						insect.type == type &&
+						!insect.isDead &&
+						!insect.isEscaping,
+				).length
+			) {
+				this.hud.crossOutType(type);
+			}
+		}
+	}
+
 	click(position: Point) {
 		if (!this.ticker.started) {
 			return;
@@ -283,19 +303,31 @@ export class Game extends Container {
 			(blueprint) =>
 				blueprint.combination == combination && !blueprint.isComplete,
 		);
+
+		let message = "";
+		let success = false;
 		if (matchingIndex >= 0) {
+			message = "Match!";
+			success = true;
 			const blueprint = this.hud.blueprints.children[matchingIndex];
 			blueprint.complete();
+			for (const type of blueprint.insectTypes) {
+				this.insectsNeededByType[type]--;
+			}
 			setTimeout(() => {
 				engine().audio.playSound("InventoryCollect2");
 			}, 500);
 		}
 
-		let message = "";
-		if (matchingIndex < 0 && combination.length > 0) {
+		if (
+			matchingIndex < 0 &&
+			combination.length > 0 &&
+			this.hud.blueprints.children.some((b) => !b.isComplete)
+		) {
 			if (
 				this.hud.blueprints.children.every(
 					(blueprint) =>
+						blueprint.isComplete ||
 						blueprint.combination.length > combination.length,
 				)
 			) {
@@ -303,6 +335,7 @@ export class Game extends Container {
 			} else if (
 				this.hud.blueprints.children.every(
 					(blueprint) =>
+						blueprint.isComplete ||
 						blueprint.combination.length < combination.length,
 				)
 			) {
@@ -318,6 +351,7 @@ export class Game extends Container {
 			new Web({
 				polygon,
 				message,
+				success,
 				messageLayer: this.errorMessages,
 			}),
 		);

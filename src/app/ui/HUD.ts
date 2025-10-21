@@ -1,6 +1,7 @@
 import {
 	AnimatedSprite,
 	Assets,
+	Graphics,
 	Rectangle,
 	Sprite,
 	Text,
@@ -16,11 +17,14 @@ import { userSettings } from "../utils/userSettings";
 import { levels } from "../game/levels";
 
 export class BlueprintItem extends Container {
+	type: InsectType;
 	bg: AnimatedSprite;
 	icon: Sprite;
+	isComplete = false;
 
 	constructor(options: ViewContainerOptions & { type: InsectType }) {
 		super(options);
+		this.type = options.type;
 		this.bg = this.addChild(
 			new AnimatedSprite({
 				textures: getIdleAnimation("InventoryLoop"),
@@ -31,7 +35,7 @@ export class BlueprintItem extends Container {
 		);
 		this.icon = this.addChild(
 			new Sprite({
-				texture: Assets.get(`${options.type}.png`),
+				texture: Assets.get(`${this.type}.png`),
 				anchor: 0.5,
 				scale: 0.65,
 			}),
@@ -39,10 +43,11 @@ export class BlueprintItem extends Container {
 	}
 
 	complete() {
+		this.isComplete = true;
 		this.animate<BlueprintItem>(
 			this,
 			{ alpha: 0.9999 },
-			{ duration: 0.5 },
+			{ duration: 0.0005 },
 		).then(() => {
 			this.bg.destroy();
 			this.bg = this.addChild(
@@ -59,6 +64,27 @@ export class BlueprintItem extends Container {
 			};
 			this.animate(this.icon, { alpha: 0 }, { duration: 1 });
 		});
+	}
+
+	crossOut() {
+		if (this.isComplete) {
+			return;
+		}
+		const d = 40;
+		const cross = this.addChild(
+			new Graphics()
+				.moveTo(-d, -d)
+				.lineTo(d, d)
+				.moveTo(-d, d)
+				.lineTo(d, -d)
+				.stroke({
+					color: "#DD0000",
+					cap: "round",
+					width: 10,
+				}),
+		);
+		cross.alpha = 0;
+		this.animate(cross, { alpha: 1 }, { duration: 0.5 });
 	}
 }
 
@@ -171,6 +197,14 @@ export class Blueprint extends Container {
 		this.isComplete = true;
 		for (const item of this.items) {
 			item.complete();
+		}
+	}
+
+	crossOutType(type: InsectType) {
+		for (const item of this.items) {
+			if (item.type == type) {
+				item.crossOut();
+			}
 		}
 	}
 }
@@ -287,6 +321,12 @@ export class HUD extends Container {
 			this.levelTextContainer.position.set(230, 350);
 
 			this.restartButton.position.set(230, height - 300);
+		}
+	}
+
+	crossOutType(type: InsectType) {
+		for (const blueprint of this.blueprints.children) {
+			blueprint.crossOutType(type);
 		}
 	}
 }
