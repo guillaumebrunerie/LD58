@@ -2,7 +2,6 @@ import {
 	AnimatedSprite,
 	Assets,
 	Graphics,
-	Rectangle,
 	Sprite,
 	Text,
 	ViewContainerOptions,
@@ -15,6 +14,7 @@ import { engine } from "../getEngine";
 import { GameScreen } from "../screens/GameScreen";
 import { userSettings } from "../utils/userSettings";
 import { levels } from "../game/levels";
+import { Label } from "./Label";
 
 export class BlueprintItem extends Container {
 	type: InsectType;
@@ -213,7 +213,7 @@ export class HUD extends Container {
 	game: Game;
 	blueprints: Container<Blueprint>;
 	levelTextContainer: Container;
-	restartButton: FancyButton;
+	restartButtonContainer: Container;
 
 	constructor(options: { game: Game; level: number; maxLevel: number }) {
 		super();
@@ -252,7 +252,7 @@ export class HUD extends Container {
 			previousLevelButton.alpha = 0.5;
 		}
 		previousLevelButton.x = -60;
-		previousLevelButton.y = 80;
+		previousLevelButton.y = 100;
 		previousLevelButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
 			if (options.level > 0) {
@@ -272,7 +272,7 @@ export class HUD extends Container {
 			nextLevelButton.alpha = 0.5;
 		}
 		nextLevelButton.x = 60;
-		nextLevelButton.y = 80;
+		nextLevelButton.y = 100;
 		nextLevelButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
 			if (options.level < options.maxLevel) {
@@ -281,16 +281,29 @@ export class HUD extends Container {
 			}
 		});
 
-		this.restartButton = this.addChild(
+		this.restartButtonContainer = this.addChild(new Container());
+		const restartButton = this.restartButtonContainer.addChild(
 			new FancyButton({
 				defaultView: Assets.get("RestartButton.png"),
 				anchor: 0.5,
 			}),
 		);
-		this.restartButton.on("pointertap", () => {
+		restartButton.on("pointertap", () => {
 			engine().audio.playSound("Click");
 			engine().navigation.showScreen(GameScreen);
 		});
+		this.restartButtonContainer.addChild(
+			new Label({
+				y: 120,
+				text: `Restart`,
+				style: {
+					fontFamily: "SueEllenFrancisco",
+					fill: "white",
+					// stroke: { color: "black", width: 6 },
+					fontSize: 70,
+				},
+			}),
+		);
 	}
 
 	resize(width: number, height: number) {
@@ -305,9 +318,9 @@ export class HUD extends Container {
 				blueprint.resize("portrait");
 			});
 
-			this.levelTextContainer.position.set(250, 300);
+			this.levelTextContainer.position.set(250, 250);
 
-			this.restartButton.position.set(1080 - 250, 300);
+			this.restartButtonContainer.position.set(1080 - 250, 250);
 		} else {
 			// Landscape
 			this.blueprints.position.set(1690, 0);
@@ -318,9 +331,9 @@ export class HUD extends Container {
 				blueprint.resize("landscape");
 			});
 
-			this.levelTextContainer.position.set(230, 350);
+			this.levelTextContainer.position.set(230, 300);
 
-			this.restartButton.position.set(230, height - 300);
+			this.restartButtonContainer.position.set(230, height - 350);
 		}
 	}
 

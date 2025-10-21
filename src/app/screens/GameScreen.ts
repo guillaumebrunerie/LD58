@@ -67,8 +67,8 @@ export class GameScreen extends Container {
 
 		this.pauseButton = this.addChild(
 			new PauseButton({
-				x: 70,
-				y: 70,
+				x: 60,
+				y: 60,
 			}),
 		);
 		this.soundButton = this.addChild(new SoundButton());
