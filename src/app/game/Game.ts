@@ -314,9 +314,9 @@ export class Game extends Container {
 			for (const type of blueprint.insectTypes) {
 				this.insectsNeededByType[type]--;
 			}
-			setTimeout(() => {
-				engine().audio.playSound("InventoryCollect2");
-			}, 500);
+			// setTimeout(() => {
+			engine().audio.playSound("InventoryCollect2");
+			// }, 500);
 		}
 
 		if (
@@ -324,6 +324,7 @@ export class Game extends Container {
 			combination.length > 0 &&
 			this.hud.blueprints.children.some((b) => !b.isComplete)
 		) {
+			engine().audio.playSound("WrongInsect");
 			if (
 				this.hud.blueprints.children.every(
 					(blueprint) =>
