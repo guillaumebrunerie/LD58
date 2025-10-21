@@ -4,7 +4,8 @@
 - Previous and next levels: need assets and proper positioning
 
 - Game over screen
-- Wrong collection posting
+- Congratulations screen
+- Automatically go to next level?
 
 - Better inventory in portrait, on several lines and stuff
 - Maybe better win flow

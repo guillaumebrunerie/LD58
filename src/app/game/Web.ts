@@ -5,13 +5,21 @@ import {
 	Sprite,
 	Assets,
 	Point,
+	IRenderLayer,
 } from "pixi.js";
 import { randomFloat } from "../../engine/utils/random";
 import { Container } from "../../PausableContainer";
 import { Thread } from "./Thread";
+import { Label } from "../ui/Label";
 
 export class Web extends Container {
-	constructor(options: ViewContainerOptions & { polygon: Polygon }) {
+	constructor(
+		options: ViewContainerOptions & {
+			polygon: Polygon;
+			message: string;
+			messageLayer: IRenderLayer;
+		},
+	) {
 		super(options);
 
 		const points = options.polygon.points;
@@ -65,6 +73,23 @@ export class Web extends Container {
 				}),
 			);
 			thread.freeze();
+		}
+
+		if (options.message) {
+			const errorMessage = this.addChild(
+				new Label({
+					x: centerX,
+					y: centerY,
+					text: options.message,
+					style: {
+						fontFamily: "SueEllenFrancisco",
+						fill: "#DD0000",
+						// stroke: { color: "black", width: 6 },
+						fontSize: 50,
+					},
+				}),
+			);
+			options.messageLayer.attach(errorMessage);
 		}
 
 		this.animate<Web>(this, { alpha: 0 }, { duration: 3 }).then(() =>

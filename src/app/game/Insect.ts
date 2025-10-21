@@ -23,6 +23,7 @@ export class Insect extends Container {
 	rotationalSpeed = 0;
 	type: InsectType;
 	isEscaping = false;
+	isDead = false;
 
 	constructor(options: ViewContainerOptions & { game: Game; type: string }) {
 		super(options);
@@ -159,6 +160,7 @@ export class Insect extends Container {
 		this.sprite.visible = false;
 		this.shadow.visible = false;
 		this.body.visible = true;
+		this.isDead = true;
 		this.animate<Insect>(this, { alpha: 0 }, { duration: 3 }).then(() =>
 			this.destroy(),
 		);

@@ -149,6 +149,7 @@ export class Game extends Container {
 	webs: Container<Web>;
 	target: Target;
 	hud!: HUD;
+	errorMessages: IRenderLayer;
 
 	wantedConfigurations: InsectType[][];
 
@@ -184,6 +185,8 @@ export class Game extends Container {
 		for (let i = 0; i < options.level.additional; i++) {
 			this.spawnInsect();
 		}
+
+		this.errorMessages = this.addChild(new RenderLayer());
 	}
 
 	start() {
@@ -267,10 +270,9 @@ export class Game extends Container {
 	webCollect(polygon: Polygon) {
 		engine().audio.playSound("WebCollect");
 
-		this.webs.addChild(new Web({ polygon }));
 		const collectedInsects = [];
 		for (const insect of this.insects.children) {
-			if (polygon.contains(insect.x, insect.y)) {
+			if (!insect.isDead && polygon.contains(insect.x, insect.y)) {
 				insect.collect();
 				collectedInsects.push(insect.type);
 			}
@@ -288,6 +290,38 @@ export class Game extends Container {
 				engine().audio.playSound("InventoryCollect2");
 			}, 500);
 		}
+
+		let message = "";
+		if (matchingIndex < 0 && combination.length > 0) {
+			if (
+				this.hud.blueprints.children.every(
+					(blueprint) =>
+						blueprint.combination.length > combination.length,
+				)
+			) {
+				message = "Not enough insects!";
+			} else if (
+				this.hud.blueprints.children.every(
+					(blueprint) =>
+						blueprint.combination.length < combination.length,
+				)
+			) {
+				message = "Too many insects!";
+			} else if (collectedInsects.length == 1) {
+				message = "Wrong insect!";
+			} else {
+				message = "Wrong insects!";
+			}
+		}
+
+		this.webs.addChild(
+			new Web({
+				polygon,
+				message,
+				messageLayer: this.errorMessages,
+			}),
+		);
+
 		if (this.hud.blueprints.children.every((b) => b.isComplete)) {
 			(engine().navigation.currentScreen as GameScreen).win();
 		}
