@@ -314,9 +314,7 @@ export class Game extends Container {
 			for (const type of blueprint.insectTypes) {
 				this.insectsNeededByType[type]--;
 			}
-			// setTimeout(() => {
 			engine().audio.playSound("InventoryCollect2");
-			// }, 500);
 		}
 
 		if (

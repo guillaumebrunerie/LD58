@@ -186,7 +186,7 @@ export class GameScreen extends Container {
 					engine().audio.playSound("Click");
 				});
 			}
-		}, 1000);
+		}, 500);
 	}
 
 	nextLevel() {
