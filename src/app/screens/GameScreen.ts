@@ -161,11 +161,12 @@ export class GameScreen extends Container {
 		}
 		this.hasWon = true;
 		setTimeout(() => {
+			const isLastLevel = this.level == levels.length - 1;
 			engine().audio.playSound("CompleteLevel");
 			this.nextLevelButton = this.addChild(
 				new FancyButton({
 					text: new Label({
-						text: `Next Level`,
+						text: isLastLevel ? "Congratulations!" : `Next Level`,
 						style: {
 							fontFamily: "SueEllenFrancisco",
 							fill: "white",
@@ -176,11 +177,15 @@ export class GameScreen extends Container {
 				}),
 			);
 			this.positionNextLevelButton();
-			this.nextLevelButton.on("pointertap", () => {
-				this.nextLevelButton?.destroy();
-				this.nextLevel();
-				engine().audio.playSound("Click");
-			});
+			if (isLastLevel) {
+				this.nextLevelButton.enabled = false;
+			} else {
+				this.nextLevelButton.on("pointertap", () => {
+					this.nextLevelButton?.destroy();
+					this.nextLevel();
+					engine().audio.playSound("Click");
+				});
+			}
 		}, 1000);
 	}
 
