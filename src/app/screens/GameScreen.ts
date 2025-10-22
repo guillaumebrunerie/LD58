@@ -154,7 +154,12 @@ export class GameScreen extends Container {
 	}
 
 	nextLevelButton?: FancyButton;
+	hasWon = false;
 	win() {
+		if (this.hasWon) {
+			return;
+		}
+		this.hasWon = true;
 		setTimeout(() => {
 			engine().audio.playSound("CompleteLevel");
 			this.nextLevelButton = this.addChild(

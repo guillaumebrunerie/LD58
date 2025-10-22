@@ -62,6 +62,7 @@ export class TutorialScreen extends Container {
 	}
 
 	nextPage() {
+		engine().audio.playSound("Click");
 		if (this.pageIndex >= instructions.length) {
 			engine().navigation.showScreen(GameScreen);
 			return;
