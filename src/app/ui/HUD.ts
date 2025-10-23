@@ -292,18 +292,24 @@ export class HUD extends Container {
 			engine().audio.playSound("Click");
 			engine().navigation.showScreen(GameScreen);
 		});
-		this.restartButtonContainer.addChild(
-			new Label({
-				y: 120,
-				text: `Restart`,
-				style: {
-					fontFamily: "SueEllenFrancisco",
-					fill: "white",
-					// stroke: { color: "black", width: 6 },
-					fontSize: 70,
-				},
+		const restartText = this.restartButtonContainer.addChild(
+			new FancyButton({
+				text: new Label({
+					y: 120,
+					text: `Restart`,
+					style: {
+						fontFamily: "SueEllenFrancisco",
+						fill: "white",
+						// stroke: { color: "black", width: 6 },
+						fontSize: 70,
+					},
+				}),
 			}),
 		);
+		restartText.on("pointertap", () => {
+			engine().audio.playSound("Click");
+			engine().navigation.showScreen(GameScreen);
+		});
 	}
 
 	resize(width: number, height: number) {
