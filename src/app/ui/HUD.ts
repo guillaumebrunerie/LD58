@@ -66,25 +66,33 @@ export class BlueprintItem extends Container {
 		});
 	}
 
-	crossOut() {
+	cross: Graphics | null = null;
+	crossOut(crossOut: boolean) {
 		if (this.isComplete) {
 			return;
 		}
-		const d = 40;
-		const cross = this.addChild(
-			new Graphics()
-				.moveTo(-d, -d)
-				.lineTo(d, d)
-				.moveTo(-d, d)
-				.lineTo(d, -d)
-				.stroke({
-					color: "#DD0000",
-					cap: "round",
-					width: 10,
-				}),
-		);
-		cross.alpha = 0;
-		this.animate(cross, { alpha: 1 }, { duration: 0.5 });
+		if (!crossOut) {
+			this.cross?.destroy();
+			this.cross = null;
+			return;
+		}
+		if (!this.cross) {
+			const d = 40;
+			this.cross = this.addChild(
+				new Graphics()
+					.moveTo(-d, -d)
+					.lineTo(d, d)
+					.moveTo(-d, d)
+					.lineTo(d, -d)
+					.stroke({
+						color: "#DD0000",
+						cap: "round",
+						width: 10,
+					}),
+			);
+			this.cross.alpha = 0;
+			this.animate(this.cross, { alpha: 1 }, { duration: 0.5 });
+		}
 	}
 }
 
@@ -200,10 +208,10 @@ export class Blueprint extends Container {
 		}
 	}
 
-	crossOutType(type: InsectType) {
+	crossOutType(type: InsectType, crossOut: boolean) {
 		for (const item of this.items) {
 			if (item.type == type) {
-				item.crossOut();
+				item.crossOut(crossOut);
 			}
 		}
 	}
@@ -343,9 +351,9 @@ export class HUD extends Container {
 		}
 	}
 
-	crossOutType(type: InsectType) {
+	crossOutType(type: InsectType, crossOut = true) {
 		for (const blueprint of this.blueprints.children) {
-			blueprint.crossOutType(type);
+			blueprint.crossOutType(type, crossOut);
 		}
 	}
 }

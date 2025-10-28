@@ -262,6 +262,8 @@ export class Game extends Container {
 				).length
 			) {
 				this.hud.crossOutType(type);
+			} else {
+				this.hud.crossOutType(type, false);
 			}
 		}
 	}
